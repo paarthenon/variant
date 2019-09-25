@@ -1,4 +1,4 @@
-# Variant
+# Variant ![npm (scoped)](https://img.shields.io/npm/v/@paarth/variant) ![NPM](https://img.shields.io/npm/l/@paarth/variant)
 Variant types (a.k.a. Discriminated Unions) in TypeScript.
 
 I wanted simple variant types to:
