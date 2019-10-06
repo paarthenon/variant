@@ -1,22 +1,41 @@
+export * from './nominal';
+
 const emptyFunc = () => ({});
 
 type Func = (...args: any[]) => any;
 type FuncyDictionary = {[variant:string]: Func};
-type OutputType<T> = {outputType: T};
 
+type Outputs<K, T> = {
+    outputKey: K
+    outputType: T
+};
+
+/**
+ * Useful in generating friendly types. Intersections are rendered as the type of the intersection, not as A & B.
+ */
+type Identity<T> = {} & {
+    [P in keyof T]: T[P]
+};
+
+// Consider calling this ObjectEntry or Entry. Also Pair? No, more like KVPair. Mapping?
+export type TypeExt<K extends string, T extends string> = K extends keyof infer LitK ? {[P in keyof LitK]: T} : never;
+
+// type TypedOutput
 export function variantFactory<K extends string>(key: K) {
-    // The actual partial object that is patched into the result of the eventual payload function.
-    type TypeExt<T> = {[key in typeof key]: T};
 
+    // type 
     // Type fuckery ensues.
-    function variantFunc<T extends string>(tag: T): (() => TypeExt<T>) & OutputType<T>
-    function variantFunc<T extends string, F extends Func>(tag: T, func?: F): ((...args: Parameters<F>) => (ReturnType<F> & TypeExt<T>)) & OutputType<T>;
+    function variantFunc<T extends string>(tag: T): (() => TypeExt<K, T>) & Outputs<K, T>
+    function variantFunc<T extends string, F extends Func >(tag: T, func: F):((...args: Parameters<F>) => Identity<TypeExt<K, T> & ReturnType<F>>) & Outputs<K, T>;
     function variantFunc<T extends string, F extends Func>(tag: T, func?: F) {
         let maker = (...args: Parameters<F>) => ({
             [key]: tag,
             ...(func || emptyFunc)(...args),
         })
-        const outputType = {outputType: tag};
+        const outputType = {
+            outputKey: key,
+            outputType: tag,
+        };
         Object.assign(maker, outputType);
         return maker as typeof maker & typeof outputType;
     }
@@ -28,8 +47,6 @@ export function variantFactory<K extends string>(key: K) {
 export const variantOn = variantFactory;
 
 export const variant = variantFactory('type');
-export const action = variant;
-export const message = variant;
 export default variant;
 
 export type Values<T> = T[keyof T];
