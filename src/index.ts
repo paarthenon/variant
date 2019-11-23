@@ -56,9 +56,13 @@ export type FunctionsOnly<T> = {
     [K in keyof T]: T[K] extends Func ? T[K] : never;
 }
 
-export function exhaust(x: never, typeProperty = 'type'): never {
+export function exhaust(x: never, options = {key: 'type', throw: false}) {
     // Should never be called. If it ever *does* happen to be called it'll dump the type string.
     // I find this to be a reasonable balance between avoiding data in the logs and providing
     // useful debugging info.
-    throw new Error(`Switch does not handle all cases. Failed case:${(x as any)[typeProperty]}`);
+
+    const msg = `Switch does not handle all cases. Failed case:${(x as any)[options.key]}`;
+    if (options.throw) {
+        throw new Error(msg);
+    }
 }
