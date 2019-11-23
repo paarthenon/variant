@@ -25,6 +25,18 @@ export module Action {
     export const AddTodo = action('ADD_TODO', (msg: string, dueDate?: Date) => ({msg, dueDate}));
     export type AddTodo = ReturnType<typeof AddTodo>; // These are optional but convenient. 
     // WOKE NOTE: The const is the type constructor, the type describes the generated object
+
+    export const UpdateTodo = action('UPDATE_TODO', fields<{
+        id: number;
+        msg: string;
+        dueDate?: Date;
+    }>().default({
+        // if the update message doesn't specify a task
+        dueDate: new Date(),
+    }));
+
+    export const DeleteTodo = action('DELETE_TODO', fields<{id: number}>({id: -1}))
+
 }
 export type Action = Variant<typeof Action>; // also optional but convenient. 
 ```
