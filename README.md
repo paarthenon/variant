@@ -30,16 +30,23 @@ export module Action {
         id: number;
         msg: string;
         dueDate?: Date;
-    }>().default({
-        // if the update message doesn't specify a task
-        dueDate: new Date(),
-    }));
+    }>());
 
     export const DeleteTodo = action('DELETE_TODO', fields<{id: number}>({id: -1}))
 
 }
-export type Action = Variant<typeof Action>; // also optional but convenient. 
+export type Action = Variant<typeof Action>;
 ```
+The `export type Action = Variant<typeof Action>;` line at the bottom takes the place of the whole
+```typescript
+export type Action =
+    | Action.Clear
+    | Action.AddTodo
+    | Action.UpdateTodo
+    | Action.DeleteTodo
+;
+```
+mess. It will also *automatically update* as you add new entries to the `Action` module.
 
 reducers.ts
 
@@ -68,6 +75,36 @@ export function someReducer(state = initState, action: Action) {
     }
 }
 ```
+### Boilerplate
+
+This is **far** less boilerplate than would normally be necessary but if you're like me and still get irritated about having to write the repetitive type declaration for each message here are a couple of snippets I wrote to ease the process. These are in vs-code's format.
+
+	"Variant": {
+		"prefix": [
+			"variant-type",
+			"vt"
+		],
+		"body": [
+			"export const ${1} = ${3:variant}('${2:TYPE}');",
+			"export type $1 = ReturnType<typeof $1>;",
+			""
+		],
+		"description": "A single specific variant's boilerplate."
+	},
+
+and the module
+
+	"VariantModule": {
+		"prefix": "variant-module",
+		"body": [
+			"export module $1 {$2",
+			"}",
+			"export type $1 = Variant<typeof $1>;",
+			""
+		],
+		"description": "Initialize a module for variants"
+	}
+
 ### Q & A
 
 ### Why pun the names?
