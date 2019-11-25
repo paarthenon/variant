@@ -43,7 +43,7 @@ export type Action =
 ```
 mess. It will also automatically update as you add new entries to the `Action` module.
 
-Note unlike other libraries viewing Action.UpdateTodo and the module will include the specific type information. 
+Note unlike some other libraries viewing Action.UpdateTodo and the module will include the specific type information. 
 
 ![Type Signature of a single message](docs/intellisense.png)
 
