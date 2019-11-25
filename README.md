@@ -91,10 +91,69 @@ Under the hood this claims a symbol exists on the first type parameter (it does 
 
 Nominals are purely compile time tagged types. Variants are full blown run time switchable objects. They work together really well. Using variants with nominally typed identity fields is pretty swag. Being able to distinguish a `Guid` from a name at a type level feels great.
 
+### Splitting the actions among files.
+
+The `Variant<>` type helper is producing a union of object literal types. Unions can themselves be put into unions. It is entirely possible to describe a full series of events as:
+
+```typescript
+export type ServerEvent =
+    | UserEvent
+    | ChannelEvent
+    | ControlEvent
+
+export module UserEvent { /***/ }
+export type UserEvent = Variant<typeof UserEvent>;
+
+export module ChannelEvent { /***/ }
+export type ChannelEvent = Variant<typeof ChannelEvent>;
+
+export module ControlEvent { /***/ }
+export type ControlEvent = Variant<typeof ControlEvent>;
+```
+
+These modules can also be across several files. The main advantage of creating a wrapper module is that you can describe itself and its type in one go. However nothing stops a coder from doing something like this:
+
+```typescript
+import * as UserEvent from './events/user';
+import * as ChannelEvent from './events/channel';
+import * as ControlEvent from './events/control';
+
+export type ServerEvent =
+    | Variant<typeof UserEvent>
+    | Variant<typeof ChannelEvent>
+    | Variant<typeof ControlEvent>
+
+```
+
+The `export type UserEvent = Variant<typeof UserEvent>;` could still be used in this file if desired.
+
+I find this to be very helpful in organizing large quantities of subtypes.
+
+It will also help manage more modular reducers. I can write
+
+```typescript
+export function reduceChannel(state = defaultChannel, event: ChannelEvent): ChannelState { /***/ }
+```
+
+Note also that these do not need to be internal module definitions. I prefer them this way because of the file organization and constructor/type punning but the `Variant<>` helper type will work on any object-like structure containing functions. 
+
+### Exhaustiveness Checking
+
+OCaml and other functional languages will warn you when there's a potential pattern match you haven't thought of. Typescript can't be quite so advanced, but it can definitely warn you when you've forgotten a case in your switch statement.
+ 
+The line in question is 
+```typescript
+default: return exhaust(action);
+```
+If we weren't handling all cases and it were possible to fall through to the default case then a type error would be raised because `exhaust(x)` is incompatible with anything besides `never`. If we somehow actually execute this code (say from javascript land) an `Error` can optionally be thrown with the type tag of the variant included in the message.
+
+
 ### Boilerplate
 
 This is **far** less boilerplate than would normally be necessary but if you're like me and still get irritated about having to write the repetitive type declaration for each message here are a couple of snippets I wrote to ease the process. These are in vs-code's format.
 
+
+```json
 	"Variant": {
 		"prefix": [
 			"variant-type",
@@ -106,10 +165,12 @@ This is **far** less boilerplate than would normally be necessary but if you're 
 			""
 		],
 		"description": "A single specific variant's boilerplate."
-	},
+    },
+```
 
 and the module
 
+```json
 	"VariantModule": {
 		"prefix": "variant-module",
 		"body": [
@@ -119,7 +180,9 @@ and the module
 			""
 		],
 		"description": "Initialize a module for variants"
-	}
+    }
+    
+```
 
 ### Q & A
 
@@ -141,10 +204,3 @@ const addAction: Action.AddTodo = {
 }
 ```
 
-### How does it check we handled all cases?
- 
-The line in question is 
-```typescript
-default: return exhaust(action);
-```
-If we weren't handling all cases and it were possible to fall through to the default case then a type error would be raised because `exhaust(x)` is incompatible with anything besides `never`. If we somehow actually execute this code (say from javascript land) an `Error` can optionally be thrown with the type tag of the variant included in the message.
