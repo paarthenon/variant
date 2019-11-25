@@ -129,7 +129,7 @@ The `export type UserEvent = Variant<typeof UserEvent>;` could still be used in 
 
 I find this to be very helpful in organizing large quantities of subtypes.
 
-It will also help manage more modular reducers. I can write
+It will also help manage more modular reducers. I can write a reducer like this and I will satisfy exhaustiveness checking as soon as I handle all the `ChannelEvent`s
 
 ```typescript
 export function reduceChannel(state = defaultChannel, event: ChannelEvent): ChannelState { /***/ }
