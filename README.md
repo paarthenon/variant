@@ -1,21 +1,16 @@
 # Variant [![Build Status](https://travis-ci.com/paarthenon/variant.svg?branch=master)](https://travis-ci.com/paarthenon/variant) ![npm (scoped)](https://img.shields.io/npm/v/@paarth/variant) ![NPM](https://img.shields.io/npm/l/@paarth/variant)
 Variant types (a.k.a. Discriminated Unions) in TypeScript.
 
-I wanted simple variant types to:
- * express type hierarchies with much less boilerplate and tedium.
- * do OCaml-style pattern matching and destructuring.
- * introduce some nominal typing into TypeScript where it would add clarity.
- * require no implicit dependencies meaning no string matching or manual casts.
+I wanted better variants. I want to express type hierarchies that I can **dispatch on at runtime** that still have compile time information that typescript can use to automatically **narrow the types at compile**. I don't want to have to *cast*, write my own user defined type guards, or repeat a string literal without having autocomplete and type safety to guide me. I want **nominal types** to express that this object with the same structure of another are actually different things.
 
-## **B**ottom **L**ine **U**p **F**ront
+Enter this library.
 
-This is the whole process and it's all type safe.
+This is useful for protocol message processing, action creators, domain driven design, and general type fuckery. However, most of you likely use redux so....
 
-Let's say you use redux.
-
-actions.ts
+## Let's say you use Redux
 
 ```typescript
+// actions.ts
 import action, {Variant} from '@paarth/variant';
 
 export module Action {
@@ -46,11 +41,21 @@ export type Action =
     | Action.DeleteTodo
 ;
 ```
-mess. It will also *automatically update* as you add new entries to the `Action` module.
+mess. It will also automatically update as you add new entries to the `Action` module.
 
-reducers.ts
+Note unlike other libraries viewing Action.UpdateTodo and the module will include the specific type information. 
+
+![Type Signature of a single message](docs/intellisense.png)
+
+As will the module: 
+
+![Type Signature of a module](docs/module_intellisense.png)
+
+Meaning the reducers will work with typescript's native switch statement.
+
 
 ```typescript
+// reducers.ts
 import {exhaust} from '@paarth/variant';
 import {Action} from './actions';
 
@@ -75,6 +80,17 @@ export function someReducer(state = initState, action: Action) {
     }
 }
 ```
+
+### Nominal
+
+Typescript has a [structural](https://www.typescriptlang.org/docs/handbook/type-compatibility.html) type system. This is useful in many different ways but there are some cases where it falls short. Sometimes you will have two objects that have the same structure but don't mean or do the same thing. [Nominal](https://www.wikiwand.com/en/Nominal_type_system) typing instead uses explicit type relationships to evaluate assignability. Sometimes that's real darn useful. Enter `type UserId = Nominal<number, 'userId'>`. Sometimes teammates would conflate a user's ID with the session used to reference the user in the active users collection. Making these different types resolved this issue.
+
+![Nominal typing in action](docs/nominal.png);
+
+Under the hood this claims a symbol exists on the first type parameter (it does not. This is purely at compile time).
+
+Nominals are purely compile time tagged types. Variants are full blown run time switchable objects. They work together really well. Using variants with nominally typed identity fields is pretty swag. Being able to distinguish a `Guid` from a name at a type level feels great.
+
 ### Boilerplate
 
 This is **far** less boilerplate than would normally be necessary but if you're like me and still get irritated about having to write the repetitive type declaration for each message here are a couple of snippets I wrote to ease the process. These are in vs-code's format.
@@ -131,4 +147,4 @@ The line in question is
 ```typescript
 default: return exhaust(action);
 ```
-If we weren't handling all cases and it were possible to fall through to the default case then a type error would be raised because `exhaust(x)` is incompatible with anything besides `never`. If we somehow actually execute this code (say from javascript land) an `Error` will be thrown with the type tag of the variant included in the message.
+If we weren't handling all cases and it were possible to fall through to the default case then a type error would be raised because `exhaust(x)` is incompatible with anything besides `never`. If we somehow actually execute this code (say from javascript land) an `Error` can optionally be thrown with the type tag of the variant included in the message.
