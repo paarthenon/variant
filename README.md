@@ -43,7 +43,7 @@ export type Action =
 ```
 mess. It will also automatically update as you add new entries to the `Action` module.
 
-Note unlike other libraries viewing Action.UpdateTodo and the module will include the specific type information. 
+Note unlike some other libraries viewing Action.UpdateTodo and the module will include the specific type information. 
 
 ![Type Signature of a single message](docs/intellisense.png)
 
@@ -129,7 +129,7 @@ The `export type UserEvent = Variant<typeof UserEvent>;` could still be used in 
 
 I find this to be very helpful in organizing large quantities of subtypes.
 
-It will also help manage more modular reducers. I can write
+It will also help manage more modular reducers. I can write a reducer like this and I will satisfy exhaustiveness checking as soon as I handle all the `ChannelEvent`s
 
 ```typescript
 export function reduceChannel(state = defaultChannel, event: ChannelEvent): ChannelState { /***/ }
