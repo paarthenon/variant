@@ -1,6 +1,6 @@
 {
   "name": "@paarth/variant",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Variant types (a.k.a. Discriminated Unions) in TypeScript",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,6 +28,6 @@
   },
   "homepage": "https://github.com/paarthenon/variant#readme",
   "devDependencies": {
-    "typescript": "^3.6.3"
+    "typescript": "^3.7.2"
   }
 }
