@@ -1,4 +1,4 @@
-import {Identity, Func, identityFunc, FuncObject, ReturnTypes, Functions} from './util';
+import {Identity, Func, identityFunc, FuncObject, ReturnTypes, Functions, ExtractOfUnion} from './util';
 
 // Consider calling this ObjectEntry or Entry. Also Pair? No, more like KVPair. Mapping?
 export type TypeExt<K extends string, T> = K extends keyof infer LitK ? {[P in keyof LitK]: T} : never;
@@ -16,7 +16,6 @@ export type VariantCreator<
     K extends string = 'type'>
 = ((...args: Args) => Identity<WithProperty<K, T> & Return>) & Outputs<K, T>;
 
-// type TypedOutput
 export function variantFactory<K extends string>(key: K) {
 
     // Type fuckery ensues.
@@ -54,4 +53,34 @@ export function variantList<T extends VariantCreator<any, any, any, any>>(varian
         ...o,
         [v.outputType]: v,
     }), Object.create(null))
+}
+
+export type Handler<T> = {
+    [P in keyof T]: (variant: T[P]) => any
+}
+export type VariantsOfUnion<T extends WithProperty<K, string>, K extends string = 'type'> = {
+    [P in T[K]]: ExtractOfUnion<T, P, K>
+}
+export function match<
+    T extends WithProperty<K, string>,
+    H extends Partial<Handler<VariantsOfUnion<T, K>>>,
+    K extends string = 'type'
+> (
+    obj: T,
+    handler: H,
+    typeKey?: K,
+): H extends Handler<VariantsOfUnion<T, K>> ? ReturnType<H[T[K]]> : ReturnType<Functions<H>[keyof H]> | undefined {
+    const typeString = obj[typeKey ?? 'type' as K];
+    return handler[typeString]?.(obj as any);
+}
+
+type VariantObj = {[tag: string]: VariantCreator<string, any>};
+export type AugmentVariant<T extends VariantObj, U> = {
+    [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & Outputs<T[P]['outputKey'], T[P]['outputType']>
+}
+export function augment<T extends VariantObj, F extends Func>(variantDef: T, f: F) {
+    return Object.keys(variantDef).reduce((acc, key) => ({
+        ...acc,
+        [key]: (...args: any[]) => (Object.assign({}, f(), variantDef[key](...args)))
+    }), {} as AugmentVariant<T, ReturnType<F>>)
 }

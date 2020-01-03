@@ -1,4 +1,4 @@
-import {Outputs} from "./variant";
+import {Outputs, WithProperty} from "./variant";
 import {Identity} from "./util";
 
 /**
@@ -86,4 +86,8 @@ export function fields<T>(defaults: Partial<T> = {}) {
  */
 export function payload<T>() {
     return (payload: T) => ({payload})
+}
+
+export function property<K extends string = 'payload'>(key: K) {
+    return <T> () => (payload: T) => ({[key]: payload}) as K extends keyof infer KLiteral ? WithProperty<keyof KLiteral & string, T> : never;
 }
