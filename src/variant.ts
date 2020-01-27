@@ -44,11 +44,22 @@ type Creators<T extends FuncObject, PropName extends string = 'type'> = {
 }
 
 export type VariantsOf<T, PropName extends string ='type'> = ReturnTypes<Creators<Functions<T>, PropName>>;
-export type Oneof<T> = T[keyof T];
+export type OneOf<T> = T[keyof T];
 
 type FilterVariants<T, Type extends string, K extends string = any> = T extends VariantCreator<Type, any, any, K> ? T : never;
 
 export function variantList<T extends VariantCreator<any, any, any, any>>(variants: Array<T>): {[P in T['outputType']]: FilterVariants<T, P>} {
+    return variants.reduce((o, v) => ({
+        ...o,
+        [v.outputType]: v,
+    }), Object.create(null))
+}
+
+/**
+ * Unused at the moment. Intended to develop the idea of an "ordered" variant.
+ * @param variants 
+ */
+function progression<T extends VariantCreator<any, any, any, any>>(variants: Array<T>): {[P in T['outputType']]: FilterVariants<T, P>} {
     return variants.reduce((o, v) => ({
         ...o,
         [v.outputType]: v,
@@ -63,15 +74,24 @@ export type VariantsOfUnion<T extends WithProperty<K, string>, K extends string 
 }
 export function match<
     T extends WithProperty<K, string>,
-    H extends Partial<Handler<VariantsOfUnion<T, K>>>,
+    H extends Handler<VariantsOfUnion<T, K>>,
     K extends string = 'type'
 > (
     obj: T,
     handler: H,
     typeKey?: K,
-): H extends Handler<VariantsOfUnion<T, K>> ? ReturnType<H[T[K]]> : ReturnType<Functions<H>[keyof H]> | undefined {
+): ReturnType<H[T[K]]>{
     const typeString = obj[typeKey ?? 'type' as K];
     return handler[typeString]?.(obj as any);
+}
+
+export type Lookup<T> = {
+    [P in keyof T]: any
+}
+
+export function lookup<T extends WithProperty<K, string>, L extends Lookup<VariantsOfUnion<T, K>>, K extends string = 'type'>(obj: T, handler: L, typeKey?: K): ReturnType<L[T[K]]> {
+    const typeString = obj[typeKey ?? 'type' as K];
+    return handler[typeString];
 }
 
 type VariantObj = {[tag: string]: VariantCreator<string, any>};

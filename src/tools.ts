@@ -91,3 +91,8 @@ export function payload<T>() {
 export function property<K extends string = 'payload'>(key: K) {
     return <T> () => (payload: T) => ({[key]: payload}) as K extends keyof infer KLiteral ? WithProperty<keyof KLiteral & string, T> : never;
 }
+
+export function data<T>(x: T) {
+    return (override?: T) => ({...x, ...(override != undefined && override)});
+}
+

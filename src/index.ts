@@ -8,9 +8,10 @@ export {
     variantList,
     variantFactory,
     VariantsOf,
-    Oneof,
+    OneOf,
     WithProperty,
     match,
+    lookup,
     Handler,
     VariantsOfUnion,
     AugmentVariant,
@@ -19,6 +20,7 @@ export {
 
 export {
     fields,
+    data,
     payload,
     property,
     exhaust,

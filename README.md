@@ -1,7 +1,7 @@
 # Variant [![Build Status](https://travis-ci.com/paarthenon/variant.svg?branch=master)](https://travis-ci.com/paarthenon/variant) ![npm (scoped)](https://img.shields.io/npm/v/@paarth/variant) ![NPM](https://img.shields.io/npm/l/@paarth/variant)
-Variant types (a.k.a. Discriminated Unions) in TypeScript.
+> Variant types (a.k.a. Discriminated Unions) in TypeScript.
 
-I wanted better variants. I want to express type hierarchies that I can **dispatch on at runtime** that still have compile time information that typescript can use to automatically **narrow the types at compile**. I don't want to have to *cast*, write my own user defined type guards, or repeat a string literal without having autocomplete and type safety to guide me. I want **nominal types** to express that this object with the same structure of another are actually different things.
+Variant is a set of tools for describing and working with flexible domain models. I want to express type hierarchies that I can **dispatch on at runtime** that still have compile time information that typescript can use to automatically **narrow the types at compile**. I don't want to have to *cast*, write my own user defined type guards, or repeat a string literal without having autocomplete and type safety to guide me. I want **nominal types** to express that this object with the same structure of another are actually different things.
 
 Enter this library.
 
@@ -10,40 +10,40 @@ This is useful for protocol message processing, action creators, domain driven d
 ## Let's say you use Redux
 
 ```typescript
-// actions.ts
-import action, {Variant} from '@paarth/variant';
+// actions.ts (compare to https://redux.js.org/basics/example)
+let nextTodoId = 0;
+export const Actions = variantList([
+    variant('addTodo ', (text: string) => ({
+        id: nextTodoId++,
+        text,
+    })),
+    variant('toggleTodo', fields<{id: number}>()),
+    variant('setVisibilityFilter', payload<VisibilityFilters>()), 
+]);
 
-export module Action {
-    export const Clear = action('CLEAR');
-    export type Clear = ReturnType<typeof Clear>; 
+export type Actions = VariantsOf<typeof Actions>;
+export type Action = OneOf<Actions>;
 
-    export const AddTodo = action('ADD_TODO', (msg: string, dueDate?: Date) => ({msg, dueDate}));
-    export type AddTodo = ReturnType<typeof AddTodo>; // These are optional but convenient. 
-    // WOKE NOTE: The const is the type constructor, the type describes the generated object
-
-    export const UpdateTodo = action('UPDATE_TODO', fields<{
-        id: number;
-        msg: string;
-        dueDate?: Date;
-    }>());
-
-    export const DeleteTodo = action('DELETE_TODO', fields<{id: number}>({id: -1}))
-
-}
-export type Action = Variant<typeof Action>;
+export const VisibilityFilters = strEnum([
+    'SHOW_ALL',
+    'SHOW_COMPLETED',
+    'SHOW_ACTIVE',
+]);
+export type VisibilityFilters = keyof typeof VisibilityFilters;
 ```
-The `export type Action = Variant<typeof Action>;` line at the bottom takes the place of the whole
+**This is all type safe.**
+
+The type definitions at the bottom takes the place of the whole
 ```typescript
 export type Action =
-    | Action.Clear
-    | Action.AddTodo
-    | Action.UpdateTodo
-    | Action.DeleteTodo
+    | Actions.addTodo
+    | Actions.toggleTodo
+    | Actions.setVisibilityFilter
 ;
 ```
-mess. It will also automatically update as you add new entries to the `Action` module.
+mess you would normally have. Notably you no longer need to maintain the bookkeeping of this value when you add a new `Action`. It will automatically update.
 
-Note unlike some other libraries viewing Action.UpdateTodo and the module will include the specific type information. 
+Note unlike some other libraries viewing the types involved will provide specific and clear info.
 
 ![Type Signature of a single message](docs/intellisense.png)
 
@@ -51,35 +51,46 @@ As will the module:
 
 ![Type Signature of a module](docs/module_intellisense.png)
 
-Meaning the reducers will work with typescript's native switch statement.
+Meaning the reducers will work with typescript's native switch statement. 
 
+> **Note**: I changed the name of the setVisibilityFilter action's property from `filter` to `payload` just to demonstrate the FSA-compliant helper function included in this library.
+
+However, you don't *need* to use TypeScript's switch statement. You can leverage the `match` utility to elegantly express the same behavior. 
 
 ```typescript
-// reducers.ts
-import {exhaust} from '@paarth/variant';
-import {Action} from './actions';
-
-const initState = {
-    todos: [],
-};
-
-export function someReducer(state = initState, action: Action) {
-    switch (action.type) {
-        case 'CLEAR': // This is limited to 'CLEAR' and 'ADD_TODO', the type tags in actions.
-            return initState;
-        case 'ADD_TODO':
-            const {msg, dueDate} = action; // type safe. The compiler sees action as
-            // {type: 'ADD_TODO', msg: string, dueDate: Date | undefined}
-            return {
-                todos: [
-                    ...state.todos,
-                    {msg, dueDate},
-                ],
+// reducers/todos.ts (compare to https://redux.js.org/basics/example/#reducerstodosjs)
+const todos = (state = [] as Todo[], action: Action) => {
+    return match(action, {
+        addTodo: ({id, text}) => [
+            ...state,
+            {
+                id,
+                text,
+                completed: false,
             }
-        default: return exhaust(action); // If we miss a case, this line will error
-    }
+        ],
+        toggleTodo: ({id}) => state.map(todo => todo.id === id ? {...todo, completed: !todo.completed} : todo),
+        setVisibilityFilter: () => state,
+    });
 }
 ```
+
+This is also type safe. You will be warned if you have forgotten a case in the handler object and the return type of match is the union of the return types of its various branches.
+
+## How does it work?
+
+This needs to be fleshed out. For now, here's a quick rundown
+
+ - You create an instance of a variant by calling one of its tag constructors (the `Actions.addTodo()` function is the tag constructor (redux folks, think action creators))
+ - the `variant` function is a factory function to *generate* tag constructors. 
+    - It takes in a type string and a function that handles the logic of creating an object based on inputs.
+    - The object gets the `type` property merged into it, the compiler gets updated type info.
+    - So `variant('STR', (...args: Params) => ReturnVal);` gives you a function with the signature `(...args: Params) => ReturnVal & {type: 'STR'}`.
+ - Now these constructors need to be grouped together to be meaningful in context.
+    - Well, an object works. And it totally does, see the Q&A at the bottom. But if you don't have a meaningful reason to distinguish the name of the action creator from the `type` value of the object it generates then it feels *slightly* tedious.
+    - Enter variantList, which just takes an array and turns it into an object by extracting the type from each variant and using it as the property name.
+ - The `VariantsOf<T>` type extracts out the action creator return types (so the type `Actions['addTodo']` describes the resulting object's interface, not the function that created it)
+ - The `OneOf<T>` type is essentually `Values<T>`. Given an object it will generate the union of the types of the values of said object.
 
 ### Nominal
 
@@ -93,49 +104,47 @@ Nominals are purely compile time tagged types. Variants are full blown run time 
 
 ### Splitting the actions among files.
 
-The `Variant<>` type helper is producing a union of object literal types. Unions can themselves be put into unions. It is entirely possible to describe a full series of events as:
+Variants can be easily manipulated. You destructure one like any other object.
 
 ```typescript
-export type ServerEvent =
-    | UserEvent
-    | ChannelEvent
-    | ControlEvent
-
-export module UserEvent { /***/ }
-export type UserEvent = Variant<typeof UserEvent>;
-
-export module ChannelEvent { /***/ }
-export type ChannelEvent = Variant<typeof ChannelEvent>;
-
-export module ControlEvent { /***/ }
-export type ControlEvent = Variant<typeof ControlEvent>;
+const {addTodo, completeTodo} = Actions;
 ```
-
-These modules can also be across several files. The main advantage of creating a wrapper module is that you can describe itself and its type in one go. However nothing stops a coder from doing something like this:
+Here's an example of creating multiple "subsets" of a variant by merging select values together.
 
 ```typescript
-import * as UserEvent from './events/user';
-import * as ChannelEvent from './events/channel';
-import * as ControlEvent from './events/control';
+// Assume a variant called 'Attributes' up above that acts as the master list.
 
-export type ServerEvent =
-    | Variant<typeof UserEvent>
-    | Variant<typeof ChannelEvent>
-    | Variant<typeof ControlEvent>
+const FileAttributes = variantList([
+    Attributes.Size,
+    Attributes.URL,
+    Attributes.CreatedDate,
+    Attributes.UpdatedDate,
+]);
+type FileAttributes = VariantsOf<typeof MovieAttributes>;
+
+const MovieAttributes = variantList([
+    Attributes.Duration,
+    Attributes.Resolution,
+    Attributes.Bitrate,
+]);
+type MovieAttributes = VariantsOf<typeof MovieAttributes>;
 
 ```
-
-The `export type UserEvent = Variant<typeof UserEvent>;` could still be used in this file if desired.
 
 I find this to be very helpful in organizing large quantities of subtypes.
 
-It will also help manage more modular reducers. I can write a reducer like this and I will satisfy exhaustiveness checking as soon as I handle all the `ChannelEvent`s
+It will also help manage more modular reducers. I can write a reducer like this and I will satisfy exhaustiveness checking as soon as I handle all the possibilities in the subtype alone.
+
+I could just as easily construct the merged object
 
 ```typescript
-export function reduceChannel(state = defaultChannel, event: ChannelEvent): ChannelState { /***/ }
+export const Attributes = {
+    ...FileAttributes,
+    ...MovieAttributes,
+    ...etc
+}
+export type Attributes = VariantsOf<typeof Attributes>
 ```
-
-Note also that these do not need to be internal module definitions. I prefer them this way because of the file organization and constructor/type punning but the `Variant<>` helper type will work on any object-like structure containing functions. 
 
 ### Exhaustiveness Checking
 
@@ -150,57 +159,49 @@ If we weren't handling all cases and it were possible to fall through to the def
 
 ### Boilerplate
 
-This is **far** less boilerplate than would normally be necessary but if you're like me and still get irritated about having to write the repetitive type declaration for each message here are a couple of snippets I wrote to ease the process. These are in vs-code's format.
-
-
-```json
-	"Variant": {
-		"prefix": [
-			"variant-type",
-			"vt"
-		],
-		"body": [
-			"export const ${1} = ${3:variant}('${2:TYPE}');",
-			"export type $1 = ReturnType<typeof $1>;",
-			""
-		],
-		"description": "A single specific variant's boilerplate."
-    },
-```
-
-and the module
+Here's a snippet that will take the little boilerplate this does require and make it trivial.
 
 ```json
 	"VariantModule": {
-		"prefix": "variant-module",
+		"prefix": ["variant-module", "vm"],
 		"body": [
-			"export module $1 {$2",
-			"}",
-			"export type $1 = Variant<typeof $1>;",
+			"export const $1s = variantList([",
+			"    $2",
+			"]);",
+			"export type $1s = VariantsOf<typeof $1s>;",
+			"export type $1 = OneOf<$1s>;",
 			""
 		],
 		"description": "Initialize a module for variants"
-    }
-    
+	},
 ```
 
 ### Q & A
 
-### Why pun the names?
+### What if I want my variants to have different type values than variable names?
 
-I like to pun the names to make them available in the variable and type namespaces. It feels natural to be able to say the result of `Action.Clear()` is assignable to a variable annotated `: Action.Clear` (which you get for free when you import `Action`). 
-
-This also makes subsets of variants easier to describe. i.e. 
-```typescript
-type SomeActions = Action.Clear | Action.AddTodo;
-```
-and makes for an easy way to safely construct message literals
+No problem. Don't use the `variantList` helper and just make an object:
 
 ```typescript
-const addAction: Action.AddTodo = {
-    type: 'ADD_TODO', // again, type safe! will cause a compiler error if anything else is used.
-    msg: 'feel satisfied about type safe custom literal actions',
-    dueDate: new Date(),
-}
+export const Actions = {
+    addTodo: variant('ADD_TODO ', (text: string) => ({
+        id: nextTodoId++,
+        text,
+    })),
+    toggleTodo: variant('TOGGLE_TODO', fields<{id: number}>()),
+    setVisibilityFilter: variant('SET_VISIBILITY_FILTER', payload<VisibilityFilters>()), 
+};
 ```
 
+### What if I want them at the top level?
+
+Also not a problem.
+
+```typescript
+export const addTodo = variant('ADD_TODO ', (text: string) => ({
+    id: nextTodoId++,
+    text,
+}));
+export const toggleTodo = variant('TOGGLE_TODO', fields<{id: number}>());
+export const setVisibilityFilter = variant('SET_VISIBILITY_FILTER', payload<VisibilityFilters>());
+```
