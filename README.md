@@ -139,8 +139,6 @@ Getting to the "Algebra" of algebraic data types, variants can be mixed and matc
 To make that as easy as possible, try `variantList([ ... ])`.
 
 ```typescript
-import variant, {variantList, VariantsOf, OneOf, fields} from '@paarth/variant';
-
 export const MediaFiles = variantList([
     variant('image', fields<{src: string}>(),
     variant('video', fields<{src: string, duration: number}>()),
@@ -237,7 +235,7 @@ export const Preview: React.FC<{media: MediaFile}>: ({media}) => {
             <ul>
                 <li>src: {media.src}</li>
                 {partialMatch(media, {
-                    video: ({duration}) => <li>duration: {src.duration}</li>
+                    video: ({duration}) => <li>duration: {duration}</li>
                 })
             </ul>
         </div>
