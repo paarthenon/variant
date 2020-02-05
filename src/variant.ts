@@ -72,6 +72,8 @@ export type Handler<T> = {
 export type VariantsOfUnion<T extends WithProperty<K, string>, K extends string = 'type'> = {
     [P in T[K]]: ExtractOfUnion<T, P, K>
 }
+type Defined<T> = T extends undefined ? never : T;
+
 export function match<
     T extends WithProperty<K, string>,
     H extends Handler<VariantsOfUnion<T, K>>,
@@ -84,6 +86,17 @@ export function match<
     const typeString = obj[typeKey ?? 'type' as K];
     return handler[typeString]?.(obj as any);
 }
+export function partialMatch<
+    T extends WithProperty<K, string>,
+    H extends Handler<VariantsOfUnion<T, K>>,
+    K extends string = 'type'
+> (
+    obj: T,
+    handler: Partial<H>,
+    typeKey?: K,
+): ReturnType<Defined<H[T[K]]>> | undefined {
+    return match(obj, handler as H, typeKey);
+}
 
 export type Lookup<T> = {
     [P in keyof T]: any
@@ -92,6 +105,10 @@ export type Lookup<T> = {
 export function lookup<T extends WithProperty<K, string>, L extends Lookup<VariantsOfUnion<T, K>>, K extends string = 'type'>(obj: T, handler: L, typeKey?: K): ReturnType<L[T[K]]> {
     const typeString = obj[typeKey ?? 'type' as K];
     return handler[typeString];
+}
+export function partialLookup<T extends WithProperty<K, string>, L extends Lookup<VariantsOfUnion<T, K>>, K extends string = 'type'>(obj: T, handler: Partial<L>, typeKey?: K): ReturnType<L[T[K]]> | undefined {
+    // Takes advantage of the fact that handler with missing keys will return undefined.
+    return lookup(obj, handler as L, typeKey);
 }
 
 type VariantObj = {[tag: string]: VariantCreator<string, any>};
