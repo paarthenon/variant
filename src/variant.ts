@@ -116,8 +116,12 @@ export type AugmentVariant<T extends VariantObj, U> = {
     [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & Outputs<T[P]['outputKey'], T[P]['outputType']>
 }
 export function augment<T extends VariantObj, F extends Func>(variantDef: T, f: F) {
-    return Object.keys(variantDef).reduce((acc, key) => ({
-        ...acc,
-        [key]: (...args: any[]) => (Object.assign({}, f(), variantDef[key](...args)))
-    }), {} as AugmentVariant<T, ReturnType<F>>)
+    return Object.keys(variantDef).reduce((acc, key) => {
+        const {outputKey, outputType} = variantDef[key];
+        const augmentedFuncWrapper = (...args: any[]) => (Object.assign({}, f(), variantDef[key](...args)));
+        return {
+            ...acc,
+            [key]: Object.assign(augmentedFuncWrapper, {outputKey, outputType})
+        };
+    }, {} as AugmentVariant<T, ReturnType<F>>);
 }
