@@ -19,6 +19,9 @@ export {
     VariantsOfUnion,
     AugmentVariant,
     augment,
+    outputTypes,
+    isOfVariant,
+    VariantModule,
 } from './variant';
 
 export {
@@ -27,7 +30,6 @@ export {
     payload,
     property,
     exhaust,
-    outputTypes,
 } from './tools';
 
 export {

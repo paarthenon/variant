@@ -2,16 +2,6 @@ import {Outputs, WithProperty} from "./variant";
 import {Identity} from "./util";
 
 /**
- * Give an array of output types for a given variant collection.
- * Useful for checking whether or not a message belongs in your
- * variant set at runtime.
- * @param variantObject 
- */
-export function outputTypes<T extends {[name: string]: Outputs<string, string>}>(variantObject: T) {
-    return Object.keys(variantObject).map(key => variantObject[key].outputType);
-}
-
-/**
  * Enforce exhaustion of a union type by using this in the default case.
  * @param x 
  * @param options 
