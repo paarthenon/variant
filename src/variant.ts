@@ -206,3 +206,8 @@ export function augment<T extends VariantObj, F extends Func>(variantDef: T, f: 
         };
     }, {} as AugmentVariant<T, ReturnType<F>>);
 }
+
+
+type FilterNeverTypedVariants<T extends WithProperty<K, string | never>, K extends string = 'type'> = T extends WithProperty<K, never> ? never : T;
+
+export type Specific<T extends WithProperty<K, string>, TType extends string = string, K extends string = 'type'> = Identity<FilterNeverTypedVariants<T & WithProperty<K, TType>, K>>;

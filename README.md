@@ -9,9 +9,110 @@ Enter this library.
 npm i -S @paarth/variant
 ```
 
-This is useful for protocol message processing, action creators, domain driven design, and general type fuckery. However, most of you likely use redux so....
+This is useful for protocol message processing, action creators, domain driven design, and general type fuckery. [A redux-specific example is available here](#lets-say-you-use-redux).
 
-# Let's say you use Redux
+# Introduction 
+
+### Let's use `variant` to describe a domain — **Animals**.
+```typescript
+import variant, {variantList, VariantsOf, OneOf, fields} from '@paarth/variant';
+
+const Animals = variantList([
+    variant('dog', fields<{name: string, favoriteBall?: string}>()),
+    variant('cat', fields<{name: string, daysSinceDamage: number}>()),
+    variant('snake', (name: string, patternName?: string) => ({
+        name,
+        pattern: patternName ?? 'striped',
+    }),
+]);
+type Animals = VariantsOf<typeof Animals>;
+type Animal = OneOf<Animals>;
+```
+
+compare this to raw discriminated unions:
+
+```typescript
+// vanilla typescript
+const DOG_TYPE = 'dog';
+const CAT_TYPE = 'cat';
+const SNAKE_TYPE = 'snake';
+
+function dog(name: string, favoriteBall?: string) {
+    return {
+        type: DOG_TYPE as typeof DOG_TYPE,
+        name,
+        favoriteBall,
+    }
+}
+const cat = (name: string, daysSinceDamage: number) => ({
+    type: CAT_TYPE as typeof CAT_TYPE,
+    name,
+    daysSinceDamage,
+})
+const snake = (name: string, patternName?: string) => ({
+    type: SNAKE_TYPE as typeof SNAKE_TYPE,
+    name,
+    pattern: patternName ?? 'striped',
+})
+
+type Animal = 
+    | ReturnType<typeof dog>
+    | ReturnType<typeof cat>
+    | ReturnType<typeof snake>;
+;
+```
+
+Both methods result in the following union type:
+
+![The union type 'Animal'](docs/animal.png)
+
+ ## **Match**
+
+We can now process the union using **match**, an alternative to the switch statement.
+
+```typescript
+import {match} from '@paarth/variant';
+declare var animal: Animal;
+
+const describeAnimal = match(animal, {
+    cat: ({name}) => `${name} is sleeping on a sunlit window sill.`,
+    dog: ({name, favoriteBall}) => [
+        `${name} is on the rug`,
+        favoriteBall ? `nuzzling a ${favoriteBall} ball.` : '.' 
+    ].join(' '),
+    snake: s => `Hi ${s.name}, your ${s.pattern} skin looks nice today.`,
+});
+```
+
+
+### `match` is...
+
+
+ - **exhaustive by default**. If you only need to handle some cases, use `partialMatch`.
+ - **pure TypeScript.** This will work on any valid discriminated union, whether or not it was made with `variant`.
+ - **well typed**. `match`'s return type is the union of the return types of all the potential handler functions. `partialMatch` does the same but adds `undefined` to the union.
+ - **familiar**. It's meant to imitate the [OCaml / Reason ML **`match`** statement](https://reasonml.github.io/docs/en/pattern-matching).
+ - **flexible**. By default `match` switches on the `type` property which can be overridden using the function's optional third paramater. 
+
+## **Lookup**
+
+If you don't need to perform any actions or use any of the union's data, use **lookup**.
+
+```typescript
+import {lookup} from '@paarth/variant';
+
+const cuteName = lookup(animal, {
+    cat: 'kitty',
+    dog: 'pupper',
+    snake: 'snek',
+});
+```
+
+The above notes on `match` also apply to `lookup`
+
+****
+
+## Let's say you use Redux
 
 Compare to [the official redux example](https://redux.js.org/basics/example).
 ```typescript
@@ -38,19 +139,7 @@ export const VisibilityFilters = strEnum([
 ]);
 export type VisibilityFilters = keyof typeof VisibilityFilters;
 ```
-**This is all type safe.** Viewing the types involved will provide specific and clear info.
-
-> ![Type Signature of a single message](docs/intellisense.png)
-
-As will the union type...
-
-> ![Type Signature of a module](docs/module_intellisense.png)
-
-meaning the reducers will work with typescript's native switch statement. However, you don't *need* to use TypeScript's switch statement. You can leverage the `match` utility to elegantly express the same behavior. 
-
-## **Match**
-
-Compare to [the official redux example reducer](https://redux.js.org/basics/example/#reducerstodosjs).
+Compare the following reducer to [the official redux example reducer](https://redux.js.org/basics/example/#reducerstodosjs).
 ```typescript
 // reducers/todos.ts
 import {match} from '@paarth/variant';
@@ -71,23 +160,7 @@ const todos = (state = [] as Todo[], action: Action) => {
 }
 ```
 
-You will be warned if you have forgotten a case in the handler object and the return type of match is the union of the return types of its various branches.
-
-## **Lookup**
-
-If you do not need to process the information and instead want to map from a variant key to some arbitrary data, use `lookup`.
-
-```typescript
-import {lookup} from '@paarth/variant';
-
-declare var action: Action;
-
-const description = lookup(action, {
-    addTodo: 'Add a new todo item.',
-    toggleTodo: 'Toggle completion status.',
-    setVisibilityFilter: 'Filter visible todos.',
-});
-```
+# API
 
 ## **Variant**
 
@@ -97,7 +170,9 @@ Calling `variant` with a given type name returns a [*tag constructor*](https://e
 import variant from '@paarth/variant';
 const toggleTodo = variant('TOGGLE_TODO');
 
-const action = toggleTodo(); // typeof action: { type: 'TOGGLE_TODO' }
+const action = toggleTodo(); 
+
+// typeof action: { type: 'TOGGLE_TODO' }
 ```
 
 But if we're toggling a todo we probably need to identify which one. To start doing something interesting we essentially provide `variant` with what the constructor function should take in and do. We do this like any old function, `variant` wraps our function and takes care of the housekeeping of merging in the `{ type: 'TOGGLE_TODO }'` property to whatever we return.
@@ -106,7 +181,9 @@ But if we're toggling a todo we probably need to identify which one. To start do
 import variant from '@paarth/variant';
 
 const toggleTodo = variant('TOGGLE_TODO', (id: number) => ({id}));
-const action = toggleTodo(4); // typeof action: { type: 'TOGGLE_TODO', id: number }
+const action = toggleTodo(4); 
+
+// typeof action: { type: 'TOGGLE_TODO', id: number }
 console.log(action); // { type: 'TOGGLE_TODO', id: 4 }
 ```
 
@@ -116,7 +193,9 @@ Once we add a few fields our parameters will start to lose meaning. Passing in a
 import variant, {fields} from '@paarth/variant';
 
 const toggleTodo = variant('TOGGLE_TODO', fields<{id: number}>());
-const action = toggleTodo({id: 4}); // typeof action: { type: 'TOGGLE_TODO', id: number }
+const action = toggleTodo({id: 4}); 
+
+// typeof action: { type: 'TOGGLE_TODO', id: number }
 console.log(action); // { type: 'TOGGLE_TODO', id: 4 }
 ```
 
@@ -126,7 +205,9 @@ When only one property is required or FSA compliance is desired, the `payload<T>
 import variant, {payload} from '@paarth/variant';
 
 const toggleTodo = variant('TOGGLE_TODO', payload<number>());
-const action = toggleTodo(4); // typeof action: { type: 'TOGGLE_TODO', payload: number }
+const action = toggleTodo(4); 
+
+// typeof action: { type: 'TOGGLE_TODO', payload: number }
 console.log(action); // { type: 'TOGGLE_TODO', payload: 4 }
 ```
 

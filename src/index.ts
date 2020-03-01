@@ -22,6 +22,7 @@ export {
     outputTypes,
     isOfVariant,
     VariantModule,
+    Specific,
 } from './variant';
 
 export {
@@ -36,5 +37,4 @@ export {
     ExtractOfUnion,
 } from './util';
 
-import {default as variantDefault} from './variant';
 export default variantDefault;
