@@ -37,4 +37,5 @@ export {
     ExtractOfUnion,
 } from './util';
 
+import {default as variantDefault} from './variant';
 export default variantDefault;
