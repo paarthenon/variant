@@ -68,7 +68,7 @@ export const variant = variantFactory('type');
 export default variant;
 
 type Creators<T extends FuncObject, PropName extends string = 'type'> = {
-    [P in keyof T]: ReturnType<T[P]> extends WithProperty<PropName, any> ? T[P] : never
+    [P in keyof T]: ReturnType<T[P]> extends WithProperty<PropName, infer TType> ? ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & WithProperty<PropName, TType>>) : never
 }
 
 export type VariantsOf<T, PropName extends string ='type'> = ReturnTypes<Creators<Functions<T>, PropName>>;
@@ -105,7 +105,7 @@ export function outputTypes<T extends {[name: string]: Outputs<string, string>}>
  * @param object 
  * @param variant 
  */
-export function isOfVariant<T extends {[name: string]: Outputs<'type', string>}>(object: WithProperty<'type', string>, variant: T): object is OneOf<VariantsOf<T>> {
+export function isOfVariant<T extends VariantModule>(object: WithProperty<'type', string>, variant: T): object is SumType<T> {
     return outputTypes(variant).some(type => type === object.type);
 }
 
@@ -187,8 +187,7 @@ export function partialLookup<T extends WithProperty<K, string>, L extends Looku
     return lookup(obj, handler as L, typeKey);
 }
 
-type VariantObj = {[tag: string]: VariantCreator<string, any>};
-export type AugmentVariant<T extends VariantObj, U> = {
+export type AugmentVariant<T extends VariantModule, U> = {
     [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & Outputs<T[P]['outputKey'], T[P]['outputType']>
 }
 /**
@@ -196,7 +195,7 @@ export type AugmentVariant<T extends VariantObj, U> = {
  * @param variantDef 
  * @param f 
  */
-export function augment<T extends VariantObj, F extends Func>(variantDef: T, f: F) {
+export function augment<T extends VariantModule, F extends Func>(variantDef: T, f: F) {
     return Object.keys(variantDef).reduce((acc, key) => {
         const {outputKey, outputType} = variantDef[key];
         const augmentedFuncWrapper = (...args: any[]) => (Object.assign({}, f(), variantDef[key](...args)));
@@ -211,3 +210,8 @@ export function augment<T extends VariantObj, F extends Func>(variantDef: T, f: 
 type FilterNeverTypedVariants<T extends WithProperty<K, string | never>, K extends string = 'type'> = T extends WithProperty<K, never> ? never : T;
 
 export type Specific<T extends WithProperty<K, string>, TType extends string = string, K extends string = 'type'> = Identity<FilterNeverTypedVariants<T & WithProperty<K, TType>, K>>;
+
+export type SumType<T, K extends string = 'type'> = OneOf<VariantsOf<T, K>>;
+export type KeysOf<T, K extends string = 'type'> = SumType<T, K>[K] & string;
+export type TypeNames<T, K extends string = 'type'> = KeysOf<T, K> | undefined;
+export type VariantOf<T, TType = undefined, K extends string = 'type'> = TType extends undefined ? SumType<T, K> : TType extends KeysOf<T, K> ? ExtractOfUnion<SumType<T, K>, TType, K> : SumType<T, K>;

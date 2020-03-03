@@ -15,18 +15,17 @@ This is useful for protocol message processing, action creators, domain driven d
 
 ### Let's use `variant` to describe a domain — **Animals**.
 ```typescript
-import variant, {variantList, VariantsOf, OneOf, fields} from '@paarth/variant';
+import variant, {variantList, VariantOf, fields, TypeNames} from '@paarth/variant';
 
-const Animals = variantList([
+const Animal = variantList([
     variant('dog', fields<{name: string, favoriteBall?: string}>()),
     variant('cat', fields<{name: string, daysSinceDamage: number}>()),
     variant('snake', (name: string, patternName?: string) => ({
         name,
         pattern: patternName ?? 'striped',
-    }),
+    })),
 ]);
-type Animals = VariantsOf<typeof Animals>;
-type Animal = OneOf<Animals>;
+type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 ```
 
 compare this to raw discriminated unions:
@@ -62,9 +61,19 @@ type Animal =
 ;
 ```
 
-Both methods result in the following union type:
+**Both methods result in the following union type:**
 
 ![The union type 'Animal'](docs/animal.png)
+
+and using the created variant `Animal` looks something like...
+
+```typescript
+import {Animal} from '...';
+
+const snek = Animal.snake('steve');
+const describeSnake = (snake: Animal<'snake'>) => {...}
+const describeAnimal = (animal: Animal) => {...}
+```
 
  ## **Match**
 
@@ -72,9 +81,8 @@ We can now process the union using **match**, an alternative to the switch state
 
 ```typescript
 import {match} from '@paarth/variant';
-declare var animal: Animal;
 
-const describeAnimal = match(animal, {
+const describeAnimal = (animal: Animal) => match(animal, {
     cat: ({name}) => `${name} is sleeping on a sunlit window sill.`,
     dog: ({name, favoriteBall}) => [
         `${name} is on the rug`,
@@ -83,7 +91,6 @@ const describeAnimal = match(animal, {
     snake: s => `Hi ${s.name}, your ${s.pattern} skin looks nice today.`,
 });
 ```
-
 
 ### `match` is...
 
@@ -111,16 +118,23 @@ const cuteName = lookup(animal, {
 The above notes on `match` also apply to `lookup`
 
 ****
+## Variant Cheat Sheet
+ - **Import:** `import {Animal} from '...';`
+ - **Create snake:** `Animal.snake('steve');`
+ - **Snake Type:** `Animal<'snake'>`
+ - **Union Type:** `Animal`
+
+****
 
 ## Let's say you use Redux
 
 Compare to [the official redux example](https://redux.js.org/basics/example).
 ```typescript
 // actions.ts 
-import variant, {variantList, VariantsOf, OneOf, fields, payload, strEnum} from '@paarth/variant';
+import variant, {variantList, VariantOf, TypeNames, fields, payload, strEnum} from '@paarth/variant';
 
 let nextTodoId = 0;
-export const Actions = variantList([
+export const Action = variantList([
     variant('addTodo', (text: string) => ({
         id: nextTodoId++,
         text,
@@ -129,8 +143,7 @@ export const Actions = variantList([
     variant('setVisibilityFilter', payload<VisibilityFilters>()), 
 ]);
 
-export type Actions = VariantsOf<typeof Actions>;
-export type Action = OneOf<Actions>;
+export type Action<T extends TypeNames<typeof Action> = undefined> = VariantOf<typeof Action, T>;
 
 export const VisibilityFilters = strEnum([
     'SHOW_ALL',
@@ -220,7 +233,7 @@ Getting to the "Algebra" of algebraic data types, variants can be mixed and matc
 To make that as easy as possible, try `variantList([ ... ])`.
 
 ```typescript
-export const MediaFiles = variantList([
+export const MediaFile = variantList([
     variant('image', fields<{src: string}>(),
     variant('video', fields<{src: string, duration: number}>()),
 ]);
@@ -228,28 +241,31 @@ export const MediaFiles = variantList([
 If you'd prefer not to use that, no problem. Use an object.
 
 ```typescript
-export const MediaFiles = {
+export const MediaFile = {
     image: variant('image', fields<{src: string}>(),
     video: variant('video', fields<{src: string, duration: number}>()),
 }
 ```
-Either way, follow up with these helper types
+Either way, follow up with this type
 
 ```typescript
-export type MediaFiles = VariantsOf<typeof MediaFiles>;
-export type MediaFile = OneOf<MediaFiles>;
+export type MediaFile<T extends TypeNames<typeof MediaFile> = undefined> = VariantOf<typeof MediaFile, T>;
 ```
 
-This pattern is not strictly necessary, but the more you deviate the more you have to know what you're doing. The first line allows us to reference the type of the generated object more easily. `MediaFiles['image']` refers to `{ type: 'image', src: string }`. The second line takes place of this tedious mess:
+The line does two main things.
 
-```typescript
-export type Action =
-    | Actions.addTodo
-    | Actions.toggleTodo
-    | Actions.setVisibilityFilter
-;
-```
-You no longer need to do any bookkeeping of this value when you add a new action to `Actions`. It will automatically update.
+1.  It takes place of this tedious mess:
+
+    ```typescript
+    export type Action =
+        | Action.addTodo
+        | Action.toggleTodo
+        | Action.setVisibilityFilter
+    ;
+    ```
+    and will automatically update. 
+
+2. It provides a way to access subtypes easily. `MediaFile<'image'>` refers to `{ type: 'image', src: string }`. 
 
 #### Boilerplate 
 

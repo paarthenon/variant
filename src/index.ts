@@ -23,6 +23,9 @@ export {
     isOfVariant,
     VariantModule,
     Specific,
+    KeysOf,
+    TypeNames,
+    VariantOf,
 } from './variant';
 
 export {
