@@ -77,7 +77,7 @@ const describeAnimal = (animal: Animal) => {...}
 
  ## **Match**
 
-We can now process the union using **match**, an alternative to the switch statement.
+We can now process the union using **match**, an alternative to the switch statement. [See test examples](src/variant.match.spec.ts).
 
 ```typescript
 import {match} from '@paarth/variant';
@@ -226,6 +226,9 @@ console.log(action); // { type: 'TOGGLE_TODO', payload: 4 }
 
 When deciding on `payload` vs. `fields` consider whether the name of the tag is so self descriptive its obvious what the intended payload would be.
 
+
+[See more test examples](src/variant.spec.ts).
+
 ### **Grouping**
 
 Getting to the "Algebra" of algebraic data types, variants can be mixed and matched in a number of ways. If you have a functional programming background, `variant()` is a factory function to generate tag constructors of [polymorphic variants](https://www.cs.cornell.edu/courses/cs3110/2019sp/textbook/data/polymorphic_variants.html). If you don't have a functional programming background, ignore that sentence. `variant()` describes one shape your data may take, but we want to understand the options.
@@ -274,11 +277,10 @@ Here is a [VS Code snippet](https://code.visualstudio.com/docs/editor/userdefine
 	"VariantModule": {
 		"prefix": ["variant-module", "vm"],
 		"body": [
-			"export const $1s = variantList([",
+			"export const $1 = variantList([",
 			"    $2",
 			"]);",
-			"export type $1s = VariantsOf<typeof $1s>;",
-			"export type $1 = OneOf<$1s>;",
+			"export type $1<T extends TypeNames<typeof $1> = undefined> = VariantOf<typeof $1, T>;",
 			""
 		],
 		"description": "Initialize a module for variants"
