@@ -29,3 +29,10 @@ test('nice variant (complex)', () => {
 
     expect(result).toEqual({kind: 'TestType', testData: 45});
 })
+
+
+test('variant toString()', () => {
+    const yoc = variant('yo');
+
+    expect('' + yoc).toBe('yo');
+})

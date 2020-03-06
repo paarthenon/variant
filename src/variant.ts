@@ -11,14 +11,39 @@ export type Outputs<K, T> = {
     outputKey: K
     outputType: T
 };
+/**
+ * It doesn't *really* matter if it's creator.outputType vs. creator.type, but
+ * the latter has the advantage of being tolerable to the group of people who will
+ * prefer to use [Animal.dog.type]: rather than dog: . 
+ */
+export type NewOutputs<K, T> = {
+    key: K
+    /**
+     * The type of object created by this function.
+     */
+    type: T
+};
 
+/**
+ * More specific toString();
+ */
+export type Stringable<ReturnType extends string> = {
+    toString(): ReturnType;
+}
+
+/**
+ * The constructor for one tag of a variant type. 
+ */
 export type VariantCreator<
     T extends string,
     Args extends any[] = [],
     Return extends {} = {},
     K extends string = 'type'>
-= ((...args: Args) => Identity<WithProperty<K, T> & Return>) & Outputs<K, T>;
+= Stringable<T> & ((...args: Args) => Identity<WithProperty<K, T> & Return>) & Outputs<K, T> & NewOutputs<K, T>;
 
+/**
+ * The overall module of variants. This is equivalent to a polymorphic variant. 
+ */
 export type VariantModule<K extends string = 'type'> = {
     [name: string]: VariantCreator<string, any[], any, K>
 }
@@ -31,14 +56,19 @@ export function variantFactory<K extends string>(key: K) {
     function variantFunc<T extends string, F extends Func>(tag: T, func?: F) {
         let maker = (...args: Parameters<F>) => ({
             [key]: tag,
-            ...(func || identityFunc)(...args),
+            ...(func ?? identityFunc)(...args),
         })
         const outputType = {
             outputKey: key,
             outputType: tag,
         };
-        return Object.assign(maker, outputType);
+        const newOutputs = {
+            key,
+            type: tag,
+        }
+        return Object.assign(maker, outputType, newOutputs, {toString: function(this: Outputs<K, T>){return this.outputType}});
     }
+    // the `variant()` function advertises the key it will use
     const outputKey = {outputKey: key};
     return Object.assign(variantFunc, outputKey);
 }
