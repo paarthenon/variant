@@ -38,6 +38,7 @@ export {
 
 export {
     ExtractOfUnion,
+    strEnum,
 } from './util';
 
 import {default as variantDefault} from './variant';

@@ -24,3 +24,15 @@ export type ReturnTypes<T extends FuncObject> = {
 }
 
 export type ExtractOfUnion<T, TType extends string, K extends string = 'type'> = T extends WithProperty<K, TType> ? T : never;
+
+/** 
+ * Utility function to create a K:V from a list of strings 
+ * 
+ * Taken from: https://basarat.gitbook.io/typescript/type-system/literal-types#string-based-enums
+ * */
+export function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
+    return o.reduce((res, key) => {
+        res[key] = key;
+        return res;
+    }, Object.create(null));
+}
