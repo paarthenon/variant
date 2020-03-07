@@ -26,6 +26,7 @@ export {
     KeysOf,
     TypeNames,
     VariantOf,
+    matchLiteral,
 } from './variant';
 
 export {

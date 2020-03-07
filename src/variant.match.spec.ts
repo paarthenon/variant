@@ -1,8 +1,9 @@
 
 
-import variant, {match, partialMatch, variantList, TypeNames, VariantOf} from './variant'
+import variant, {match, partialMatch, variantList, TypeNames, VariantOf, VariantsOfUnion, matchLiteral} from './variant'
 import {fields} from './tools';
 import Chance from 'chance';
+import {strEnum, ExtractOfUnion} from './util';
 
 
 const chance = new Chance();
@@ -49,4 +50,26 @@ test('partial match', () => {
 
     expect(rating(cerberus)).toBeUndefined();
     expect(rating(Animal.cat({name: 'Loki', daysSinceDamage: 8}))).toBe(1);
+});
+
+const things = strEnum([
+    'a',
+    'b',
+    'c',
+])
+type things = keyof typeof things;
+
+const handleThing = (thing: things) => matchLiteral(thing, {
+    a: _ => 1,
+    b: b => b,
+    c: _ => '3',
+});
+
+test('match literal', () => {
+    expect(handleThing('a')).toBe(1);
+    expect(handleThing('c')).toBe('3');
+});
+
+test('match literal undefined', () => {
+    expect(handleThing('asdf' as any)).toBe(undefined);
 });

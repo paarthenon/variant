@@ -494,3 +494,21 @@ export const toggleTodo = variant('TOGGLE_TODO', fields<{id: number}>());
 export const setVisibilityFilter = variant('SET_VISIBILITY_FILTER', payload<VisibilityFilters>());
 ```
 
+### **Can I match on a strEnum?**
+
+Yes, use `matchLiteral` instead of `match`.
+
+```typescript
+const things = strEnum([
+    'a',
+    'b',
+    'c',
+])
+type things = keyof typeof things;
+
+const handleThing = (thing: things) => matchLiteral(thing, {
+    a: _ => 1,
+    b: b => b,
+    c: _ => '3',
+});
+```

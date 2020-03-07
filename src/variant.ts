@@ -159,6 +159,10 @@ export type Handler<T> = {
     [P in keyof T]: (variant: T[P]) => any
 }
 
+export type UnionHandler<T extends string> = {
+    [P in T]: (variant: P) => any
+}
+
 export type VariantsOfUnion<T extends WithProperty<K, string>, K extends string = 'type'> = {
     [P in T[K]]: ExtractOfUnion<T, P, K>
 }
@@ -186,6 +190,10 @@ export function partialMatch<
     typeKey?: K,
 ): ReturnType<Defined<H[T[K]]>> | undefined {
     return match(obj, handler as H, typeKey);
+};
+
+export function matchLiteral<T extends string, H extends UnionHandler<T>>(literal: T, handler: H): ReturnType<H[T]> {
+    return handler[literal]?.(literal);
 }
 
 /**
