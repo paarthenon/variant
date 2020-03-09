@@ -123,8 +123,8 @@ export function variantList<T extends VariantCreator<any, any, any, any>>(varian
  * variant set at runtime.
  * @param variantObject 
  */
-export function outputTypes<T extends {[name: string]: Outputs<string, string>}>(variantObject: T) {
-    return Object.keys(variantObject).map(key => variantObject[key].outputType);
+export function outputTypes<T extends {[name: string]: NewOutputs<string, string>}>(variantObject: T) {
+    return Object.keys(variantObject).map(key => variantObject[key].type);
 }
 
 /**
@@ -226,7 +226,7 @@ export function partialLookup<T extends WithProperty<K, string>, L extends Looku
 }
 
 export type AugmentVariant<T extends VariantModule, U> = {
-    [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & Outputs<T[P]['outputKey'], T[P]['outputType']>
+    [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & NewOutputs<T[P]['outputKey'], T[P]['outputType']>
 }
 /**
  * 
@@ -239,7 +239,7 @@ export function augment<T extends VariantModule, F extends Func>(variantDef: T, 
         const augmentedFuncWrapper = (...args: any[]) => (Object.assign({}, f(), variantDef[key](...args)));
         return {
             ...acc,
-            [key]: Object.assign(augmentedFuncWrapper, {outputKey, outputType})
+            [key]: Object.assign(augmentedFuncWrapper, {outputKey, outputType, key: variantDef[key].key, type: variantDef[key].type})
         };
     }, {} as AugmentVariant<T, ReturnType<F>>);
 }

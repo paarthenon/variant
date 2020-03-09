@@ -4,18 +4,9 @@ import variant, {match, partialMatch, variantList, TypeNames, VariantOf, Variant
 import {fields} from './tools';
 import Chance from 'chance';
 import {strEnum, ExtractOfUnion} from './util';
-
+import {Animal} from './__test__/animal'
 
 const chance = new Chance();
-const Animal = variantList([
-    variant('dog', fields<{name: string, favoriteBall?: string}>()),
-    variant('cat', fields<{name: string, daysSinceDamage: number}>()),
-    variant('snake', (name: string, patternName?: string) => ({
-        name,
-        pattern: patternName ?? 'striped',
-    })),
-]);
-type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 
 const cerberus = Animal.dog({name: 'Cerberus'});
 

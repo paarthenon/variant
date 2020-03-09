@@ -1,5 +1,6 @@
-import {variant, variantFactory} from './variant';
+import {variant, variantFactory, outputTypes} from './variant';
 import {payload} from './tools';
+import {Animal} from './__test__/animal';
 
 test('empty', () => {
     const func = variant('');
@@ -35,4 +36,19 @@ test('variant toString()', () => {
     const yoc = variant('yo');
 
     expect('' + yoc).toBe('yo');
+})
+
+test('output type', () => {
+    expect(Animal.cat.type).toBe('cat');
+    expect(Animal.cat.toString()).toBe('cat');
+    expect(Animal.cat.key).toBe('type');
+})
+
+test('legacy output type', () => {
+    expect(Animal.cat.outputType).toBe('cat');
+    expect(Animal.cat.outputKey).toBe('type');
+})
+
+test('output types', () => {
+    expect(outputTypes(Animal)).toEqual(['dog', 'cat', 'snake']);
 })
