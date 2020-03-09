@@ -1,4 +1,4 @@
-import {variant, variantFactory, outputTypes} from './variant';
+import {variant, variantFactory, outputTypes, augment, TypeNames, VariantOf} from './variant';
 import {payload} from './tools';
 import {Animal} from './__test__/animal';
 
@@ -44,11 +44,16 @@ test('output type', () => {
     expect(Animal.cat.key).toBe('type');
 })
 
-test('legacy output type', () => {
-    expect(Animal.cat.outputType).toBe('cat');
-    expect(Animal.cat.outputKey).toBe('type');
-})
-
 test('output types', () => {
     expect(outputTypes(Animal)).toEqual(['dog', 'cat', 'snake']);
+})
+
+test('augment', () => {
+    const BetterAnimal = augment(Animal, () => ({better: true}));
+    type BetterAnimal<T extends TypeNames<typeof BetterAnimal> = undefined> = VariantOf<typeof BetterAnimal, T>;
+
+    const snek = BetterAnimal.snake('steve');
+    expect(snek.name).toBe('steve');
+    expect(snek.better).toBeDefined();
+    expect(snek.better).toBe(true);
 })

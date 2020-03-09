@@ -6,17 +6,12 @@ export type WithProperty<K extends string, T> = TypeExt<K, T>;
 
 /**
  * The type marking metadata. It's useful to know the type of the items the function will generate.
- */
-export type Outputs<K, T> = {
-    outputKey: K
-    outputType: T
-};
-/**
+ * 
  * It doesn't *really* matter if it's creator.outputType vs. creator.type, but
  * the latter has the advantage of being tolerable to the group of people who will
  * prefer to use [Animal.dog.type]: rather than dog: . 
  */
-export type NewOutputs<K, T> = {
+export type Outputs<K, T> = {
     key: K
     /**
      * The type of object created by this function.
@@ -39,7 +34,7 @@ export type VariantCreator<
     Args extends any[] = [],
     Return extends {} = {},
     K extends string = 'type'>
-= Stringable<T> & ((...args: Args) => Identity<WithProperty<K, T> & Return>) & Outputs<K, T> & NewOutputs<K, T>;
+= Stringable<T> & ((...args: Args) => Identity<WithProperty<K, T> & Return>) & Outputs<K, T>;
 
 /**
  * The overall module of variants. This is equivalent to a polymorphic variant. 
@@ -58,15 +53,11 @@ export function variantFactory<K extends string>(key: K) {
             [key]: tag,
             ...(func ?? identityFunc)(...args),
         })
-        const outputType = {
-            outputKey: key,
-            outputType: tag,
-        };
-        const newOutputs = {
+        const outputs = {
             key,
             type: tag,
         }
-        return Object.assign(maker, outputType, newOutputs, {toString: function(this: Outputs<K, T>){return this.outputType}});
+        return Object.assign(maker, outputs, {toString: function(this: Outputs<K, T>){return this.type}});
     }
     // the `variant()` function advertises the key it will use
     const outputKey = {outputKey: key};
@@ -110,10 +101,10 @@ type FilterVariants<T, Type extends string, K extends string = any> = T extends 
  * Basically works like strEnum to generate an object where the property keys are the variant type strings.
  * @param variants 
  */
-export function variantList<T extends VariantCreator<any, any, any, any>>(variants: Array<T>): {[P in T['outputType']]: FilterVariants<T, P>} {
+export function variantList<T extends VariantCreator<any, any, any, any>>(variants: Array<T>): {[P in T['type']]: FilterVariants<T, P>} {
     return variants.reduce((o, v) => ({
         ...o,
-        [v.outputType]: v,
+        [v.type]: v,
     }), Object.create(null))
 }
 
@@ -123,7 +114,7 @@ export function variantList<T extends VariantCreator<any, any, any, any>>(varian
  * variant set at runtime.
  * @param variantObject 
  */
-export function outputTypes<T extends {[name: string]: NewOutputs<string, string>}>(variantObject: T) {
+export function outputTypes<T extends {[name: string]: Outputs<string, string>}>(variantObject: T) {
     return Object.keys(variantObject).map(key => variantObject[key].type);
 }
 
@@ -144,10 +135,10 @@ export function isOfVariant<T extends VariantModule>(object: WithProperty<'type'
  * Unused at the moment. Intended to develop the idea of an "ordered" variant.
  * @param variants 
  */
-function progression<T extends VariantCreator<any, any, any, any>>(variants: Array<T>): {[P in T['outputType']]: FilterVariants<T, P>} {
+function progression<T extends VariantCreator<any, any, any, any>>(variants: Array<T>): {[P in T['type']]: FilterVariants<T, P>} {
     return variants.reduce((o, v) => ({
         ...o,
-        [v.outputType]: v,
+        [v.type]: v,
     }), Object.create(null))
 }
 
@@ -226,7 +217,7 @@ export function partialLookup<T extends WithProperty<K, string>, L extends Looku
 }
 
 export type AugmentVariant<T extends VariantModule, U> = {
-    [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & NewOutputs<T[P]['outputKey'], T[P]['outputType']>
+    [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & Outputs<T[P]['key'], T[P]['type']>
 }
 /**
  * 
@@ -235,11 +226,10 @@ export type AugmentVariant<T extends VariantModule, U> = {
  */
 export function augment<T extends VariantModule, F extends Func>(variantDef: T, f: F) {
     return Object.keys(variantDef).reduce((acc, key) => {
-        const {outputKey, outputType} = variantDef[key];
         const augmentedFuncWrapper = (...args: any[]) => (Object.assign({}, f(), variantDef[key](...args)));
         return {
             ...acc,
-            [key]: Object.assign(augmentedFuncWrapper, {outputKey, outputType, key: variantDef[key].key, type: variantDef[key].type})
+            [key]: Object.assign(augmentedFuncWrapper, {key: variantDef[key].key, type: variantDef[key].type})
         };
     }, {} as AugmentVariant<T, ReturnType<F>>);
 }
