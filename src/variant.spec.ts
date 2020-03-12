@@ -1,8 +1,7 @@
 import {variant, variantFactory, outputTypes, augment, TypeNames, VariantOf} from './variant';
-import {payload} from './tools';
 import {Animal} from './__test__/animal';
 
-test('empty', () => {
+test('empty variant', () => {
     const func = variant('');
     const result = func();
     expect(result).toEqual({type: ''});

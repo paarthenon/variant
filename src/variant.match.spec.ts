@@ -1,17 +1,8 @@
-
-
-import variant, {match, partialMatch, variantList, TypeNames, VariantOf, VariantsOfUnion, matchLiteral} from './variant'
-import {fields} from './tools';
-import Chance from 'chance';
-import {strEnum, ExtractOfUnion} from './util';
-import {Animal} from './__test__/animal'
-
-const chance = new Chance();
-
-const cerberus = Animal.dog({name: 'Cerberus'});
+import {match, partialMatch, matchLiteral} from './variant'
+import {strEnum} from './util';
+import {Animal, cerberus} from './__test__/animal'
 
 test('match with string', () => {
-
     const rating = (animal: Animal) => match(animal, {
         dog: _ => 1,
         cat: _ => 2,

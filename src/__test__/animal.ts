@@ -9,3 +9,5 @@ export const Animal = variantList([
     })),
 ]);
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
+
+export const cerberus = Animal.dog({name: 'Cerberus'});
