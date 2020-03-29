@@ -1,4 +1,16 @@
-import {variant, variantFactory, outputTypes, augment, TypeNames, VariantOf} from './variant';
+import {
+    variant, 
+    variantFactory, 
+    outputTypes, 
+    augment, 
+    TypeNames, 
+    VariantOf, 
+    narrow,
+    cast,
+    VariantsOfUnion, 
+    KeysOf,
+    Specific,
+} from './variant';
 import {Animal} from './__test__/animal';
 
 test('empty variant', () => {
@@ -56,3 +68,32 @@ test('augment', () => {
     expect(snek.better).toBeDefined();
     expect(snek.better).toBe(true);
 })
+
+test('cast', () => {
+    const animal = Animal.snake('Steven') as any as Animal;
+
+    const thing = cast(animal, 'snake');
+
+    expect(thing.name).toBe('Steven');
+    expect(thing.pattern).toBe('striped');
+});
+
+test('narrow', () => {
+    const animal = Animal.snake('Steven') as any as Animal;
+
+    const thing = narrow(animal, 'snake');
+
+    expect(thing!.name).toBe('Steven');
+    expect(thing!.pattern).toBe('striped');
+});
+
+test('cast failure', () => {
+    const animal = Animal.dog({name: 'Fido'}) as any as Animal;
+
+    const thing = cast(animal, 'snake');
+
+    expect(thing.name).toBe('Fido');
+    expect(thing.pattern).toBe(undefined);
+});
+
+

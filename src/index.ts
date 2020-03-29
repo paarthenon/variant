@@ -27,6 +27,8 @@ export {
     TypeNames,
     VariantOf,
     matchLiteral,
+    cast,
+    narrow,
 } from './variant';
 
 export {
