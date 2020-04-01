@@ -75,7 +75,7 @@ const describeSnake = (snake: Animal<'snake'>) => {...}
 const describeAnimal = (animal: Animal) => {...}
 ```
 
- ## **Match**
+## **Match**
 
 We can now process the union using **match**, an alternative to the switch statement. [See test examples](src/variant.match.spec.ts).
 

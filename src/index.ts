@@ -29,6 +29,9 @@ export {
     matchLiteral,
     cast,
     narrow,
+    Flags,
+    Matrix,
+    keynum,
 } from './variant';
 
 export {

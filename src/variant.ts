@@ -1,4 +1,4 @@
-import {Identity, Func, identityFunc, FuncObject, ReturnTypes, Functions, ExtractOfUnion} from './util';
+import {Identity, Func, identityFunc, FuncObject, ReturnTypes, Functions, ExtractOfUnion, strEnum} from './util';
 
 // Consider calling this ObjectEntry or Entry. Also Pair? No, more like KVPair. Mapping?
 export type TypeExt<K extends string, T> = K extends keyof infer LitK ? {[P in keyof LitK]: T} : never;
@@ -299,3 +299,20 @@ export type SumType<T, K extends string = 'type'> = OneOf<VariantsOf<T, K>>;
 export type KeysOf<T, K extends string = 'type'> = SumType<T, K>[K] & string;
 export type TypeNames<T, K extends string = 'type'> = KeysOf<T, K> | undefined;
 export type VariantOf<T, TType = undefined, K extends string = 'type'> = TType extends undefined ? SumType<T, K> : TType extends KeysOf<T, K> ? ExtractOfUnion<SumType<T, K>, TType, K> : SumType<T, K>;
+
+export function keynum<T extends VariantModule>(variantDef: T): {[P in KeysOf<T>]: P} {
+    return strEnum(outputTypes(variantDef)) as any;
+}
+
+export type Matrix<T extends VariantModule> = {
+    [P in KeysOf<T>]: Specific<SumType<T>, P>
+}
+
+export type Flags<T extends VariantModule> = Partial<Matrix<T>>;
+
+export function flagList<T extends WithProperty<K, string>, K extends string = 'type'>(flags: T[]): {[P in T[K]]: Specific<T, P, K>} {
+    return flags.reduce((o, v) => ({
+        ...o,
+        [v.type]: v,
+    }), Object.create(null))
+}

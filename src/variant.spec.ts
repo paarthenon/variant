@@ -10,6 +10,8 @@ import {
     VariantsOfUnion, 
     KeysOf,
     Specific,
+    keynum,
+    match,
 } from './variant';
 import {Animal} from './__test__/animal';
 
@@ -96,4 +98,18 @@ test('cast failure', () => {
     expect(thing.pattern).toBe(undefined);
 });
 
+test('keynum', () => {
+    const keys = keynum(Animal);
+
+    expect(keys).toHaveProperty(Animal.dog.type);
+    expect(keys).toHaveProperty('cat');
+});
+
+test('keynum values', () => {
+    const keys = keynum(Animal);
+
+    expect(keys.cat).toBe('cat');
+    expect(keys.dog).toBe('dog');
+    expect(keys.snake).toBe('snake');
+});
 

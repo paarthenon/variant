@@ -21,7 +21,7 @@ function _set<T, X, Y>(func: (x: X) => Y, data: T) {
     // remove T from inputs, add T to outputs
     return (input: Identity<Omit<X, keyof T>>) => {
         const combined = Object.assign({}, data, input) as T & X;
-        return func(combined) as Y;
+        return func(combined) as (Y & T);
     }
 }
 
@@ -61,7 +61,7 @@ export function fields<T>(defaults: Partial<T> = {}) {
             ...input,
         }) as T,
         {
-            set<D>(this: (x: T) => T, data: D) {
+            set<D extends Partial<T>>(this: (x: T) => T, data: D) {
                 return _set(this, data);
             },
             default<D>(this: (x: T) => T, data: D) {
