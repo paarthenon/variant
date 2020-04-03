@@ -30,6 +30,7 @@ export {
     cast,
     narrow,
     Flags,
+    flags,
     Matrix,
     keynum,
 } from './variant';

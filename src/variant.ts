@@ -310,7 +310,7 @@ export type Matrix<T extends VariantModule> = {
 
 export type Flags<T extends VariantModule> = Partial<Matrix<T>>;
 
-export function flagList<T extends WithProperty<K, string>, K extends string = 'type'>(flags: T[]): {[P in T[K]]: Specific<T, P, K>} {
+export function flags<T extends WithProperty<K, string>, K extends string = 'type'>(flags: T[]): {[P in T[K]]: Specific<T, P, K>} {
     return flags.reduce((o, v) => ({
         ...o,
         [v.type]: v,

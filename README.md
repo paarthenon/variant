@@ -1,21 +1,23 @@
-# **Variant** [![Build Status](https://travis-ci.com/paarthenon/variant.svg?branch=master)](https://travis-ci.com/paarthenon/variant) ![npm (scoped)](https://img.shields.io/npm/v/@paarth/variant) ![NPM](https://img.shields.io/npm/l/@paarth/variant)
-> Variant types (a.k.a. Discriminated Unions) in TypeScript.
-
-Variant is a set of tools for describing and working with flexible domain models. I want to express type hierarchies that I can **dispatch on at runtime** that still have compile time information that typescript can use to automatically narrow the types at compile. I don't want to have to *cast*, write my own user defined type guards, or repeat a string literal without having autocomplete and type safety to guide me. I want **nominal types** to express that this object with the same structure of another are actually different things.
-
-Enter this library.
+# **Variant** [![Build Status](https://img.shields.io/travis/com/paarthenon/variant/master?style=flat-square)](https://travis-ci.com/paarthenon/variant) ![npm](https://img.shields.io/npm/v/variant?style=flat-square) ![NPM](https://img.shields.io/npm/l/variant?style=flat-square)
+> [A variant type](https://reasonml.github.io/docs/en/variant) is like an enum but each case can hold some extra data.
 
 ```bash
-npm i -S @paarth/variant
+npm i -S variant
 ```
 
-This is useful for protocol message processing, action creators, domain driven design, and general type fuckery. [A redux-specific example is available here](#lets-say-you-use-redux).
+Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domain models and tiny DSLs. However, because *"TypeScript instead builds on JavaScript patterns as they exist today"[(*)](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)* using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
+
+ - [Introduction](#introduction)
+ - [API](#api)
+ - [Technique](#technique)
+ - [Q & A](#q--a)
+
 
 # Introduction 
 
-### Let's use `variant` to describe a domain — **Animals**.
+### Let's use `variant` to describe a domain — **Animals**. [Or if you'd like a redux example...](#lets-say-you-use-redux)
 ```typescript
-import variant, {variantList, VariantOf, fields, TypeNames} from '@paarth/variant';
+import variant, {variantList, VariantOf, fields, TypeNames} from 'variant';
 
 const Animal = variantList([
     variant('dog', fields<{name: string, favoriteBall?: string}>()),
@@ -28,7 +30,74 @@ const Animal = variantList([
 type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 ```
 
-compare this to raw discriminated unions:
+and using the created variant `Animal` looks something like...
+
+```typescript
+import {Animal} from '...';
+
+const snek = Animal.snake('steve');
+console.log(snek); 
+// {type: 'snake', name: 'steve', pattern: 'striped'}
+const describeSnake = (snake: Animal<'snake'>) => {...}
+const describeAnimal = (animal: Animal) => {...}
+```
+
+## **Match**
+
+We can now process the union using **match**, an alternative to the switch statement. [See test examples](src/variant.match.spec.ts).
+
+```typescript
+import {match} from 'variant';
+
+const describeAnimal = (animal: Animal) => match(animal, {
+    cat: ({name}) => `${name} is sleeping on a sunlit window sill.`,
+    dog: ({name, favoriteBall}) => [
+        `${name} is on the rug`,
+        favoriteBall ? `nuzzling a ${favoriteBall} ball.` : '.' 
+    ].join(' '),
+    snake: s => `Hi ${s.name}, your ${s.pattern} skin looks nice today.`,
+});
+```
+
+### `match` is...
+
+
+ - **exhaustive by default**. If you only need to handle some cases, use `partialMatch`.
+ - **pure TypeScript.** This will work on any valid discriminated union, whether or not it was made with `variant`.
+ - **well typed**. `match`'s return type is the union of the return types of all the potential handler functions. `partialMatch` does the same but adds `undefined` to the union.
+ - **familiar**. It's meant to imitate the [OCaml / Reason ML **`match`** statement](https://ocaml.org/learn/tutorials/data_types_and_matching.html#Pattern-matching-on-datatypes).
+ - **flexible**. By default `match` switches on the `type` property which can be overridden using the function's optional third paramater. 
+
+## **Lookup**
+
+If you don't need to perform any actions or use any of the union's data, use **lookup**.
+
+```typescript
+import {lookup} from 'variant';
+
+const cuteName = lookup(animal, {
+    cat: 'kitty',
+    dog: 'pupper',
+    snake: 'snek',
+});
+```
+
+The above notes on `match` also apply to `lookup`
+
+****
+## Variant Cheat Sheet
+ - **Import:** `import {Animal} from '...';`
+ - **Create snake:** `Animal.snake('steve');`
+ - **Snake Type:** `Animal<'snake'>`
+ - **Union Type:** `Animal`
+
+****
+
+## **Motivation**
+
+TypeScript has an inherent problem. Interfaces and inferred types only exist at compile time, but inspecting a type can only be done at runtime. Classes are one option to provide compile time type checking and runtime behavior together but they don't serialize, so we can't send them over the network or shove them in a redux store. Enter this library.
+
+You could certainly do this with raw discriminated unions, but here's that animal example again. 
 
 ```typescript
 // vanilla typescript
@@ -65,114 +134,7 @@ type Animal =
 
 ![The union type 'Animal'](docs/animal.png)
 
-and using the created variant `Animal` looks something like...
-
-```typescript
-import {Animal} from '...';
-
-const snek = Animal.snake('steve');
-const describeSnake = (snake: Animal<'snake'>) => {...}
-const describeAnimal = (animal: Animal) => {...}
-```
-
-## **Match**
-
-We can now process the union using **match**, an alternative to the switch statement. [See test examples](src/variant.match.spec.ts).
-
-```typescript
-import {match} from '@paarth/variant';
-
-const describeAnimal = (animal: Animal) => match(animal, {
-    cat: ({name}) => `${name} is sleeping on a sunlit window sill.`,
-    dog: ({name, favoriteBall}) => [
-        `${name} is on the rug`,
-        favoriteBall ? `nuzzling a ${favoriteBall} ball.` : '.' 
-    ].join(' '),
-    snake: s => `Hi ${s.name}, your ${s.pattern} skin looks nice today.`,
-});
-```
-
-### `match` is...
-
-
- - **exhaustive by default**. If you only need to handle some cases, use `partialMatch`.
- - **pure TypeScript.** This will work on any valid discriminated union, whether or not it was made with `variant`.
- - **well typed**. `match`'s return type is the union of the return types of all the potential handler functions. `partialMatch` does the same but adds `undefined` to the union.
- - **familiar**. It's meant to imitate the [OCaml / Reason ML **`match`** statement](https://ocaml.org/learn/tutorials/data_types_and_matching.html#Pattern-matching-on-datatypes).
- - **flexible**. By default `match` switches on the `type` property which can be overridden using the function's optional third paramater. 
-
-## **Lookup**
-
-If you don't need to perform any actions or use any of the union's data, use **lookup**.
-
-```typescript
-import {lookup} from '@paarth/variant';
-
-const cuteName = lookup(animal, {
-    cat: 'kitty',
-    dog: 'pupper',
-    snake: 'snek',
-});
-```
-
-The above notes on `match` also apply to `lookup`
-
-****
-## Variant Cheat Sheet
- - **Import:** `import {Animal} from '...';`
- - **Create snake:** `Animal.snake('steve');`
- - **Snake Type:** `Animal<'snake'>`
- - **Union Type:** `Animal`
-
-****
-
-## Let's say you use Redux
-
-Compare to [the official redux example](https://redux.js.org/basics/example).
-```typescript
-// actions.ts 
-import variant, {variantList, VariantOf, TypeNames, fields, payload, strEnum} from '@paarth/variant';
-
-let nextTodoId = 0;
-export const Action = variantList([
-    variant('addTodo', (text: string) => ({
-        id: nextTodoId++,
-        text,
-    })),
-    variant('toggleTodo', fields<{id: number}>()),
-    variant('setVisibilityFilter', payload<VisibilityFilters>()), 
-]);
-
-export type Action<T extends TypeNames<typeof Action> = undefined> = VariantOf<typeof Action, T>;
-
-export const VisibilityFilters = strEnum([
-    'SHOW_ALL',
-    'SHOW_COMPLETED',
-    'SHOW_ACTIVE',
-]);
-export type VisibilityFilters = keyof typeof VisibilityFilters;
-```
-Compare the following reducer to [the official redux example reducer](https://redux.js.org/basics/example/#reducerstodosjs).
-```typescript
-// reducers/todos.ts
-import {match} from '@paarth/variant';
-
-const todos = (state = [] as Todo[], action: Action) => {
-    return match(action, {
-        addTodo: ({id, text}) => [
-            ...state,
-            {
-                id,
-                text,
-                completed: false,
-            }
-        ],
-        toggleTodo: ({id}) => state.map(todo => todo.id === id ? {...todo, completed: !todo.completed} : todo),
-        setVisibilityFilter: () => state,
-    });
-}
-```
-
+But one is shorter, *automatically updates* as I add new animals, and requires **no manual casting**.
 # API
 
 ## **Variant**
@@ -180,7 +142,7 @@ const todos = (state = [] as Todo[], action: Action) => {
 Calling `variant` with a given type name returns a [*tag constructor*](https://en.wikipedia.org/wiki/Algebraic_data_type#Explanation) (a.k.a. *action creator*) for that type. 
 
 ```typescript
-import variant from '@paarth/variant';
+import variant from 'variant';
 const toggleTodo = variant('TOGGLE_TODO');
 
 const action = toggleTodo(); 
@@ -191,7 +153,7 @@ const action = toggleTodo();
 But if we're toggling a todo we probably need to identify which one. To start doing something interesting we essentially provide `variant` with what the constructor function should take in and do. We do this like any old function, `variant` wraps our function and takes care of the housekeeping of merging in the `{ type: 'TOGGLE_TODO }'` property to whatever we return.
 
 ```typescript
-import variant from '@paarth/variant';
+import variant from 'variant';
 
 const toggleTodo = variant('TOGGLE_TODO', (id: number) => ({id}));
 const action = toggleTodo(4); 
@@ -203,7 +165,7 @@ console.log(action); // { type: 'TOGGLE_TODO', id: 4 }
 Once we add a few fields our parameters will start to lose meaning. Passing in an object is more or less how javascript handles named parameters. To easily describe such constructors, use the `fields<T>()` helper function. 
 
 ```typescript
-import variant, {fields} from '@paarth/variant';
+import variant, {fields} from 'variant';
 
 const toggleTodo = variant('TOGGLE_TODO', fields<{id: number}>());
 const action = toggleTodo({id: 4}); 
@@ -215,7 +177,7 @@ console.log(action); // { type: 'TOGGLE_TODO', id: 4 }
 When only one property is required or FSA compliance is desired, the `payload<T>()` helper function is available.
 
 ```typescript
-import variant, {payload} from '@paarth/variant';
+import variant, {payload} from 'variant';
 
 const toggleTodo = variant('TOGGLE_TODO', payload<number>());
 const action = toggleTodo(4); 
@@ -320,7 +282,63 @@ Like before, the second property can only be a valid key of `Animal`. If `animal
 >     narrow(state.view, 'Settings')?.graphics ?? DEFAULT_GRAPHICS_SETTINGS);
 > ```
 
+
+### **Undocumented (TBD)**
+
+ * There is a function called `augment` that will let you mixin a property to every form of a variant type. I use this to easily and unobtrusively add auditing fields.
+ * `flags` is like `variantList` but instead of taking in `VariantCreators` it takes in a list of generated objects and generates a mapped object similar to the flags or options fields in C programs and modern JS.
+ * `fields` actually has two functions attached to it, `set` and `default` that I use to set extra or default values.
+ * **This can use enums as keys.** See the tests, I don't have docs but I have examples.
+
 # Technique
+
+
+## Let's say you use Redux
+
+Compare to [the official redux example](https://redux.js.org/basics/example).
+```typescript
+// actions.ts 
+import variant, {variantList, VariantOf, TypeNames, fields, payload, strEnum} from 'variant';
+
+let nextTodoId = 0;
+export const Action = variantList([
+    variant('addTodo', (text: string) => ({
+        id: nextTodoId++,
+        text,
+    })),
+    variant('toggleTodo', fields<{id: number}>()),
+    variant('setVisibilityFilter', payload<VisibilityFilters>()), 
+]);
+
+export type Action<T extends TypeNames<typeof Action> = undefined> = VariantOf<typeof Action, T>;
+
+export const VisibilityFilters = strEnum([
+    'SHOW_ALL',
+    'SHOW_COMPLETED',
+    'SHOW_ACTIVE',
+]);
+export type VisibilityFilters = keyof typeof VisibilityFilters;
+```
+Compare the following reducer to [the official redux example reducer](https://redux.js.org/basics/example/#reducerstodosjs).
+```typescript
+// reducers/todos.ts
+import {match} from 'variant';
+
+const todos = (state = [] as Todo[], action: Action) => {
+    return match(action, {
+        addTodo: ({id, text}) => [
+            ...state,
+            {
+                id,
+                text,
+                completed: false,
+            }
+        ],
+        toggleTodo: ({id}) => state.map(todo => todo.id === id ? {...todo, completed: !todo.completed} : todo),
+        setVisibilityFilter: () => state,
+    });
+}
+```
 
 ## Overview
 
@@ -343,7 +361,7 @@ const filterLabel = lookup({filter}, {
 If you only need to act on some possibilities and not others, use the **partial*** versions of each of these functions. 
 
 ```typescript
-import {partialLookup} from '@paarth/variant';
+import {partialLookup} from 'variant';
 
 declare var action: Action;
 
@@ -381,7 +399,7 @@ export const Preview: React.FC<{media: MediaFile}>: ({media}) => {
 This mapping can be created ahead of time.
 
 ```typescript
-import {lookup, Lookup} from '@paarth/variant';
+import {lookup, Lookup} from 'variant';
 
 declare var action: Action;
 
@@ -399,7 +417,7 @@ The equivalent type for `match` and `partialMatch` is `Handler<T>`.
 Partial versions have a very similar story.
 
 ```typescript
-import {partialLookup, Lookup} from '@paarth/variant';
+import {partialLookup, Lookup} from 'variant';
 
 declare var action: Action;
 
@@ -433,8 +451,9 @@ This needs to be fleshed out. For now, here's a quick rundown
  - Now these constructors need to be grouped together to be meaningful in context.
     - Well, an object works. And it totally does, see the Q&A at the bottom. But if you don't have a meaningful reason to distinguish the name of the action creator from the `type` value of the object it generates then it feels *slightly* tedious.
     - Enter variantList, which just takes an array and turns it into an object by extracting the type from each variant and using it as the property name.
- - The `VariantsOf<T>` type extracts out the action creator return types (so the type `Actions['addTodo']` describes the resulting object's interface, not the function that created it)
- - The `OneOf<T>` type is essentually `Values<T>`. Given an object it will generate the union of the types of the values of said object.
+ - `VariantOf<T>` is where the magic happens, but it's ultimately `OneOf<VariantOf<T>>` with some special sauce.
+    - The `VariantOf<T>` type extracts out the action creator return types (so the type `Actions['addTodo']` describes the resulting object's interface, not the function that created it)
+    - The `OneOf<T>` type is essentually `Values<T>`. Given an object it will generate the union of the types of the values of said object.
 
 
 
@@ -492,7 +511,7 @@ export type Attributes = VariantsOf<typeof Attributes>
 
 A simple way would be to use `match`. However TypeScript's own switch function is certainly up to the task. To do so add the following line to your switch statement.
 ```typescript
-import {exhaust} from '@paarth/variant'; 
+import {exhaust} from 'variant'; 
 
 // ...
     default: return exhaust(action);
