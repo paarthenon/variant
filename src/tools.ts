@@ -21,7 +21,7 @@ function _set<T, X, Y>(func: (x: X) => Y, data: T) {
     // remove T from inputs, add T to outputs
     return (input: Identity<Omit<X, keyof T>>) => {
         const combined = Object.assign({}, data, input) as T & X;
-        return func(combined) as (Y & T);
+        return func(combined) as Identity<Y & T>;
     }
 }
 

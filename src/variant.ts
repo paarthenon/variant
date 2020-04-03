@@ -231,8 +231,8 @@ export function matchLiteral<T extends string, H extends UnionHandler<T>>(litera
  * An object that has the same keys as a variant but has arbitrary values for the data. 
  * a.k.a. a lookup table.
  */
-export type Lookup<T> = {
-    [P in keyof T]: any
+export type Lookup<T, U = any> = {
+    [P in keyof T]: U
 }
 
 /**
