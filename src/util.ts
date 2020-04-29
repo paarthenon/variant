@@ -1,4 +1,4 @@
-import {WithProperty} from './variant';
+import {WithProperty, VariantModule} from './variant';
 
 /**
  * Useful in generating friendly types. Intersections are rendered as the type of the intersection, not as A & B.
@@ -11,18 +11,25 @@ export const identityFunc = <T>(x?: T) => (x || {}) as T extends unknown ? {} : 
 
 export type Func = (...args: any[]) => any;
 
-export type Functions<T> = {
-    [P in keyof T]: T[P] extends Func ? T[P] : never;
-}
 
 export interface FuncObject {
     [key: string]: Func
 }
 
-export type ReturnTypes<T extends FuncObject> = {
-    [P in keyof T]: ReturnType<T[P]>
+/**
+ * Extract the data type from a function, whether it returns the
+ * object directly or does so with a promise.
+ */
+export type GetDataType<T extends VariantModule<K>, K extends string = 'type'> = {
+    [P in keyof T]: ReturnType<T[P]> extends PromiseLike<infer R>
+        ? R extends WithProperty<K, string> ? R : never
+        : ReturnType<T[P]>
 }
 
+/**
+ * Given a union of types all of which meet the contract {[K]: string}
+ * extract the type that is specifically {[K]: TType}
+ */
 export type ExtractOfUnion<T, TType extends string, K extends string = 'type'> = T extends WithProperty<K, TType> ? T : never;
 
 /** 
@@ -35,4 +42,12 @@ export function strEnum<T extends string>(o: Array<T>): {[K in T]: K} {
         res[key] = key;
         return res;
     }, Object.create(null));
+}
+
+/**
+ * Determine whether or not a variable is a promise.
+ * @param x 
+ */
+export function isPromise<T>(x: T | PromiseLike<T>): x is PromiseLike<T> {
+    return x != undefined && typeof x === 'object' && 'then' in x && typeof x.then === 'function';
 }

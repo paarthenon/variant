@@ -1,4 +1,4 @@
-import {Identity, Func, identityFunc, FuncObject, ReturnTypes, Functions, ExtractOfUnion, strEnum} from './util';
+import {Identity, Func, identityFunc, GetDataType, ExtractOfUnion, strEnum, isPromise} from './util';
 
 // Consider calling this ObjectEntry or Entry. Also Pair? No, more like KVPair. Mapping?
 export type TypeExt<K extends string, T> = K extends keyof infer LitK ? {[P in keyof LitK]: T} : never;
@@ -31,16 +31,16 @@ export type Stringable<ReturnType extends string> = {
  */
 export type VariantCreator<
     T extends string,
-    Args extends any[] = [],
-    Return extends {} = {},
+    F extends (...args: any[]) => {},
     K extends string = 'type'>
-= Stringable<T> & ((...args: Args) => Identity<WithProperty<K, T> & Return>) & Outputs<K, T>;
+= Stringable<T> & ((...args: Parameters<F>) => PatchObjectOrPromise<ReturnType<F>, WithProperty<K, T>>) & Outputs<K, T>;
+export type PatchObjectOrPromise<T extends {} | PromiseLike<{}>, U extends {}> = T extends PromiseLike<infer R> ? PromiseLike<Identity<U & R>> : Identity<U & T>;
 
 /**
  * The overall module of variants. This is equivalent to a polymorphic variant. 
  */
 export type VariantModule<K extends string = 'type'> = {
-    [name: string]: VariantCreator<string, any[], any, K>
+    [name: string]: VariantCreator<string, (...args: any[]) => any, K>
 }
 
 /**
@@ -51,13 +51,23 @@ export type VariantModule<K extends string = 'type'> = {
 export function variantFactory<K extends string>(key: K) {
 
     // Type fuckery ensues.
-    function variantFunc<T extends string>(tag: T): VariantCreator<T, [], {}, K>
-    function variantFunc<T extends string, F extends Func>(tag: T, func: F): VariantCreator<T, Parameters<F>, ReturnType<F>, K>
+    function variantFunc<T extends string>(tag: T): VariantCreator<T, () => {}, K>
+    function variantFunc<T extends string, F extends Func>(tag: T, func: F): VariantCreator<T, F, K>
     function variantFunc<T extends string, F extends Func>(tag: T, func?: F) {
-        let maker = (...args: Parameters<F>) => ({
-            [key]: tag,
-            ...(func ?? identityFunc)(...args),
-        })
+        let maker = (...args: Parameters<F>) => {
+            const returned = (func ?? identityFunc)(...args);
+            if (isPromise(returned)) {
+                return returned.then(result => ({
+                    [key]: tag,
+                    ...result,
+                }))
+            } else {
+                return {
+                    [key]: tag,
+                    ...returned,
+                }
+            }
+        };
         const outputs = {
             key,
             type: tag,
@@ -93,26 +103,27 @@ export const variant = variantFactory('type');
  */
 export default variant;
 
-type Creators<T extends FuncObject, PropName extends string = 'type'> = {
-    [P in keyof T]: ReturnType<T[P]> extends WithProperty<PropName, infer TType> ? ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & WithProperty<PropName, TType>>) : never
+export type Creators<T extends VariantModule<PropName>, PropName extends string = 'type'> = {
+    [P in keyof T]: T[P] extends VariantCreator<string, Func, PropName>
+        ? T[P]
+        : never
 }
-
 /**
  * DEPRECATED. Use VariantOf
  */
-export type VariantsOf<T, PropName extends string ='type'> = ReturnTypes<Creators<Functions<T>, PropName>>;
+export type VariantsOf<T extends VariantModule<PropName>, PropName extends string ='type'> = GetDataType<Creators<T, PropName>, PropName>;
 /**
  * DEPRECATED. Use VariantOf
  */
 export type OneOf<T> = T[keyof T];
 
-type FilterVariants<T, Type extends string, K extends string = any> = T extends VariantCreator<Type, any, any, K> ? T : never;
+type FilterVariants<T, Type extends string, K extends string = any> = T extends VariantCreator<Type, Func, K> ? T : never;
 
 /**
  * Basically works like strEnum to generate an object where the property keys are the variant type strings.
  * @param variants 
  */
-export function variantList<T extends VariantCreator<any, any, any, any>>(variants: Array<T>): {[P in T['type']]: FilterVariants<T, P>} {
+export function variantList<T extends VariantCreator<any, Func, any>>(variants: Array<T>): {[P in T['type']]: FilterVariants<T, P>} {
     return variants.reduce((o, v) => ({
         ...o,
         [v.type]: v,
@@ -137,8 +148,8 @@ export function outputTypes<T extends {[name: string]: Outputs<string, string>}>
  * @param object 
  * @param variant 
  */
-export function isOfVariant<T extends VariantModule>(object: WithProperty<'type', string>, variant: T): object is SumType<T> {
-    return outputTypes(variant).some(type => type === object.type);
+export function isOfVariant<T extends VariantModule<K>, K extends string = 'type'>(object: {} | null | undefined, variant: T, typeKey?: K): object is SumType<T, K> {
+    return object != undefined && outputTypes(variant).some(type => type === (object as any)[typeKey ?? 'type']);
 }
 
 
@@ -146,7 +157,7 @@ export function isOfVariant<T extends VariantModule>(object: WithProperty<'type'
  * Unused at the moment. Intended to develop the idea of an "ordered" variant.
  * @param variants 
  */
-function progression<T extends VariantCreator<any, any, any, any>>(variants: Array<T>): {[P in T['type']]: FilterVariants<T, P>} {
+function progression<T extends VariantCreator<any, Func, any>>(variants: Array<T>): {[P in T['type']]: FilterVariants<T, P>} {
     return variants.reduce((o, v) => ({
         ...o,
         [v.type]: v,
@@ -264,11 +275,11 @@ export type AugmentVariant<T extends VariantModule, U> = {
 }
 
 export function cast<O extends WithProperty<K, string>, T extends O[K], K extends string = 'type'>(obj: O, _type: T, _typeKey?: K) {
-    return obj as Specific<O, T, K>;
+    return obj as ExtractOfUnion<O, T, K>;
 }
 export function narrow<O extends WithProperty<K, string>, T extends O[K], K extends string = 'type'>(obj: O, type: T, typeKey?: K) {
     const typeString = obj[typeKey ?? 'type' as K];
-    return typeString === type ? obj as Specific<O, T, K> : undefined;
+    return typeString === type ? obj as ExtractOfUnion<O, T, K> : undefined;
 }
 
 /**
@@ -288,29 +299,26 @@ export function augment<T extends VariantModule, F extends Func>(variantDef: T, 
 }
 
 
-type FilterNeverTypedVariants<T extends WithProperty<K, string | never>, K extends string = 'type'> = T extends WithProperty<K, never> ? never : T;
 
-/**
- * Select a single manifestation of a variant type based on the type name. 
- */
-export type Specific<T extends WithProperty<K, string>, TType extends string = string, K extends string = 'type'> = Identity<FilterNeverTypedVariants<T & WithProperty<K, TType>, K>>;
-
-export type SumType<T, K extends string = 'type'> = OneOf<VariantsOf<T, K>>;
-export type KeysOf<T, K extends string = 'type'> = SumType<T, K>[K] & string;
-export type TypeNames<T, K extends string = 'type'> = KeysOf<T, K> | undefined;
-export type VariantOf<T, TType = undefined, K extends string = 'type'> = TType extends undefined ? SumType<T, K> : TType extends KeysOf<T, K> ? ExtractOfUnion<SumType<T, K>, TType, K> : SumType<T, K>;
+export type SumType<T extends VariantModule<K>, K extends string = 'type'> = VariantsOf<T, K>[keyof T];
+export type KeyMap<T extends VariantModule<K>, K extends string = 'type'> = {
+    [Label in keyof T]: T[Label] extends VariantCreator<infer TypeStr, Func, K> ? TypeStr : never;
+}
+export type KeysOf<T extends VariantModule<K>, K extends string = 'type'> = KeyMap<T, K>[keyof T];
+export type TypeNames<T extends VariantModule<K>, K extends string = 'type'> = KeysOf<T, K> | undefined;
+export type VariantOf<T extends VariantModule<K>, TType = undefined, K extends string = 'type'> = TType extends undefined ? SumType<T, K> : TType extends KeysOf<T, K> ? ExtractOfUnion<SumType<T, K>, TType, K> : SumType<T, K>;
 
 export function keynum<T extends VariantModule>(variantDef: T): {[P in KeysOf<T>]: P} {
     return strEnum(outputTypes(variantDef)) as any;
 }
 
-export type Matrix<T extends VariantModule> = {
-    [P in KeysOf<T>]: Specific<SumType<T>, P>
+export type Matrix<T extends VariantModule<K>, K extends string = 'type'> = {
+    [P in KeysOf<T, K>]: ExtractOfUnion<SumType<T, K>, P, K>
 }
 
 export type Flags<T extends VariantModule> = Partial<Matrix<T>>;
 
-export function flags<T extends WithProperty<K, string>, K extends string = 'type'>(flags: T[]): {[P in T[K]]: Specific<T, P, K>} {
+export function flags<T extends WithProperty<K, string>, K extends string = 'type'>(flags: T[]): {[P in T[K]]: ExtractOfUnion<T, P, K>} {
     return flags.reduce((o, v) => ({
         ...o,
         [v.type]: v,

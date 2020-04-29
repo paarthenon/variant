@@ -22,7 +22,6 @@ export {
     outputTypes,
     isOfVariant,
     VariantModule,
-    Specific,
     KeysOf,
     TypeNames,
     VariantOf,

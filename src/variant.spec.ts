@@ -9,7 +9,6 @@ import {
     cast,
     VariantsOfUnion, 
     KeysOf,
-    Specific,
     keynum,
     match,
 } from './variant';
@@ -113,3 +112,37 @@ test('keynum values', () => {
     expect(keys.snake).toBe('snake');
 });
 
+test('async variant', async () => {
+    // from issue #3 on github
+    const bla = () => 'hello';
+
+    const TaskExtractMetadata = variant('extract_metadata', async function() {
+        // do async stuff
+        const stuff1 = await bla();
+        return {
+            stuff1
+        }
+    });
+
+    const thing = await TaskExtractMetadata();
+
+    expect(thing.type).toBe('extract_metadata');
+    expect(thing.stuff1).toBe('hello');
+});
+
+test('async variant output types', async () => {
+    const nonce = Promise.resolve(5);
+
+    const AsyncTask = variant('A_TASK', async () => ({
+        nonce: await nonce,
+        four: 4,
+    }))
+
+    const result = AsyncTask();
+
+    expect(AsyncTask.type).toBe('A_TASK');
+    expect(AsyncTask.key).toBe('type');
+
+    expect((result as any).four).toBeUndefined();
+    expect((await result).four).toBe(4);
+})
