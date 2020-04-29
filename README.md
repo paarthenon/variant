@@ -403,7 +403,7 @@ import {lookup, Lookup} from 'variant';
 
 declare var action: Action;
 
-const actionDescriptions: Lookup<Actions> = {
+const actionDescriptions: Lookup<Action> = {
     addTodo: 'Add a new todo item.',
     toggleTodo: 'Toggle completion status.',
     setVisibilityFilter: 'Filter visible todos.',
@@ -421,7 +421,7 @@ import {partialLookup, Lookup} from 'variant';
 
 declare var action: Action;
 
-const actionDescriptions: Partial<Lookup<Actions>> = {
+const actionDescriptions: Partial<Lookup<Action>> = {
     addTodo: 'Add a new todo item.',
 };
 
@@ -451,13 +451,72 @@ This needs to be fleshed out. For now, here's a quick rundown
  - Now these constructors need to be grouped together to be meaningful in context.
     - Well, an object works. And it totally does, see the Q&A at the bottom. But if you don't have a meaningful reason to distinguish the name of the action creator from the `type` value of the object it generates then it feels *slightly* tedious.
     - Enter variantList, which just takes an array and turns it into an object by extracting the type from each variant and using it as the property name.
- - `VariantOf<T>` is where the magic happens, but it's ultimately `OneOf<VariantOf<T>>` with some special sauce.
-    - The `VariantOf<T>` type extracts out the action creator return types (so the type `Actions['addTodo']` describes the resulting object's interface, not the function that created it)
+ - `VariantOf<T>` is where the magic happens, but it's ultimately `OneOf<VariantsOf<T>>` with some special sauce.
+    - The `VariantsOf<T>` type extracts out the action creator return types (so the type `Actions['addTodo']` describes the resulting object's interface, not the function that created it)
     - The `OneOf<T>` type is essentually `Values<T>`. Given an object it will generate the union of the types of the values of said object.
 
 
 
 # Q & A
+### **Can I get a real world example?**
+
+Sure, so a real world use case for me in a file manager I'm working on. I automatically parse a file based on its type and generate a series of attributes that my UI needs to know how to render.
+
+A `bitrate` is a common concept, but video files will have one and image files will not, even though they both have a `resolution` and a `sizeOnDisk`. With this library I can create an attributes variant type:
+
+```typescript
+export const Attribute = variantList([
+    variant('Bitrate', payload<number>()),
+    variant('Duration', payload<number>()),
+    variant('Resolution', fields<{
+        width: number;
+        height: number;
+    }>()),
+    variant('sizeOnDisk'),
+]);
+export type Attribute<T extends TypeNames<typeof Attribute> = undefined> = VariantOf<typeof Attribute, T>;
+
+
+export const FileAttribute = variantList([
+    Attribute.sizeOnDisk,
+]);
+export type FileAttribute<T extends TypeNames<typeof FileAttribute> = undefined> = VariantOf<typeof FileAttribute, T>;
+
+export const SongAttribute = variantList([
+    Attribute.Duration,
+    Attribute.Bitrate,
+    Attribute.sizeOnDisk,
+]);
+export type SongAttribute<T extends TypeNames<typeof SongAttribute> = undefined> = VariantOf<typeof SongAttribute, T>;
+
+type ParsedSong = Matrix<typeof SongAttribute>;
+
+```
+
+This let me quickly and easily create meaningful subsets of attributes and work with them. The type of ParsedSong is
+
+```typescript
+{
+    Duration: Attribute<'Duration'>;
+    Bitrate: Attribute<'Bitrate'>;
+    SizeOnDisk: Attribute<'SizeOnDisk'>;
+}
+```
+
+I can use that directly as the return type of my `parseSong()` function. I can store that object in redux or save it to disk. 
+
+I can collect those attributes and shove them into an array and then loop over them to render them in a UI and still do so in a simple way in a single component.
+
+```
+export const AttributeBadge: React.FC<{attr: Attribute}> = ({attr}) =>
+    match(attr, {
+        Duration: ({payload}) => <span>{payload} seconds</span>
+        Resolution: ({width, height}) => <span>Resolution: {width} x {height}</span>
+        ...
+    })
+```
+
+Whenever I add a new Attribute, the compiler warns me I have to update AttributeBadge.
 
 ### **How can I work with variants across multiple files?**
 
@@ -471,20 +530,20 @@ Here's an example of creating multiple "subsets" of a variant by merging select 
 ```typescript
 // Assume a variant called 'Attributes' up above that acts as the master list.
 
-const FileAttributes = variantList([
+const FileAttribute = variantList([
     Attributes.Size,
     Attributes.URL,
     Attributes.CreatedDate,
     Attributes.UpdatedDate,
 ]);
-type FileAttributes = VariantsOf<typeof MovieAttributes>;
 
-const MovieAttributes = variantList([
+...
+
+const MovieAttribute = variantList([
     Attributes.Duration,
     Attributes.Resolution,
     Attributes.Bitrate,
 ]);
-type MovieAttributes = VariantsOf<typeof MovieAttributes>;
 
 ```
 
@@ -495,12 +554,12 @@ It will also help manage more modular reducers. I can write a reducer like this 
 I could just as easily construct the merged object
 
 ```typescript
-export const Attributes = {
-    ...FileAttributes,
-    ...MovieAttributes,
+export const Attribute = {
+    ...FileAttribute,
+    ...MovieAttribute,
     ...etc
 }
-export type Attributes = VariantsOf<typeof Attributes>
+export type Attribute = VariantsOf<typeof Attribute>
 ```
 
 ### **Do I have to use the `type` property?**
