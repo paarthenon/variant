@@ -1,4 +1,4 @@
-import {match, partialMatch, matchLiteral} from './variant'
+import {match, partialMatch, matchLiteral, matchElse} from './variant'
 import {strEnum} from './util';
 import {Animal, cerberus} from './__test__/animal'
 
@@ -33,6 +33,26 @@ test('partial match', () => {
     expect(rating(cerberus)).toBeUndefined();
     expect(rating(Animal.cat({name: 'Loki', daysSinceDamage: 8}))).toBe(1);
 });
+
+test('match else', () => {
+    const rating = (animal: Animal) => matchElse(animal, {
+        cat: _ => 1,
+    }, animal => match(animal, {
+        dog: _ => 2,
+        snake: _ => 3,
+    }));
+
+    expect(rating(cerberus)).toBe(2);
+})
+
+test('match else default', () => {
+    const rating = (animal: Animal) => matchElse(animal, {
+        cat: _ => 4,
+    }, _others => 5);
+
+    expect(rating(cerberus)).toBe(5);
+    expect(rating(Animal.cat({name: 'Jenna', daysSinceDamage: 2}))).toBe(4);
+})
 
 const things = strEnum([
     'a',

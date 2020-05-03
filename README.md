@@ -289,6 +289,7 @@ Like before, the second property can only be a valid key of `Animal`. If `animal
  * `flags` is like `variantList` but instead of taking in `VariantCreators` it takes in a list of generated objects and generates a mapped object similar to the flags or options fields in C programs and modern JS.
  * `fields` actually has two functions attached to it, `set` and `default` that I use to set extra or default values.
  * **This can use enums as keys.** See the tests, I don't have docs but I have examples.
+ * The function `matchElse` allows you to handle *some* cases and then provide a function to handle the rest.
 
 # Technique
 
