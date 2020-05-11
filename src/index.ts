@@ -32,6 +32,7 @@ export {
     flags,
     Matrix,
     keynum,
+    matchElse,
 } from './variant';
 
 export {
