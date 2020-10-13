@@ -1,12 +1,18 @@
 module.exports = {
   title: 'Variant',
   tagline: 'Better discriminated unions in TypeScript',
-  url: 'paarth.io/variant',
-  baseUrl: '/',
+  url: 'http://paarth.io',
+  baseUrl: '/variant/',
   favicon: 'img/variant.ico',
   organizationName: 'paarthenon', // Usually your GitHub org/user name.
   projectName: 'variant', // Usually your repo name.
+  
   themeConfig: {
+    prism: {
+      theme: require('prism-react-renderer/themes/vsDark'),
+      darkTheme: require('prism-react-renderer/themes/ultramin'),
+    },
+    sidebarCollapsible: false,
     navbar: {
       title: 'Variant',
       logo: {
@@ -20,7 +26,12 @@ module.exports = {
           label: 'Docs',
           position: 'left',
         },
-        {to: 'blog', label: 'About', position: 'left'},
+        {
+          to: 'docs/about', 
+          activeBasePath: 'about',
+          label: 'About', 
+          position: 'left'
+        },
         {
           href: 'https://github.com/paarthenon/variant',
           label: 'GitHub',
@@ -35,47 +46,43 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Style Guide',
-              to: 'docs/doc1',
+              label: 'Getting Started',
+              to: 'docs/intro',
             },
             {
-              label: 'Second Doc',
-              to: 'docs/doc2',
+              label: 'About',
+              to: 'docs/about',
             },
           ],
         },
         {
-          title: 'Community',
+          title: 'Related',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+              label: 'TypeScript',
+              href: 'https://www.typescriptlang.org/',
             },
             {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
+              label: 'ReasonML Variants',
+              href: 'https://reasonml.github.io/docs/en/variant',
             },
           ],
         },
         {
-          title: 'More',
+          title: 'Links',
           items: [
-            {
-              label: 'Blog',
-              to: 'blog',
-            },
             {
               label: 'GitHub',
               href: 'https://github.com/paarthenon/variant',
             },
+            {
+              label: 'NPM package',
+              href: 'https://www.npmjs.com/package/variant',
+            }
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Variant Contributors`,
+      copyright: `Copyright © ${new Date().getFullYear()} Variant Contributors` ,
     },
   },
   presets: [
@@ -83,6 +90,9 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          sidebarPath: require.resolve('./sidebars.js'),
+        },
+        about: {
           sidebarPath: require.resolve('./sidebars.js'),
         },
         blog: {

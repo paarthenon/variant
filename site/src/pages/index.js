@@ -8,32 +8,34 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: <>Easy to Use</>,
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    title: <>Intuitive</>,
+    imageUrl: 'img/idea.jpg',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Variant was designed with minimal friction in mind. With little
+        boilerplate and no dependencies, write your types freely and use
+        them anywhere.
       </>
     ),
   },
   {
-    title: <>Focus on What Matters</>,
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    title: <>Expressive</>,
+    imageUrl: 'img/people talking.svg',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Tools to help you describe your domain, the shapes of your entities,
+        and variations in logical flow. Represent your data using Algebraic
+        Data Types and increase readibility.
       </>
     ),
   },
   {
-    title: <>Powered by React</>,
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: <>Type Safe</>,
+    imageUrl: 'img/software engineer2.svg',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Variant is pure TypeScript and built on top of existing patterns. Works
+        seamlessly with redux, type narrowing, and async.
       </>
     ),
   },
@@ -45,7 +47,7 @@ function Feature({imageUrl, title, description}) {
     <div className={classnames('col col--4', styles.feature)}>
       {imgUrl && (
         <div className="text--center">
-          <img className={styles.featureImage} src={imgUrl} alt={title} />
+          <img className={styles.featureImage} src={imgUrl} alt={title}  style={{borderRadius: '50%', margin: '1em'}} />
         </div>
       )}
       <h3>{title}</h3>
@@ -67,7 +69,6 @@ function Home() {
           <div>
             <div style={{
               marginTop: '25%',
-              color: 'black',
             }}>
               <h1 className="hero__title" >{siteConfig.title}</h1>
               <p className="hero__subtitle">{siteConfig.tagline}</p>
@@ -77,7 +78,7 @@ function Home() {
                     'button  button--primary button--lg',
                     styles.getStarted,
                   )}
-                  to={useBaseUrl('docs/doc1')}
+                  to={useBaseUrl('docs/intro')}
                   style={{color: 'white'}}
                 >
                   Get Started

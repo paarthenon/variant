@@ -1,4 +1,5 @@
-import {match, partialMatch, matchLiteral, matchElse} from './variant'
+import {lookup, partialLookup} from './variant'
+import {match, partialMatch, matchLiteral, matchElse} from '.';
 import {strEnum} from './util';
 import {Animal, cerberus} from './__test__/animal'
 
@@ -67,6 +68,18 @@ const handleThing = (thing: things) => matchLiteral(thing, {
     c: _ => '3',
 });
 
+test('match return type', () => {
+    function handleAnimal(animal: Animal) {
+        return partialLookup(animal, {
+            snake: 'snek',
+            cat: 'yo',
+        })
+    };
+
+    const result = handleAnimal(Animal.dog({name: 'Frodo'}))
+
+})
+
 test('match literal', () => {
     expect(handleThing('a')).toBe(1);
     expect(handleThing('c')).toBe('3');
@@ -74,4 +87,37 @@ test('match literal', () => {
 
 test('match literal undefined', () => {
     expect(handleThing('asdf' as any)).toBe(undefined);
+});
+
+
+test('above and beyond', () => {
+    /**
+ * TEST TYPES
+ */
+
+    function handleAnimal(animal: Animal) {
+        return lookup(animal, {
+            snake: 'snek',
+            cat: 'yo',
+            dog: 4,
+        } as const)
+    }
+
+    function getName(animal: Animal) {
+        return partialMatch(animal, {
+            cat: cat => cat.name,
+            dog: ({name}) => name,
+        })
+    }
+
+    function getDaysSinceDamage(animal: Animal) {
+        return matchElse(animal, {
+            cat: ({daysSinceDamage}) => daysSinceDamage
+        }, _ => {
+            return 'yellow';
+        })
+    }
+    const name = getName(Animal.dog({name: 'Frodo'}));
+
+    const result = handleAnimal(Animal.dog({name: 'Frodo'}));
 });

@@ -10,7 +10,6 @@ import {
     VariantsOfUnion, 
     KeysOf,
     keynum,
-    match,
 } from './variant';
 import {Animal} from './__test__/animal';
 

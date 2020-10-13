@@ -24,10 +24,20 @@
   padding: 0 var(--ifm-pre-padding);
 }
 
-.hero.hero--primary {
-  background-color: #e4dddd;
+[data-theme=""] .hero.hero--primary {
+  background-image: linear-gradient(#444, #111);
+}
+[data-theme="dark"] .hero.hero--primary {
+  background-image: linear-gradient(#FFF, #C8C0C0) ;
 }
 
+.docusaurus-highlight-code-line {
+  background-color: #503030;
+}
+
+html[data-theme='dark'] .docusaurus-highlight-code-line {
+  background-color: #E8E0D8;
+}
 .flex-row {
   display: flex;
   flex-direction: row;

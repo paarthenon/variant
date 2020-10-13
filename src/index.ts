@@ -10,11 +10,8 @@ export {
     VariantsOf,
     OneOf,
     WithProperty,
-    match,
-    partialMatch,
     lookup,
     partialLookup,
-    Handler,
     Lookup,
     VariantsOfUnion,
     AugmentVariant,
@@ -25,14 +22,12 @@ export {
     KeysOf,
     TypeNames,
     VariantOf,
-    matchLiteral,
     cast,
     narrow,
     Flags,
     flags,
     Matrix,
     keynum,
-    matchElse,
 } from './variant';
 
 export {
@@ -47,6 +42,8 @@ export {
     ExtractOfUnion,
     strEnum,
 } from './util';
+
+export * from './match';
 
 import {default as variantDefault} from './variant';
 export default variantDefault;

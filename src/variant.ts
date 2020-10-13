@@ -103,15 +103,15 @@ export const variant = variantFactory('type');
  */
 export default variant;
 
-export type Creators<T extends VariantModule<PropName>, PropName extends string = 'type'> = {
-    [P in keyof T]: T[P] extends VariantCreator<string, Func, PropName>
-        ? T[P]
+export type Creators<VM extends VariantModule<K>, K extends string = 'type'> = {
+    [P in keyof VM]: VM[P] extends VariantCreator<string, Func, K>
+        ? VM[P]
         : never
 }
 /**
  * DEPRECATED. Use VariantOf
  */
-export type VariantsOf<T extends VariantModule<PropName>, PropName extends string ='type'> = GetDataType<Creators<T, PropName>, PropName>;
+export type VariantsOf<VM extends VariantModule<K>, K extends string ='type'> = GetDataType<Creators<VM, K>, K>;
 /**
  * DEPRECATED. Use VariantOf
  */
@@ -164,13 +164,7 @@ function progression<T extends VariantCreator<any, Func, any>>(variants: Array<T
     }), Object.create(null))
 }
 
-/**
- * Built to describe an object with the same keys as a variant but instead of constructors
- * for those objects provides functions that handle objects of that type.
- */
-export type Handler<T> = {
-    [P in keyof T]: (variant: T[P]) => any
-}
+
 
 /**
  * Same as handler but needs to handle literals instead of variants. Used by matchLiteral.
@@ -185,84 +179,7 @@ export type UnionHandler<T extends string> = {
 export type VariantsOfUnion<T extends WithProperty<K, string>, K extends string = 'type'> = {
     [P in T[K]]: ExtractOfUnion<T, P, K>
 }
-type Defined<T> = T extends undefined ? never : T;
 
-/**
- * Match a variant against it's possible options and do some processing
- * based on the type of variant received. 
- * @param obj the variant in question
- * @param handler an object whose keys are the type names of the variant's type and values are handler functions for each option.
- * @param {string?} typeKey override the property to inspect. By default, 'type'.
- * @returns {The union of the return types of the various branches of the handler object}
- */
-export function match<
-    T extends WithProperty<K, string>,
-    H extends Handler<VariantsOfUnion<T, K>>,
-    K extends string = 'type'
-> (
-    obj: T,
-    handler: H,
-    typeKey?: K,
-): ReturnType<H[T[K]]>{
-    const typeString = obj[typeKey ?? 'type' as K];
-    return handler[typeString]?.(obj as any);
-}
-
-
-/**
- * Match a variant against it's some of its possible options and do some 
- * processing based on the type of variant received. Finally, take the remaining
- * possibilities and handle them in a function.
- * 
- * @param obj the variant in question
- * @param handler an object whose keys are the type names of the variant's type and values are handler functions for each option.
- * @param {string?} typeKey override the property to inspect. By default, 'type'.
- * @returns {The union of the return types of the various branches of the handler object}
- */
-export function matchElse<
-    T extends WithProperty<K, string>,
-    H extends Partial<Handler<VariantsOfUnion<T, K>>>,
-    E extends (rest: Exclude<T, TypeExt<K, keyof H>>) => any,
-    K extends string = 'type'
-> (
-    obj: T,
-    handler: Partial<H>,
-    _else: E,
-    typeKey?: K,
-): ReturnType<Exclude<H[T[K]], undefined>> | ReturnType<E> {
-    const typeString = obj[typeKey ?? 'type' as K];
-    return handler[typeString]?.(obj as any) ?? _else(obj as any)
-}
-
-/**
- * Match a variant against some of its possible options and do some
- * processing based on the type of variant received. May return undefined
- * if the variant is not accounted for by the handler.
- * @param obj 
- * @param handler 
- * @param typeKey override the property to inspect. By default, 'type'.
- */
-export function partialMatch<
-    T extends WithProperty<K, string>,
-    H extends Handler<VariantsOfUnion<T, K>>,
-    K extends string = 'type'
-> (
-    obj: T,
-    handler: Partial<H>,
-    typeKey?: K,
-): ReturnType<Defined<H[T[K]]>> | undefined {
-    return match(obj, handler as H, typeKey);
-};
-
-/**
- * Match a literal against some of its possible options and do some processing based
- * on the type of literal received. Works well with strEnum
- * @param literal
- * @param handler 
- */
-export function matchLiteral<T extends string, H extends UnionHandler<T>>(literal: T, handler: H): ReturnType<H[T]> {
-    return handler[literal]?.(literal);
-}
 
 /**
  * An object that has the same keys as a variant but has arbitrary values for the data. 
@@ -278,7 +195,11 @@ export type Lookup<T, U = any> = {
  * @param handler 
  * @param typeKey 
  */
-export function lookup<T extends WithProperty<K, string>, L extends Lookup<VariantsOfUnion<T, K>>, K extends string = 'type'>(obj: T, handler: L, typeKey?: K): ReturnType<L[T[K]]> {
+export function lookup<
+    T extends WithProperty<K, string>,
+    L extends Lookup<VariantsOfUnion<T, K>>,
+    K extends string = 'type'
+>(obj: T, handler: L, typeKey?: K): L[keyof L] {
     const typeString = obj[typeKey ?? 'type' as K];
     return handler[typeString];
 }
@@ -292,6 +213,14 @@ export function lookup<T extends WithProperty<K, string>, L extends Lookup<Varia
  * @param typeKey 
  */
 export function partialLookup<T extends WithProperty<K, string>, L extends Lookup<VariantsOfUnion<T, K>>, K extends string = 'type'>(obj: T, handler: Partial<L>, typeKey?: K): ReturnType<L[T[K]]> | undefined {
+    // Takes advantage of the fact that handler with missing keys will return undefined.
+    return lookup(obj, handler as L, typeKey);
+}
+export function partialLookup2<
+    T extends WithProperty<K, string>,
+    L extends Lookup<VariantsOfUnion<T, K>>,
+    K extends string = 'type'
+>(obj: T, handler: Partial<L>, typeKey?: K): Identity<L> {
     // Takes advantage of the fact that handler with missing keys will return undefined.
     return lookup(obj, handler as L, typeKey);
 }
