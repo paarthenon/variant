@@ -10,9 +10,6 @@ export {
     VariantsOf,
     OneOf,
     WithProperty,
-    lookup,
-    partialLookup,
-    Lookup,
     VariantsOfUnion,
     AugmentVariant,
     augment,
@@ -27,7 +24,8 @@ export {
     Flags,
     flags,
     Matrix,
-    keynum,
+    keymap,
+    keys,
 } from './variant';
 
 export {
@@ -44,6 +42,8 @@ export {
 } from './util';
 
 export * from './match';
+export * from './lookup';
+export * from './loose';
 
 import {default as variantDefault} from './variant';
 export default variantDefault;

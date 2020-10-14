@@ -46,11 +46,11 @@ export function match<
  */
 export function partialMatch<
     T extends WithProperty<K, string>,
-    H extends Partial<Handler<VariantsOfUnion<T, K>>>,
+    H extends Handler<VariantsOfUnion<T, K>>,
     K extends string = 'type'
 > (
     obj: T,
-    handler: H,
+    handler: Partial<H>,
     typeKey?: K,
 ): ReturnType<Defined<H[keyof H]>> | undefined {
     return match(obj, handler as H, typeKey) as any;
@@ -61,6 +61,8 @@ export function partialMatch<
  * Match a variant against it's some of its possible options and do some 
  * processing based on the type of variant received. Finally, take the remaining
  * possibilities and handle them in a function.
+ * 
+ * The input to the 'or' clause is well-typed. 
  * 
  * @param obj the variant in question
  * @param handler an object whose keys are the type names of the variant's type and values are handler functions for each option.

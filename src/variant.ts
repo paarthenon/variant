@@ -1,3 +1,4 @@
+import variantDefault from '.';
 import {Identity, Func, identityFunc, GetDataType, ExtractOfUnion, strEnum, isPromise} from './util';
 
 // Consider calling this ObjectEntry or Entry. Also Pair? No, more like KVPair. Mapping?
@@ -74,7 +75,9 @@ export function variantFactory<K extends string>(key: K) {
         }
         return Object.assign(maker, outputs, {toString: function(this: Outputs<K, T>){return this.type}});
     }
-    // the `variant()` function advertises the key it will use
+    // the `variant()` function advertises the key it will use.
+    // this has been updated to just use "key" and "type" but
+    // this is quietly retained for legacy support.
     const outputKey = {outputKey: key};
     return Object.assign(variantFunc, outputKey);
 }
@@ -108,6 +111,10 @@ export type Creators<VM extends VariantModule<K>, K extends string = 'type'> = {
         ? VM[P]
         : never
 }
+
+export type Variant<Type extends string, Fields extends {} = {}, Key extends string = 'type'>
+    = WithProperty<Key, Type> & Fields;
+
 /**
  * DEPRECATED. Use VariantOf
  */
@@ -128,6 +135,29 @@ export function variantList<T extends VariantCreator<any, Func, any>>(variants: 
         ...o,
         [v.type]: v,
     }), Object.create(null))
+}
+
+function safeKeys<O extends {}>(o: O) {
+    return Object.keys(o) as (keyof O & string)[];
+}
+
+export type RawVariant = {[type: string]: Func | undefined};
+
+type Default<T, U> = T extends undefined ? U : T;
+
+export type OutVariant<T extends RawVariant>
+    = {[P in (keyof T & string)]: VariantCreator<P, Default<T[P], () => {}>>}
+;
+
+export function variantModule<
+    T extends RawVariant,
+>(v: T): OutVariant<T> {
+    return safeKeys(v).reduce((acc, key) => {
+        return {
+            ...acc,
+            [key]: variant(key, v[key] ?? identityFunc),
+        };
+    }, {} as OutVariant<T>);
 }
 
 /**
@@ -180,51 +210,6 @@ export type VariantsOfUnion<T extends WithProperty<K, string>, K extends string 
     [P in T[K]]: ExtractOfUnion<T, P, K>
 }
 
-
-/**
- * An object that has the same keys as a variant but has arbitrary values for the data. 
- * a.k.a. a lookup table.
- */
-export type Lookup<T, U = any> = {
-    [P in keyof T]: U
-}
-
-/**
- * Map a variant to some value based on the type of variant provided.
- * @param obj 
- * @param handler 
- * @param typeKey 
- */
-export function lookup<
-    T extends WithProperty<K, string>,
-    L extends Lookup<VariantsOfUnion<T, K>>,
-    K extends string = 'type'
->(obj: T, handler: L, typeKey?: K): L[keyof L] {
-    const typeString = obj[typeKey ?? 'type' as K];
-    return handler[typeString];
-}
-/**
- * Map a variant to some value or undefined based on the type of variant
- * provided. If he handler does not account for your use case, undefined
- * will be returned. The type of undefined is the union of the various
- * values in the object. 
- * @param obj 
- * @param handler 
- * @param typeKey 
- */
-export function partialLookup<T extends WithProperty<K, string>, L extends Lookup<VariantsOfUnion<T, K>>, K extends string = 'type'>(obj: T, handler: Partial<L>, typeKey?: K): ReturnType<L[T[K]]> | undefined {
-    // Takes advantage of the fact that handler with missing keys will return undefined.
-    return lookup(obj, handler as L, typeKey);
-}
-export function partialLookup2<
-    T extends WithProperty<K, string>,
-    L extends Lookup<VariantsOfUnion<T, K>>,
-    K extends string = 'type'
->(obj: T, handler: Partial<L>, typeKey?: K): Identity<L> {
-    // Takes advantage of the fact that handler with missing keys will return undefined.
-    return lookup(obj, handler as L, typeKey);
-}
-
 export type AugmentVariant<T extends VariantModule, U> = {
     [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & Outputs<T[P]['key'], T[P]['type']>
 }
@@ -263,8 +248,33 @@ export type KeysOf<T extends VariantModule<K>, K extends string = 'type'> = KeyM
 export type TypeNames<T extends VariantModule<K>, K extends string = 'type'> = KeysOf<T, K> | undefined;
 export type VariantOf<T extends VariantModule<K>, TType = undefined, K extends string = 'type'> = TType extends undefined ? SumType<T, K> : TType extends KeysOf<T, K> ? ExtractOfUnion<SumType<T, K>, TType, K> : SumType<T, K>;
 
-export function keynum<T extends VariantModule>(variantDef: T): {[P in KeysOf<T>]: P} {
+/**
+ * Return an object cache (`{[P]: P}`) of the keys.
+ * 
+ * An object cache is more useful than an array because you can do
+ * constant time checks and you can still reduce to a well-typed
+ * array with Object.keys
+ * @param variantDef 
+ */
+export function keys<T extends VariantModule>(variantDef: T): {[P in KeysOf<T>]: P} {
     return strEnum(outputTypes(variantDef)) as any;
+}
+
+/**
+ * A variant module does not *necessarily* have a 1-1 mapping from
+ * the key used to refer to the object (Animal.bird) and the key generated
+ * by the variant (ANIMAL_BIRD, @animal/bird, etc.).
+ * 
+ * This enables 
+ * @param v 
+ */
+export function keymap<T extends VariantModule<K>, K extends string = 'type'>(v: T): KeyMap<T, K> {
+    return Object.keys(v).reduce((acc, key) => {
+        return {
+            ...acc,
+            [key]: v[key].type,
+        };
+    }, {} as KeyMap<T,K>);
 }
 
 export type Matrix<T extends VariantModule<K>, K extends string = 'type'> = {
@@ -279,3 +289,4 @@ export function flags<T extends WithProperty<K, string>, K extends string = 'typ
         [v.type]: v,
     }), Object.create(null))
 }
+

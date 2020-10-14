@@ -1,5 +1,4 @@
-import {lookup, partialLookup} from './variant'
-import {match, partialMatch, matchLiteral, matchElse} from '.';
+import {match, partialMatch, matchLiteral, matchElse, partialLookup, lookup} from '.';
 import {strEnum} from './util';
 import {Animal, cerberus} from './__test__/animal'
 
@@ -107,12 +106,14 @@ test('above and beyond', () => {
         return partialMatch(animal, {
             cat: cat => cat.name,
             dog: ({name}) => name,
-        })
+        });
     }
+
+    const namesdfg = getName(cerberus);
 
     function getDaysSinceDamage(animal: Animal) {
         return matchElse(animal, {
-            cat: ({daysSinceDamage}) => daysSinceDamage
+            cat: ({daysSinceDamage}) => daysSinceDamage,
         }, _ => {
             return 'yellow';
         })

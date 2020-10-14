@@ -1,5 +1,5 @@
-import {variant, variantFactory, outputTypes, augment, TypeNames, VariantOf, variantList, lookup, partialLookup} from './variant';
-import {fields} from '.';
+import {variant, variantFactory, outputTypes, augment, TypeNames, VariantOf, variantList} from './variant';
+import {fields, lookup} from '.';
 
 enum ANIMAL_NAME {
     DOG = 'dog',

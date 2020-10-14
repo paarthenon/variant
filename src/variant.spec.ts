@@ -1,3 +1,5 @@
+import {pass, constrainedVariant, typedVariant, nil} from './loose';
+import {match, partialMatch} from './match';
 import {
     variant, 
     variantFactory, 
@@ -9,7 +11,11 @@ import {
     cast,
     VariantsOfUnion, 
     KeysOf,
-    keynum,
+    keys,
+    KeyMap,
+    Variant,
+    keymap,
+    variantModule,
 } from './variant';
 import {Animal} from './__test__/animal';
 
@@ -97,18 +103,18 @@ test('cast failure', () => {
 });
 
 test('keynum', () => {
-    const keys = keynum(Animal);
+    const aKeys = keys(Animal);
 
-    expect(keys).toHaveProperty(Animal.dog.type);
-    expect(keys).toHaveProperty('cat');
+    expect(aKeys).toHaveProperty(Animal.dog.type);
+    expect(aKeys).toHaveProperty('cat');
 });
 
 test('keynum values', () => {
-    const keys = keynum(Animal);
+    const aKeys = keys(Animal);
 
-    expect(keys.cat).toBe('cat');
-    expect(keys.dog).toBe('dog');
-    expect(keys.snake).toBe('snake');
+    expect(aKeys.cat).toBe('cat');
+    expect(aKeys.dog).toBe('dog');
+    expect(aKeys.snake).toBe('snake');
 });
 
 test('async variant', async () => {
@@ -144,4 +150,109 @@ test('async variant output types', async () => {
 
     expect((result as any).four).toBeUndefined();
     expect((await result).four).toBe(4);
+})
+
+test('keymap', () => {
+    const Anim = {
+        dog: Animal.dog,
+        kitty: Animal.cat,
+    };
+    type Anim<T extends TypeNames<typeof Anim> = undefined> = VariantOf<typeof Anim, T>;
+    
+    const thing = keymap(Anim);
+    type asdf = KeyMap<typeof Anim>;
+    thing.dog;
+})
+
+
+test('variantModule', () => {
+    const AnimClone = typedVariant<Animal>({
+        cat: pass,
+        dog: pass,
+        snake: pass,
+    })
+    const Anim = variantModule({
+        dog(name: string) {
+            return {name};
+        },
+        bird: undefined,
+    })
+
+    Anim.bird()
+
+})
+test('YOOOOOO', () => {
+    
+    type Tree =
+        | Variant<'node', {data: string}>
+        | Variant<'branch', {left?: Tree, right?: Tree}>
+    ;
+
+    const Tree = typedVariant<
+        | Variant<'node', {data: string}>
+        | Variant<'branch', {left?: Tree, right?: Tree}>
+    >({
+        branch: pass,
+        node: pass,
+    });
+
+    const x = Tree.branch({right: Tree.node({data: 'yolo'})});
+
+    expect(x.right?.type === 'node' && x.right.data).toBe('yolo');
+
+    console.log('TREESS', x);
+})
+
+test('YOOOOOO (generic)', () => {
+    type Tree<T> =
+        | Variant<'node', {data: T}>
+        | Variant<'branch', {left?: Tree<T>, right?: Tree<T>}>
+    ;
+
+    function getTree<T>() {
+        return typedVariant<Tree<T>>({
+            branch: pass,
+            node: pass,
+        })
+    };
+
+    const strTree = getTree<string>();
+    const stringX = strTree.branch({right: strTree.node({data: 'yolo'})});
+
+    const numTree = getTree<number>();
+    const numX = numTree.branch({right: numTree.node({data: 34})});
+
+    expect(stringX.right?.type === 'node' && stringX.right.data).toBe('yolo');
+    expect(numX.right?.type === 'node' && numX.right.data).toBe(34);
+});
+
+
+test('issue #2', () => {
+    type Employee = unknown;
+
+    type Fetched<T> =
+        | Variant<'fetching', {progress: number, previousData?: T}>
+        | Variant<'fetched', {data: T}>
+        | Variant<'error', {error: string}>
+    ;
+
+    const getFetched = <T>() => typedVariant<Fetched<T>>({
+        fetching: pass,
+        fetched: pass,
+        error: pass,
+    });
+
+    const FetchedAnimal = getFetched<Animal>();
+    const FetchedEmployee = getFetched<Employee>();
+
+    function showFetchedStatus<T>(fetched: Fetched<T>) {
+        return match(fetched, {
+            fetching: ({progress}) => `fetching ${progress}%`,
+            fetched: () => 'fetched',
+            error: ({error}) => `fetch error ${error}`,
+        })
+    }
+
+    expect(showFetchedStatus(FetchedEmployee.fetching({progress: 50}))).toBe('fetching 50%');
+    expect(showFetchedStatus(FetchedAnimal.fetching({progress: 10}))).toBe('fetching 10%');
 })
