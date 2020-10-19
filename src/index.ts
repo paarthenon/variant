@@ -7,8 +7,6 @@ export {
     variant,
     variantList,
     variantFactory,
-    VariantsOf,
-    OneOf,
     WithProperty,
     VariantsOfUnion,
     AugmentVariant,

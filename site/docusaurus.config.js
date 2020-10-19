@@ -33,6 +33,11 @@ module.exports = {
           position: 'left'
         },
         {
+          to: 'docs/api',
+          label: '☕ API',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/paarthenon/variant',
           label: 'GitHub',
           position: 'right',
@@ -53,6 +58,10 @@ module.exports = {
               label: 'About',
               to: 'docs/about',
             },
+            {
+              label: 'API',
+              to: 'docs/api',
+            }
           ],
         },
         {

@@ -1,5 +1,6 @@
 import {pass, constrainedVariant, typedVariant, nil} from './loose';
 import {match, partialMatch} from './match';
+import {fields} from './tools';
 import {
     variant, 
     variantFactory, 
@@ -255,4 +256,21 @@ test('issue #2', () => {
 
     expect(showFetchedStatus(FetchedEmployee.fetching({progress: 50}))).toBe('fetching 50%');
     expect(showFetchedStatus(FetchedAnimal.fetching({progress: 10}))).toBe('fetching 10%');
+})
+
+test('better variantList', () => {
+    const Animal = betterVariantList([
+        variant('dog', fields<{name: string}>()),
+        'bird',
+    ]);
+
+    expect(Animal.bird().type).toBe('bird');
+
+    console.log(Animal);
+});
+
+test('card variantList', () => {
+    const Suit = betterVariantList(['Diamonds', 'Hearts', 'Spades', 'Clubs']);
+
+    expect(Suit.Clubs().type).toBe('Clubs');
 })

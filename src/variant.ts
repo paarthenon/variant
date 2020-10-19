@@ -32,7 +32,7 @@ export type Stringable<ReturnType extends string> = {
  */
 export type VariantCreator<
     T extends string,
-    F extends (...args: any[]) => {},
+    F extends (...args: any[]) => {} = () => {},
     K extends string = 'type'>
 = Stringable<T> & ((...args: Parameters<F>) => PatchObjectOrPromise<ReturnType<F>, WithProperty<K, T>>) & Outputs<K, T>;
 export type PatchObjectOrPromise<T extends {} | PromiseLike<{}>, U extends {}> = T extends PromiseLike<infer R> ? PromiseLike<Identity<U & R>> : Identity<U & T>;
@@ -118,23 +118,35 @@ export type Variant<Type extends string, Fields extends {} = {}, Key extends str
 /**
  * DEPRECATED. Use VariantOf
  */
-export type VariantsOf<VM extends VariantModule<K>, K extends string ='type'> = GetDataType<Creators<VM, K>, K>;
+type VariantsOf<VM extends VariantModule<K>, K extends string ='type'> = GetDataType<Creators<VM, K>, K>;
 /**
  * DEPRECATED. Use VariantOf
  */
-export type OneOf<T> = T[keyof T];
+type OneOf<T> = T[keyof T];
 
 type FilterVariants<T, Type extends string, K extends string = any> = T extends VariantCreator<Type, Func, K> ? T : never;
+
+type validListType = VariantCreator<any, Func, any> | string;
+
+type Variantify<T extends validListType> = T extends string ? VariantCreator<T> : T;
 
 /**
  * Basically works like strEnum to generate an object where the property keys are the variant type strings.
  * @param variants 
  */
-export function variantList<T extends VariantCreator<any, Func, any>>(variants: Array<T>): {[P in T['type']]: FilterVariants<T, P>} {
-    return variants.reduce((o, v) => ({
-        ...o,
-        [v.type]: v,
-    }), Object.create(null))
+export function variantList<T extends validListType>(variants: Array<T>): {[P in Variantify<T>['type']]: FilterVariants<Variantify<T>, P>} {
+    return variants
+        .map((v): VariantCreator<string> => {
+            if (typeof v === 'string') {
+                return variant(v);
+            } else {
+                return v as any;
+            }
+        })
+        .reduce((o, v) => ({
+            ...o,
+            [v.type]: v,
+        }), Object.create(null))
 }
 
 function safeKeys<O extends {}>(o: O) {

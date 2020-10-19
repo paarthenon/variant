@@ -24,7 +24,7 @@ The short version is this: A variant type is like an enum but each case can hold
 ### Discriminated Unions *in TypeScript*
 TypeScript has an inherent problem. Interfaces and inferred types only exist at compile time, but inspecting a type can only be done at runtime. That makes it difficult to simultaneously benefit from types and make decisions based on those types. Classes are one solution to provide compile time type checking and runtime behavior together but they don't *serialize*, so we can't send them over the network or shove them in a redux store. Enter variant types, and this library.
 
-This can certainly be done with raw discriminated unions, but compare the animal example from before to the vanilla TypeScript code.
+This can certainly be done with raw discriminated unions, but this is what it looks like at its best. Compare this vanilla TypeScript code to the animal example with variant.
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -110,3 +110,13 @@ type Animal = {
 ```
 
 But the variant approach is shorter, has better types, *automatically updates* as I add new animals, and requires **no manual casting**.
+
+****
+
+### 🚧 TODO
+(pardon our dust)
+
+ - [ ] Add section on exhaustiveness
+ - [ ] Add section on extra features variant gives you that aren't in TS by default.
+    - [ ] subsection "Matrix and Flags"
+    - [ ] fluent utilities to process DUs (match, matchElse, partialLookup, etc.)

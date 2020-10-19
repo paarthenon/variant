@@ -8,27 +8,24 @@ Variant aims to bring the experience of [variant types](https://dev.realworldoca
 
 ## Quick Start 
 
-Let's use [`variant`](use/variant) to describe a domain — **Animals**. [Or if you'd like a redux example...](use/redux)
+Let's use [`variant`](use/variant) to describe a simple domain — **Animals**. [Or if you'd like a redux example...](use/redux)
 
 For this application, we care about dogs, cats, and snakes. We have different concerns for each animal, so we'll want to define them with distinct fields. The [`fields`](api.md#fields) function below is shorthand to help do this. We'll see more of how it works in the [first section of the User Guide](use/variant).
 ```typescript
-import variant, {variantList, VariantOf, fields, TypeNames} from 'variant';
+import {variant, variantModule, VariantOf, fields, TypeNames} from 'variant';
 
-export const Animal = variantList([
-    variant('dog', fields<{name: string, favoriteBall?: string}>()),
-    variant('cat', fields<{name: string, daysSinceDamage: number}>()),
-    variant('snake', (name: string, patternName?: string) => ({
-        name,
-        pattern: patternName ?? 'striped',
-    })),
-]);
+export const Animal = variantModule({
+    dog: fields<{name: string, favoriteBall?: string}>(),
+    cat: fields<{name: string, daysSinceDamage: number}>(),
+    snake: (name: string, pattern = 'striped') => ({name, pattern}),
+});
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 ```
 
 We can now import and use the `Animal` object, which simply collects the tag constructors we care about in one place. To create a new dog, for example, call `Animal.dog({name: 'Guava'})`. When we imported the `Animal` *object* we also imported the `Animal` *type* since we defined these with the same name. This single import will allows us to:
 
  - **Create** a new animal
-    - `Animal.snake('steve')` — *value*: `{ type: 'snake', name: 'steve', pattern: 'striped' }`
+    - `Animal.snake('Steve')` — *value*: `{ type: 'snake', name: 'Steve', pattern: 'striped' }`
  - **Annotate** the type for a **single** animal.
     - `Animal<'snake'>` — *type*: `{ type: 'snake', name: string, pattern: string }`
  - **Annotate** the **union** of all animals.
@@ -42,11 +39,13 @@ const describeSnake = (snake: Animal<'snake'>) => {...}
 const describeAnimal = (animal: Animal) => {...}
 ```
 
-With these building blocks we're ready to write some elegant code. Let's expand the `describeAnimal` function with the [`match`](api.md#match) utility.
+With these building blocks we're ready to write some elegant code. Let's implement the `describeAnimal` function with the [`match`](api.md#match) utility.
 
 ### Match
 
-Match is a great tool to **process** a variant of unknown type. The function will accept an variant object (*animal*) and a handler object. Think of each entry of the handler like a branch that might execute. To be safe the object will need an entry for every case of the variant. In this example that means one for each animal. 
+Match is a great tool to **process** a variant of unknown type. The function will accept a variant object (*animal*) and a handler object. Think of each entry of the handler like a branch that might execute. We'll have to describe how to deal with every option to be safe. 
+
+In this case, let's describe how each animal is relaxing in the bedroom.
 
 ```typescript
 import {match} from 'variant';
@@ -57,22 +56,23 @@ const describeAnimal = (animal: Animal) => match(animal, {
         `${name} is on the rug`,
         favoriteBall ? `nuzzling a ${favoriteBall} ball.` : '.' 
     ].join(' '),
-    snake: s => `Hi ${s.name}, your ${s.pattern} skin looks nice today.`,
+    snake: s => `${s.name} is enjoying the heat of the lamp on his ${s.pattern} skin`,
 });
 ```
 
-If any of this looks unfamiliar, this sample leverages the ES6 [lambda expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), [template strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals), and [parameter destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Unpacking_fields_from_objects_passed_as_function_parameter) features. 
+If any of this syntax looks unfamiliar, take a look at ES6 [lambda expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), [template strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals), and [parameter destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Unpacking_fields_from_objects_passed_as_function_parameter) features. 
 
 ****
 **[`match`](api.md#match)** is...
   - **exhaustive by default**. If you only need to handle some cases, use [`partialMatch`](api.md#partialmatch).
- - **pure TypeScript.** This will work on any valid discriminated union, whether or not it was made with [`variant`](api.md#variant).
- - **well typed**. `match`'s return type is the union of the return types of all the potential handler functions. `partialMatch` does the same but adds `undefined` to the union.
+    - *Exhaustiveness* means if you add a new animal, TypeScript will remind you to update the `describeAnimal` function! No more tedious guesswork.
+ - **pure TypeScript.** This will work on any valid discriminated union, made with [`variant`](api.md#variant) or not.
+ - **well typed**. `match`'s return type is the union of the return types of all the handler functions.
  - **familiar**. It's meant to imitate the [OCaml / Reason ML **`match`** statement](https://ocaml.org/learn/tutorials/data_types_and_matching.html#Pattern-matching-on-datatypes).
- - **flexible**. By default `match` switches on the `type` property which can be overridden using the function's optional third paramater. 
+ - **flexible**. By default `match` switches on the `type` property but that can easily be overridden.
 
 :::note
-[**match**](api.md#match) has a little sister named [**lookup**](api.md#lookup), for when you don't need to use any properties of the variant.
+[**match**](api.md#match) has a little sister named [**lookup**](api.md#lookup), for when you don't need to use any properties from the variant.
 
 ```typescript
 const cuteName = lookup(animal, {
@@ -80,12 +80,23 @@ const cuteName = lookup(animal, {
     dog: 'pupper',
     snake: 'snek',
 });
+```
 :::
 
 ### Grouping
 
-Earlier we defined `Animal` using the [`variantList`](api.md#variantlist) function. It's also valid to construct the `Animal` object directly.
+Earlier we defined `Animal` using the [`variantModule`](api.md#variantmodule) function. This is often the most convenient method, but it's also perfectly valid to use the `variantList()` function or to construct the `Animal` object directly.
 
+> Here's `variantList()`
+```typescript
+const Animal = variantList([
+    variant('dog', ...),
+    variant('cat', ...),
+    variant('snake', ...),
+])
+```
+
+> ...and this is the direct approach.
 ```typescript
 const Animal = {
     dog: variant('dog', ...),
@@ -94,8 +105,17 @@ const Animal = {
 }
 ```
 
-This is discussed further in [the page on grouping variants.](use/grouping)
+Feel free to mix and match styles. This is discussed further in [the page on grouping variants.](use/grouping)
+
+### Applications
+
+(coming soon)
+
+ - Message handling and dispatching (redux, CQRS)
+ - Flags
+ - File attributes for file browser
+
 
 ### Continued
 
-There's more to come. The next page, [Motivation](motivation), is context and can be skipped. It explains why variant matters and what a vanilla TypeScript approach would look like. The [Usage Guide](use/variant) goes over the practical things you need to know and is the next place I'd look as a new user wanting to get things done. Finally, [the API Reference](api) is available for details on every function and type.
+There's more to come. The next page, [Motivation](motivation), is background information for new and interested readers. *This next section is safe to skip*. It explains why variant matters and what a vanilla TypeScript approach would look like. The [Usage Guide](use/variant) goes over the practical things you need to know and is the next place I'd look as a new user wanting to get things done. Finally, [the API Reference](api) is available for details on every function and type.

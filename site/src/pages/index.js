@@ -19,13 +19,13 @@ const features = [
     ),
   },
   {
-    title: <>Expressive</>,
-    imageUrl: 'img/people talking.svg',
+    title: <>Powerful</>,
+    imageUrl: 'img/powerful.svg',
     description: (
       <>
-        Tools to help you describe your domain, the shapes of your entities,
-        and variations in logical flow. Represent your data using Algebraic
-        Data Types and increase readibility.
+        Out of the box support for <b>generic</b>, <b>async</b>, and <b>recursive</b> variants. 
+        The ability to create subsets and combinations. Tools for conditional rendering
+        and property matrices
       </>
     ),
   },
