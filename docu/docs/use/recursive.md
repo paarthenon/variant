@@ -3,7 +3,7 @@ id: 'recursive'
 title: 'Recursive variants'
 ---
 
-Recursive variants are a wonderful pattern for expressing and evaluating tree and list-like data. The traditional example involves a binary tree.
+Recursive variants are a wonderful pattern for expressing and evaluating tree and list-like data. The traditional example involves a binary tree, so let's do a binary tree of `Animal`s. I know this doesn't make sense but please bear with me.
 
 ## `typedVariant<T>()`
 So far we've been letting the **type** flow from the **value**. However, this makes recursive variants impossible. Attempting to reference `AnimalNode` in the *definition* for `AnimalNode` causes an error in the time-loop (and `tsc`).

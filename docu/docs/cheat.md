@@ -35,3 +35,6 @@ Here is a [VS Code snippet](https://code.visualstudio.com/docs/editor/userdefine
 		"description": "Initialize a module for variants"
 	},
 ```
+
+TODO
+ - [] add variant-list, variant-module, variant-type-

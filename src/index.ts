@@ -16,6 +16,7 @@ export {
     VariantModule,
     KeysOf,
     TypeNames,
+    Variant,
     VariantOf,
     cast,
     narrow,
@@ -32,6 +33,7 @@ export {
     payload,
     property,
     exhaust,
+    constant
 } from './tools';
 
 export {

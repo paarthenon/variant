@@ -17,6 +17,7 @@ import {
     Variant,
     keymap,
     variantModule,
+    variantList,
 } from './variant';
 import {Animal} from './__test__/animal';
 
@@ -259,7 +260,7 @@ test('issue #2', () => {
 })
 
 test('better variantList', () => {
-    const Animal = betterVariantList([
+    const Animal = variantList([
         variant('dog', fields<{name: string}>()),
         'bird',
     ]);
@@ -270,7 +271,7 @@ test('better variantList', () => {
 });
 
 test('card variantList', () => {
-    const Suit = betterVariantList(['Diamonds', 'Hearts', 'Spades', 'Clubs']);
+    const Suit = variantList(['Diamonds', 'Hearts', 'Spades', 'Clubs']);
 
     expect(Suit.Clubs().type).toBe('Clubs');
 })

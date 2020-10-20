@@ -82,9 +82,9 @@ Well, two reasons.
     ```
 2. **Your property names and type names are different.** In these examples my type names are pretty simple and are also valid property names. Depending on the conventions of your codebase this may not be possible. 
     
-    Legacy support may be needed to achieve continuity with data from the time java programmers would toss around `ALL_CAPS_MESSAGE_CONSTANTS` with no regard to the fact that may someday become unfashionable someday. *The nerve*.
+    Legacy support may be needed to achieve continuity with data from the time java programmers would toss around `ALL_CAPS_MESSAGE_CONSTANTS` with no regard to the fact that may become unfashionable someday. *The nerve*.
 
-    In some react projects, actions or other variant types are *scoped*, or *namespaced*, resulting in type names like `@action/ADD_ANIMAL`. This is not a valid property name and so it may be desirable to use a more friendly name on the module object. 
+    In some react projects, actions or other variant types are *scoped*, or *namespaced*, resulting in type names like `@action/ADD_ANIMAL`. This is not a valid property name and so it may be desirable to use a more friendly name as the key.. 
 
     ```typescript
     const Action = {
@@ -94,7 +94,7 @@ Well, two reasons.
     }
     ```
 
-    It's much easier to call `Action.addAnimal(...)` than `Action['@action/ADD_ANIMAL'](...)`. Rest assured the variant library functions have all been designed to work with the *actual* type of the generated object, even when that made the type signatures really frustrating to write.
+    It's much easier to call `Action.addAnimal(...)` than `Action['@action/ADD_ANIMAL'](...)`. Rest assured the variant library functions have all been designed to work with the *actual* type of the generated object, even when that made the type signatures of those functions really frustrating to write.
 
 ## Subsets and Combinations
 

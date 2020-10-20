@@ -10,7 +10,7 @@ Variant aims to bring the experience of [variant types](https://dev.realworldoca
 
 Let's use [`variant`](use/variant) to describe a simple domain — **Animals**. [Or if you'd like a redux example...](use/redux)
 
-For this application, we care about dogs, cats, and snakes. We have different concerns for each animal, so we'll want to define them with distinct fields. The [`fields`](api.md#fields) function below is shorthand to help do this. We'll see more of how it works in the [first section of the User Guide](use/variant).
+For this application, we care about dogs, cats, and snakes. These will be the various pets our player can have. We have different concerns for each animal, so we'll want to define them with distinct fields. The [`fields`](api.md#fields) function below is shorthand to help do this. We'll see more of how it works in the [first section of the User Guide](use/variant).
 ```typescript
 import {variant, variantModule, VariantOf, fields, TypeNames} from 'variant';
 

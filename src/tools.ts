@@ -86,3 +86,10 @@ export function data<T>(x: T) {
     return (override?: T) => ({...x, ...(override != undefined && override)});
 }
 
+/**
+ * Meant to be used inside of a `match`
+ * @param x 
+ */
+export function constant<T>(x: T) {
+    return () => x;
+}
