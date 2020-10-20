@@ -12,4 +12,13 @@ I use `variant` in almost every project I make. It's a language feature as a lib
 
 I'd like to express my sincere thanks to the users and companies using `variant` in their codebases every day. ❤️
 
-Profiles - [GH](https://github.com/paarthenon) - [SO](https://stackoverflow.com/users/2557260/paarth)
+
+### Contact
+
+ - Email: [`variant.developer@gmail.com`](mailto:variant.developer@gmail.com)
+ - Github: [Paarthenon](https://github.com/paarthenon)
+ - StackOverflow: [Paarth](https://stackoverflow.com/users/2557260/paarth)
+
+I'm active on reddit. I won't be posting my username because I learn from the mistakes of others but you might see me around the TypeScript subreddit.
+
+If you liked what you saw here and have any questions or would like to consult with me or my employer, please feel free to reach out to `variant.developer@gmail.com`. However, I should note that I am happily employed and will likely *not* pursue an opening as a Java developer with required relocation to New Jersey.

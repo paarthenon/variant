@@ -65,7 +65,7 @@ const rating = (a: Animal) => match(a, {
 Use `_` as the label for throwaway arguments in the handler functions. This convention is concise and helps limit `tsc`'s whining when the `noUnusedParameters` flag is on.
 :::
 
-Now let's pretend I made a mistake while typing `4`, and accidentally wrote `'4'`.
+Now this would never happen, of course, but let's pretend I made a mistake while typing `4`, and accidentally wrote the string `'4'`.
 ```typescript {4}
 const rating = (a: Animal) => match(a, {
     dog: ({name}) => name === 'Chewbacca' ? 10 : 7, 

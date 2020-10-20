@@ -13,28 +13,28 @@
 <link data-react-helmet="true" rel="shortcut icon" href="/variant/img/variant.ico">
 
 
-<link rel="stylesheet" href="/variant/styles.b4b4e2a7.css">
+<link rel="stylesheet" href="/variant/styles.10563a9a.css">
 
 
-<link rel="preload" href="/variant/styles.79f3d18f.js" as="script">
+<link rel="preload" href="/variant/styles.58e0cbf8.js" as="script">
 
-<link rel="preload" href="/variant/runtime~main.43496d3e.js" as="script">
+<link rel="preload" href="/variant/runtime~main.c596bfea.js" as="script">
 
-<link rel="preload" href="/variant/main.4b8758bd.js" as="script">
+<link rel="preload" href="/variant/main.11846125.js" as="script">
 
-<link rel="preload" href="/variant/1.ee6ce182.js" as="script">
+<link rel="preload" href="/variant/1.944951c9.js" as="script">
 
-<link rel="preload" href="/variant/2.a86e87e5.js" as="script">
+<link rel="preload" href="/variant/2.7625dcab.js" as="script">
 
-<link rel="preload" href="/variant/3.86400aee.js" as="script">
+<link rel="preload" href="/variant/3.92a14990.js" as="script">
 
-<link rel="preload" href="/variant/1be78505.c4bc7774.js" as="script">
+<link rel="preload" href="/variant/1be78505.4287f605.js" as="script">
 
-<link rel="preload" href="/variant/4949f0cf.4f509a0a.js" as="script">
+<link rel="preload" href="/variant/4949f0cf.60261139.js" as="script">
 
-<link rel="preload" href="/variant/17896441.89220495.js" as="script">
+<link rel="preload" href="/variant/17896441.61d41e40.js" as="script">
 
-<link rel="preload" href="/variant/6d1e2756.0d45ede8.js" as="script">
+<link rel="preload" href="/variant/6d1e2756.abacb2da.js" as="script">
 
 </head>
 <body>
@@ -44,25 +44,25 @@
 </span></div><div class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token console class-name" style="color:rgb(78, 201, 176)">console</span><span class="token punctuation" style="color:rgb(212, 212, 212)">.</span><span class="token method function property-access" style="color:rgb(220, 220, 170)">log</span><span class="token punctuation" style="color:rgb(212, 212, 212)">(</span><span class="token plain">snake</span><span class="token operator" style="color:rgb(212, 212, 212)">?.</span><span class="token plain">pattern</span><span class="token punctuation" style="color:rgb(212, 212, 212)">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span></div></div></div></div></div><p>Like before, the second property can only be a valid key of <code>Animal</code>. If <code>animal</code> is in fact a snake you get it back. If not, you get undefined. This works very well with the optional chaining operator in TypeScript. Especially when you get a deeper object in the tree. </p><blockquote><p>Yes this is equivalent to <code>const snake = partialMatch(animal, {snake: s =&gt; s});</code> but it&#x27;s way more readable. It&#x27;s also clearer in a <code>useSelector</code> call.</p><div class="mdxCodeBlock_iHAB"><div class="codeBlockContent_32p_"><button type="button" aria-label="Copy code to clipboard" class="copyButton_1BYj">Copy</button><div tabindex="0" class="prism-code language-typescript codeBlock_19pQ"><div class="codeBlockLines_2n9r" style="color:#9CDCFE;background-color:#1E1E1E"><div class="token-line" style="color:#9CDCFE"><span class="token comment" style="color:rgb(106, 153, 85)">// settingsPage.tsx</span><span class="token plain"></span></div><div class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token keyword" style="color:rgb(86, 156, 214)">const</span><span class="token plain"> graphicsSettings </span><span class="token operator" style="color:rgb(212, 212, 212)">=</span><span class="token plain"> </span><span class="token function" style="color:rgb(220, 220, 170)">useSelector</span><span class="token punctuation" style="color:rgb(212, 212, 212)">(</span><span class="token punctuation" style="color:rgb(212, 212, 212)">(</span><span class="token parameter">state</span><span class="token parameter operator" style="color:rgb(212, 212, 212)">:</span><span class="token parameter"> RootState</span><span class="token punctuation" style="color:rgb(212, 212, 212)">)</span><span class="token plain"> </span><span class="token arrow operator" style="color:rgb(212, 212, 212)">=&gt;</span><span class="token plain"> </span></div><div class="token-line" style="color:#9CDCFE"><span class="token plain">    </span><span class="token function" style="color:rgb(220, 220, 170)">narrow</span><span class="token punctuation" style="color:rgb(212, 212, 212)">(</span><span class="token plain">state</span><span class="token punctuation" style="color:rgb(212, 212, 212)">.</span><span class="token property-access">view</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token string" style="color:rgb(206, 145, 120)">&#x27;Settings&#x27;</span><span class="token punctuation" style="color:rgb(212, 212, 212)">)</span><span class="token operator" style="color:rgb(212, 212, 212)">?.</span><span class="token plain">graphics </span><span class="token operator" style="color:rgb(212, 212, 212)">??</span><span class="token plain"> </span><span class="token constant" style="color:rgb(100, 102, 149)">DEFAULT_GRAPHICS_SETTINGS</span><span class="token punctuation" style="color:rgb(212, 212, 212)">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span></div></div></div></div></div></blockquote></div></article><div class="margin-vert--lg"><nav class="pagination-nav"><div class="pagination-nav__item"></div><div class="pagination-nav__item pagination-nav__item--next"></div></nav></div></div></div><div class="col col--3"><div class="tableOfContents_TbNY"></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="row footer__links"><div class="col footer__col"><h4 class="footer__title">Docs</h4><ul class="footer__items"><li class="footer__item"><a class="footer__link-item" href="/variant/docs/intro">Getting Started</a></li><li class="footer__item"><a class="footer__link-item" href="/variant/docs/about">About</a></li><li class="footer__item"><a class="footer__link-item" href="/variant/docs/api">API</a></li></ul></div><div class="col footer__col"><h4 class="footer__title">Related</h4><ul class="footer__items"><li class="footer__item"><a class="footer__link-item" target="_blank" rel="noopener noreferrer" href="https://www.typescriptlang.org/">TypeScript</a></li><li class="footer__item"><a class="footer__link-item" target="_blank" rel="noopener noreferrer" href="https://reasonml.github.io/docs/en/variant">ReasonML Variants</a></li></ul></div><div class="col footer__col"><h4 class="footer__title">Links</h4><ul class="footer__items"><li class="footer__item"><a class="footer__link-item" target="_blank" rel="noopener noreferrer" href="https://github.com/paarthenon/variant">GitHub</a></li><li class="footer__item"><a class="footer__link-item" target="_blank" rel="noopener noreferrer" href="https://www.npmjs.com/package/variant">NPM package</a></li></ul></div></div><div class="text--center"><div>Copyright © 2020 Variant Contributors</div></div></div></footer>
 </div>
 
-<script src="/variant/styles.79f3d18f.js"></script>
+<script src="/variant/styles.58e0cbf8.js"></script>
 
-<script src="/variant/runtime~main.43496d3e.js"></script>
+<script src="/variant/runtime~main.c596bfea.js"></script>
 
-<script src="/variant/main.4b8758bd.js"></script>
+<script src="/variant/main.11846125.js"></script>
 
-<script src="/variant/1.ee6ce182.js"></script>
+<script src="/variant/1.944951c9.js"></script>
 
-<script src="/variant/2.a86e87e5.js"></script>
+<script src="/variant/2.7625dcab.js"></script>
 
-<script src="/variant/3.86400aee.js"></script>
+<script src="/variant/3.92a14990.js"></script>
 
-<script src="/variant/1be78505.c4bc7774.js"></script>
+<script src="/variant/1be78505.4287f605.js"></script>
 
-<script src="/variant/4949f0cf.4f509a0a.js"></script>
+<script src="/variant/4949f0cf.60261139.js"></script>
 
-<script src="/variant/17896441.89220495.js"></script>
+<script src="/variant/17896441.61d41e40.js"></script>
 
-<script src="/variant/6d1e2756.0d45ede8.js"></script>
+<script src="/variant/6d1e2756.abacb2da.js"></script>
 
 
 </body>

@@ -13,7 +13,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Articles',
-      items: ['articles/that-type'],
+      items: ['articles/that-type', 'articles/augment'],
     },
     'api',
   ],

@@ -4,13 +4,13 @@ sidebar_label: ☕ API
 ---
 The full list of options.
 
+:::warning in progress
+This page is not yet complete. For now the user guide is relatively thorough and it's possible to inspect the types and documentation on the functions themselves.
+:::
+
 ## Functions
 
-tools to help describe the domain.
-
-### flags
-
-TODO
+Tools to help describe and process domains.
 
 ### isOfVariant
 
