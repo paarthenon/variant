@@ -9,9 +9,7 @@ npm i -S variant
 
 Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domain models and tiny DSLs. However, because *"TypeScript instead builds on JavaScript patterns as they exist today"[(*)](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions)* using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
 
-### [![Variant Logo](docs/variant_logo_xsmall.png "Variant Logo") Documentation](https://paarthenon.github.io/variant/)
-
-****
+# [![Variant Logo](docs/variant_logo_xsmall.png "Variant Logo") Documentation](https://paarthenon.github.io/variant/)
 
 *everything below this line is legacy documentation for variant 1.x. Please use the website linked above.*
 
