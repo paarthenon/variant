@@ -72,7 +72,7 @@ Well, two reasons.
 1. **You're mixing styles.** `variantList()` is better suited for scooping up specific forms and passing them on, so we might use this to save ourselves effort while building the `Mammal` module by pulling from the `Animal` module we created earlier.
 
     ```typescript
-    const Mammals = {
+    const Mammal = {
         squirrel: variant('squirrel', fields<{numAcorns: number}>()),
         ...variantList([
             Animal.dog,

@@ -2,7 +2,7 @@
 id: intro
 title: Introduction
 ---
-Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domain models and tiny DSLs. However, because [*"TypeScript instead builds on JavaScript patterns as they exist today"*](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
+Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://basarat.gitbook.io/typescript/type-system/discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domain models and tiny DSLs. However, because [*"TypeScript instead builds on JavaScript patterns as they exist today"*](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
 
 > [🧠 Click here to jump straight to the API Reference](api.md).
 
@@ -26,7 +26,7 @@ export const Animal = variantModule({
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 ```
 
-We can now import and use the `Animal` object, which simply collects the tag constructors we care about in one place. To create a new dog, for example, call `Animal.dog({name: 'Guava'})`. When we imported the `Animal` *object* we also imported the `Animal` *type* since we defined these with the same name. This single import will allows us to:
+We can now import and use the `Animal` object, which simply collects the tag constructors we care about in one place. To create a new dog, for example, call `Animal.dog({name: 'Guava'})`. When we imported the `Animal` *object* we also imported the [`Animal` *type*](articles/that-type) since we defined these with the same name. This single import will allows us to:
 
  - **Create** a new animal
     - `Animal.snake('Steve')` — *value*: `{ type: 'snake', name: 'Steve', pattern: 'striped' }`
@@ -120,9 +120,9 @@ However there are certainly applications where variants *excel*
  - **Actions**. Variant types are the ideal solution for expressing a set of possible actions that need dispatching. That's exactly why this example is used in every conversation about discriminated unions.
  - **Optionals and result objects**. The [`Option<T>` type](https://en.wikipedia.org/wiki/Option_type) is familiar and loved for good reason. Variants allow you to express this and more powerful versions of result types with partial success and progress information.
  - **Compilers and interpreters.** Variants closely mirror the recursive rule definitions of S-langs. Expressing grammars in TypeScript feels natural and is feasible with this project's support for recursive and generic types.
- - **Heterogeneous** (mixed) **lists**. These are the best way to express heterogeneous lists that can still be "unzippered" into separate, well-typed parts. Job or task systems tend to love having access to heterogeneous lists for the task queue, a list made up of different types of jobs.
+ - **Heterogeneous** (mixed) **lists**. These are the best way to express heterogeneous lists that can still be unzipped into separate, well-typed parts. Job or task systems tend to love having access to heterogeneous lists for the task queue, a list made up of different types of jobs.
 
 
 ### Continued
 
-There's more to come. The next page, [Motivation](motivation), is background information for new and interested readers. *This next section is safe to skip*. It explains why variant matters and what a vanilla TypeScript approach would look like. The [Usage Guide](use/variant) goes over the practical things you need to know and is the next place I'd look as a new user wanting to get things done. Finally, [the API Reference](api) is available for details on every function and type.
+There's more to come. The next page, [Motivation](./motivation), is background information for new and interested readers. *This next section is safe to skip*. It explains why variant matters and what a vanilla TypeScript approach would look like. The [Usage Guide](use/variant) goes over the practical things you need to know and is the next place I'd look as a new user wanting to get things done. [Articles](articles/that-type) are loose writings addressing specific topics. Finally, [the API Reference](api) is available for details on every function and type.

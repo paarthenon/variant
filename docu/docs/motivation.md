@@ -73,17 +73,12 @@ type Animal =
 <TabItem value="variant">
 
 ```typescript
-import variant, {variantList, VariantOf, fields, TypeNames} from 'variant';
-
-const Animal = variantList([
-    variant('dog', fields<{name: string, favoriteBall?: string}>()),
-    variant('cat', fields<{name: string, daysSinceDamage: number}>()),
-    variant('snake', (name: string, patternName?: string) => ({
-        name,
-        pattern: patternName ?? 'striped',
-    })),
-]);
-type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
+export const Animal = variantModule({
+    dog: fields<{name: string, favoriteBall?: string}>(),
+    cat: fields<{name: string, daysSinceDamage: number}>(),
+    snake: (name: string, pattern = 'striped') => ({name, pattern}),
+});
+export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 ```
 
 </TabItem>
@@ -110,13 +105,3 @@ type Animal = {
 ```
 
 But the variant approach is shorter, has better types, *automatically updates* as I add new animals, and requires **no manual casting**.
-
-****
-
-### 🚧 TODO
-(pardon our dust)
-
- - [ ] Add section on exhaustiveness
- - [ ] Add section on extra features variant gives you that aren't in TS by default.
-    - [ ] subsection "Matrix and Flags"
-    - [ ] fluent utilities to process DUs (match, matchElse, partialLookup, etc.)
