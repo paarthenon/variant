@@ -10,11 +10,16 @@ Variant aims to bring the experience of [variant types](https://dev.realworldoca
 The term [Domain](https://en.wikipedia.org/wiki/Domain_(software_engineering)) has many meanings but here we use domain to mean **your set of concerns**. If you are making a game, you might care about the player state, potential enemies, or items and inventory. If you are writing a budget tracker, your concerns might include income sources and recurring vs. one-time expenses.
 :::
 
+Variant doesn't have any dependencies and doesn't need any setup. Simply run `npm install`.
+
+```bash
+npm install --save variant
+```
 ## Quick Start 
 
 Let's use [`variant`](use/variant) to describe a simple domain — **Animals**. [Or if you'd like a redux example...](use/redux)
 
-For this application, we care about dogs, cats, and snakes. These will be the various pets our player can have. We have different concerns for each animal, so we'll want to define them with distinct fields. The [`fields`](api.md#fields) function below is shorthand to help do this. We'll see more of how it works in the [first section of the User Guide](use/variant).
+For this application, we care about dogs, cats, and snakes. These will be the various pets our player can have. We have different concerns for each animal, so we'll want to define them with distinct fields. The [`fields`](use/variant#fields) function below is shorthand to help do this. We'll see more of how it works in the [first section of the User Guide](use/variant).
 ```typescript
 import {variant, variantModule, VariantOf, fields, TypeNames} from 'variant';
 
@@ -43,7 +48,7 @@ const describeSnake = (snake: Animal<'snake'>) => {...}
 const describeAnimal = (animal: Animal) => {...}
 ```
 
-With these building blocks we're ready to write some elegant code. Let's implement the `describeAnimal` function with the [`match`](api.md#match) utility.
+With these building blocks we're ready to write some elegant code. Let's implement the `describeAnimal` function with the [`match`](use/matching) utility.
 
 ### Match
 
@@ -89,7 +94,7 @@ const cuteName = lookup(animal, {
 
 ### Grouping
 
-Earlier we defined `Animal` using the [`variantModule`](api.md#variantmodule) function. This is often the most convenient method, but it's also perfectly valid to use the `variantList()` function or to construct the `Animal` object directly.
+Earlier we defined `Animal` using the [`variantModule`](use/grouping#variantmodule) function. This is often the most convenient method, but it's also perfectly valid to use the [`variantList()`](use/grouping#variantlist) function or to construct the `Animal` object directly.
 
 > Here's `variantList()`
 ```typescript

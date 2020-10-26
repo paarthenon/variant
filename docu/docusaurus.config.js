@@ -1,7 +1,7 @@
 module.exports = {
   title: 'Variant',
   tagline: 'Better discriminated unions in TypeScript',
-  url: 'http://paarth.io',
+  url: 'https://paarthenon.github.io',
   baseUrl: '/variant/',
   favicon: 'img/variant.ico',
   organizationName: 'paarthenon', // Usually your GitHub org/user name.

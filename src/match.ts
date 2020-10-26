@@ -8,7 +8,7 @@ type Defined<T> = T extends undefined ? never : T;
 
 /**
  * Built to describe an object with the same keys as a variant but instead of constructors
- * for those objects provides functions that handle objects of that type.
+ * for those objects has functions that handle objects of that type.
  */
 export type Handler<T, U = any> = {
     [P in keyof T]: (variant: T[P]) => U
