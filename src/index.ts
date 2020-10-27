@@ -7,15 +7,7 @@ export {
     variant,
     variantList,
     variantFactory,
-    VariantsOf,
-    OneOf,
     WithProperty,
-    match,
-    partialMatch,
-    lookup,
-    partialLookup,
-    Handler,
-    Lookup,
     VariantsOfUnion,
     AugmentVariant,
     augment,
@@ -24,15 +16,15 @@ export {
     VariantModule,
     KeysOf,
     TypeNames,
+    Variant,
     VariantOf,
-    matchLiteral,
     cast,
     narrow,
     Flags,
     flags,
     Matrix,
-    keynum,
-    matchElse,
+    keymap,
+    keys,
 } from './variant';
 
 export {
@@ -41,12 +33,17 @@ export {
     payload,
     property,
     exhaust,
+    constant
 } from './tools';
 
 export {
     ExtractOfUnion,
     strEnum,
 } from './util';
+
+export * from './match';
+export * from './lookup';
+export * from './loose';
 
 import {default as variantDefault} from './variant';
 export default variantDefault;

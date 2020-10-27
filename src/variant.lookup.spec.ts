@@ -1,5 +1,5 @@
 import {Animal, cerberus} from './__test__/animal';
-import {lookup, partialLookup} from './variant';
+import {lookup, partialLookup} from '.';
 
 test('basic lookup', () => {
     const cuteName = (animal: Animal) => lookup(animal, {
