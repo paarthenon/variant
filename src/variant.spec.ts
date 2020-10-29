@@ -1,6 +1,3 @@
-import {pass, constrainedVariant, typedVariant, nil} from './loose';
-import {match, partialMatch} from './match';
-import {fields} from './tools';
 import {
     variant, 
     variantFactory, 
@@ -18,7 +15,11 @@ import {
     keymap,
     variantModule,
     variantList,
-} from './variant';
+    fields,
+    match,
+    pass,
+    typedVariant,
+} from './index';
 import {Animal} from './__test__/animal';
 
 test('empty variant', () => {
