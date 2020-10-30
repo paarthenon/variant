@@ -19,6 +19,7 @@ import {
     match,
     pass,
     typedVariant,
+    isType,
 } from './index';
 import {Animal} from './__test__/animal';
 
@@ -275,4 +276,44 @@ test('card variantList', () => {
     const Suit = variantList(['Diamonds', 'Hearts', 'Spades', 'Clubs']);
 
     expect(Suit.Clubs().type).toBe('Clubs');
+})
+
+
+test('IsType 0', () => {
+    const kitty = Animal.cat({name: 'Yannis', daysSinceDamage: 0}) as Animal;
+
+    const isCat = isType(kitty, 'cat');
+    const isDog = isType(kitty, 'dog');
+    expect(isCat).toBe(true);
+    expect(isDog).toBe(false);
+});
+
+test('IsType UDTG', () => {
+    const kerb = Animal.dog({name: 'Kerberos', favoriteBall: 'yellow'});
+
+    if (isType(kerb, 'dog')) {
+        expect(kerb.favoriteBall).toBe('yellow');
+    } else {
+        fail('isType did not register kerb as a dog');
+    }
+});
+
+test('IsType UDTG (func)', () => {
+    const kerb = Animal.dog({name: 'Kerberos', favoriteBall: 'yellow'});
+
+    if (isType(kerb, Animal.dog)) {
+        expect(kerb.favoriteBall).toBe('yellow');
+    } else {
+        fail('isType did not register kerb as a dog');
+    }
+});
+
+test('IsType UDTG wrong', () => {
+    const kerb = Animal.dog({name: 'Kerberos', favoriteBall: 'yellow'}) as Animal;
+
+    if (isType(kerb, Animal.snake)) {
+        fail('isType did not register kerb as a dog');
+    } else {
+        expect(kerb).
+    }
 })

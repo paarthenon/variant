@@ -34,6 +34,7 @@ export {
 export {
     fields,
     data,
+    isType,
     payload,
     property,
     exhaust,

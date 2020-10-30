@@ -1,5 +1,5 @@
-import {Outputs, WithProperty} from "./variant";
-import {Identity} from "./util";
+import {Outputs, Variant, VariantCreator, WithProperty} from "./variant";
+import {ExtractOfUnion, Identity} from "./util";
 
 /**
  * Enforce exhaustion of a union type by using this in the default case.
@@ -92,4 +92,29 @@ export function data<T>(x: T) {
  */
 export function constant<T>(x: T) {
     return () => x;
+}
+
+/**
+ * Check if an object is of a given type. The type here
+ * may be a string or a variant constructor (i.e. `Animal.dog`).
+ * 
+ * If the object being analyzed is typed as a union, typing
+ * a string will autocomplete the property names and providing
+ * a function will be restricted to the set of variant creators
+ * for those potential types.
+ * @param instance some JS object
+ * @param type a string for the type, or the constructor for that variant
+ * @param key optional discriminant key override. 'type' by default.
+ */
+export function isType<
+    O extends WithProperty<K, string>,
+    T extends (O[K] | VariantCreator<O[K], any, K>),
+    K extends string = 'type',
+>(
+    instance: O | {} | null | undefined,
+    type: T,
+    key?: K,
+): instance is ExtractOfUnion<O, T extends VariantCreator<infer R, any, K> ? R : T extends string ? T : never, K> {
+    const typeStr = typeof type === 'string' ? type : (type as VariantCreator<string, any, K>).type;
+    return instance != undefined && (instance as WithProperty<K, string>)[key ?? 'type'] === typeStr;
 }
