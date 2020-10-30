@@ -21,7 +21,7 @@ import {
     typedVariant,
     isType,
 } from './index';
-import {Animal} from './__test__/animal';
+import {Animal, cerberus} from './__test__/animal';
 
 test('empty variant', () => {
     const func = variant('');
@@ -276,6 +276,14 @@ test('card variantList', () => {
     const Suit = variantList(['Diamonds', 'Hearts', 'Spades', 'Clubs']);
 
     expect(Suit.Clubs().type).toBe('Clubs');
+})
+
+test('Animal filter', () => {
+    const animals = [cerberus, Animal.snake('Steve')];
+
+    const result = animals.filter(isType(Animal.dog));
+    expect(result.length).toBe(1);
+    expect(result[0].name).toBe('Cerberus');
 })
 
 

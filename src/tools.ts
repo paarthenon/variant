@@ -1,4 +1,4 @@
-import {Outputs, Variant, VariantCreator, WithProperty} from "./variant";
+import variant, {Outputs, Variant, VariantCreator, WithProperty} from "./variant";
 import {ExtractOfUnion, Func, Identity} from "./util";
 
 /**
@@ -94,6 +94,14 @@ export function constant<T>(x: T) {
     return () => x;
 }
 
+type FlattenToTypeStr<T extends (string | VariantCreator<string, Func, K>), K extends string = 'type'> =
+    T extends VariantCreator<infer R, Func, K> ? R : T extends string ? T : never;
+
+/**
+ * Curried isType, useful for `.filter` or rxjs
+ * @param type 
+ */
+export function isType<T extends (string | VariantCreator<string, Func, K>), K extends string = 'type'>(type: T): <O extends WithProperty<K, string>> (o: O) => o is ExtractOfUnion<O, FlattenToTypeStr<T, K>, K>; 
 /**
  * Check if an object is of a given type. The type here
  * may be a string or a variant constructor (i.e. `Animal.dog`).
@@ -114,7 +122,29 @@ export function isType<
     instance: O | {} | null | undefined,
     type: T,
     key?: K,
-): instance is ExtractOfUnion<O, T extends VariantCreator<infer R, Func, K> ? R : T extends string ? T : never, K> {
-    const typeStr = typeof type === 'string' ? type : (type as VariantCreator<string, any, K>).type;
-    return instance != undefined && (instance as WithProperty<K, string>)[key ?? 'type'] === typeStr;
+): instance is ExtractOfUnion<O, T extends VariantCreator<infer R, Func, K> ? R : T extends string ? T : never, K>; 
+export function isType<
+    O extends WithProperty<K, string>,
+    T extends (O[K] | VariantCreator<O[K], Func, K>),
+    K extends string = 'type',
+>(
+    instanceOrType: O | {} | null | undefined | T,
+    typeOrKey?: T | K,
+    key?: K,
+) {
+    if (instanceOrType != undefined) {
+        if (typeof instanceOrType === 'function' || typeof instanceOrType === 'string') {
+            const typeArg = instanceOrType as T;
+            const typeStr = typeof typeArg === 'string' ? typeArg : (typeArg as VariantCreator<string, any, K>).type;
+            return <O extends WithProperty<K, string>>(o: O): o is ExtractOfUnion<O, FlattenToTypeStr<T, K>, K> => isType(o, typeStr);
+        } else {
+            const instance = instanceOrType as O;
+            const type = typeOrKey as T;
+
+            const typeStr = typeof type === 'string' ? type : (type as VariantCreator<string, any, K>).type;
+            return instance != undefined && (instance as WithProperty<K, string>)[key ?? 'type'] === typeStr;
+        }
+    } else {
+        return false;
+    }
 }
