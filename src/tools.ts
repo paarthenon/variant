@@ -1,5 +1,5 @@
 import {Outputs, Variant, VariantCreator, WithProperty} from "./variant";
-import {ExtractOfUnion, Identity} from "./util";
+import {ExtractOfUnion, Func, Identity} from "./util";
 
 /**
  * Enforce exhaustion of a union type by using this in the default case.
@@ -108,13 +108,13 @@ export function constant<T>(x: T) {
  */
 export function isType<
     O extends WithProperty<K, string>,
-    T extends (O[K] | VariantCreator<O[K], any, K>),
+    T extends (O[K] | VariantCreator<O[K], Func, K>),
     K extends string = 'type',
 >(
     instance: O | {} | null | undefined,
     type: T,
     key?: K,
-): instance is ExtractOfUnion<O, T extends VariantCreator<infer R, any, K> ? R : T extends string ? T : never, K> {
+): instance is ExtractOfUnion<O, T extends VariantCreator<infer R, Func, K> ? R : T extends string ? T : never, K> {
     const typeStr = typeof type === 'string' ? type : (type as VariantCreator<string, any, K>).type;
     return instance != undefined && (instance as WithProperty<K, string>)[key ?? 'type'] === typeStr;
 }

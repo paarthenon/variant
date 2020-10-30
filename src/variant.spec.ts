@@ -314,6 +314,6 @@ test('IsType UDTG wrong', () => {
     if (isType(kerb, Animal.snake)) {
         fail('isType did not register kerb as a dog');
     } else {
-        expect(kerb).
+        expect(kerb.type).toBe('dog');
     }
 })
