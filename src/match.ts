@@ -43,7 +43,7 @@ export function match<
     H extends Partial<Handler<VariantsOfUnion<T, K>>>,
     E extends (rest: Exclude<T, TypeExt<K, keyof H>>) => any,
     K extends string = 'type'
->(obj: T, handler: H, _else?: E, typeKey?: K): ReturnType<Defined<H[keyof H]>> | ReturnType<E>;
+>(obj: T, handler: H, _else: E, typeKey?: K): ReturnType<Defined<H[keyof H]>> | ReturnType<E>;
 /**
  * Match a variant against its possible options and do some processing
  * based on the type of variant received. 
