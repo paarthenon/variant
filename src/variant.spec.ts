@@ -179,7 +179,7 @@ test('variantModule', () => {
         dog(name: string) {
             return {name};
         },
-        bird: undefined,
+        bird: {},
     })
 
     Anim.bird()

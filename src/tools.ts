@@ -55,20 +55,10 @@ function _default<T, X, Y>(func: (x: X) => Y, data: T) {
  * @param defaults set some default values for the object. Note this does not remove
  */
 export function fields<T>(defaults: Partial<T> = {}) {
-    return Object.assign(
-        (input: T) => ({
-            ...defaults,
-            ...input,
-        }) as T,
-        {
-            set<D extends Partial<T>>(this: (x: T) => T, data: D) {
-                return _set(this, data);
-            },
-            default<D>(this: (x: T) => T, data: D) {
-                return _default(this, data);
-            },
-        },
-    );
+    return (input: T) => ({
+        ...defaults,
+        ...input,
+    }) as T;
 }
 
 /**

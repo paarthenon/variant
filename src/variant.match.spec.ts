@@ -104,8 +104,7 @@ test('above and beyond', () => {
 
     function getName(animal: Animal) {
         return partialMatch(animal, {
-            cat: cat => cat.name,
-            dog: ({name}) => name,
+            default: _ => _.name,
         });
     }
 

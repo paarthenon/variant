@@ -81,6 +81,13 @@ export function match<
 }
 
 /**
+ * Built to describe an object with the same keys as a variant but instead of constructors
+ * for those objects has functions that handle objects of that type. In this case, the
+ * keys are all partial and there is an extra option "default"
+ */
+export type DefaultedHandler<T, U = any> = Partial<Handler<T> & {default?: (union: T[keyof T]) => U}>
+
+/**
  * Match a variant against some of its possible options and do some
  * processing based on the type of variant received. May return undefined
  * if the variant is not accounted for by the handler.
@@ -90,14 +97,13 @@ export function match<
  */
 export function partialMatch<
     T extends WithProperty<K, string>,
-    H extends Handler<VariantsOfUnion<T, K>>,
     K extends string = 'type'
 > (
     obj: T,
-    handler: Partial<H>,
+    handler: DefaultedHandler<VariantsOfUnion<T, K>>,
     typeKey?: K,
-): ReturnType<Defined<H[keyof H]>> | undefined {
-    return match(obj, handler as H, typeKey) as any;
+): ReturnType<Defined<typeof handler[keyof typeof handler]>> {
+    return match(obj, handler as any, typeKey) as any;
 };
 
 

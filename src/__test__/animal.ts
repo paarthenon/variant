@@ -14,7 +14,7 @@ export const Animal2 = variantModule({
     dog: fields<{name: string, favoriteBall?: string}>(),
     cat: fields<{name: string, daysSinceDamage: number}>(),
     snake: (name: string, pattern = 'striped') => ({name, pattern}),
-    bird: undefined,
+    bird: {},
 });
 export type Animal2<T extends TypeNames<typeof Animal2> = undefined> = VariantOf<typeof Animal2, T>;
 

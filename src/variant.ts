@@ -152,12 +152,12 @@ function safeKeys<O extends {}>(o: O) {
     return Object.keys(o) as (keyof O & string)[];
 }
 
-export type RawVariant = {[type: string]: Func | undefined};
+export type RawVariant = {[type: string]: Func | {}};
 
-type Default<T, U> = T extends undefined ? U : T;
+type CleanResult<T, U> = T extends undefined ? U : T extends Func ? T : T extends object ? U : T;
 
 export type OutVariant<T extends RawVariant>
-    = {[P in (keyof T & string)]: VariantCreator<P, Default<T[P], () => {}>>}
+    = {[P in (keyof T & string)]: VariantCreator<P, CleanResult<T[P], () => {}>>}
 ;
 
 /**
@@ -168,11 +168,11 @@ export type OutVariant<T extends RawVariant>
  */
 export function variantModule<
     T extends RawVariant,
->(v: T): OutVariant<T> {
+>(v: T): Identity<OutVariant<T>> {
     return safeKeys(v).reduce((acc, key) => {
         return {
             ...acc,
-            [key]: variant(key, v[key] ?? identityFunc),
+            [key]: variant(key, typeof v[key] === 'function' ? v[key] as Func : identityFunc),
         };
     }, {} as OutVariant<T>);
 }
