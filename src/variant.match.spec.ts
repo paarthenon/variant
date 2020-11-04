@@ -26,8 +26,9 @@ test('match with type prop', () => {
 
 
 test('partial match', () => {
-    const rating = (animal: Animal) => partialMatch(animal, {
-        cat: _ => 1,
+    const rating = (animal: Animal) => match(animal, {
+        cat: () => 1,
+        default: () => {},
     });
 
     expect(rating(cerberus)).toBeUndefined();
@@ -46,7 +47,7 @@ test('match else', () => {
 })
 
 test('match else default', () => {
-    const rating = (animal: Animal) => matchElse(animal, {
+    const rating = (animal: Animal) => match(animal, {
         cat: _ => 4,
     }, _others => 5);
 
@@ -88,6 +89,35 @@ test('match literal undefined', () => {
     expect(handleThing('asdf' as any)).toBe(undefined);
 });
 
+test('default handler', () => {
+    const x = cerberus as Animal;
+    const result = match(x, {
+        cat: _ => 5,
+        default: _ => 0,
+    });
+
+    expect(result).toBe(0);
+});
+
+test('default handler 2', () => {
+    const x = Animal.cat({name: 'Stevie', daysSinceDamage: 0}) as Animal;
+    const result = match(x, {
+        cat: _ => 5,
+        default: _ => 0,
+    });
+
+    expect(result).toBe(5);
+});
+
+
+test('partial match2', () => {
+    const x = cerberus as Animal;
+    const result = match(x, {
+        cat: c => c.daysSinceDamage,
+        zorg: () => new Date(),
+        dog: d => d.favoriteBall,
+    }, z => z.pattern);
+})
 
 test('above and beyond', () => {
     /**
@@ -113,6 +143,7 @@ test('above and beyond', () => {
     function getDaysSinceDamage(animal: Animal) {
         return matchElse(animal, {
             cat: ({daysSinceDamage}) => daysSinceDamage,
+            dog: ({name}) => name,
         }, _ => {
             return 'yellow';
         })

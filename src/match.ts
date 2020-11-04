@@ -1,4 +1,5 @@
-import {TypeExt, UnionHandler, WithProperty, VariantsOfUnion} from './variant';
+import {Func} from './util';
+import {TypeExt, UnionHandler, WithProperty, VariantsOfUnion, VariantModule, KeysOf} from './variant';
 
 
 /**
@@ -14,6 +15,14 @@ export type Handler<T, U = any> = {
     [P in keyof T]: (variant: T[P]) => U
 }
 
+type WithDefault<T, U = any> = 
+    | Partial<T> & {default: (...args: Parameters<FuncsOnly<T>[keyof T]>) => U}
+    | T
+;
+
+type FuncsOnly<T> = {
+    [P in keyof T]: T[P] extends Func ? T[P] : never;
+}
 
 /**
  * Match a variant against its possible options and do some processing
@@ -24,8 +33,8 @@ export type Handler<T, U = any> = {
  */
 export function match<
     T extends WithProperty<'type', string>,
-    H extends Handler<VariantsOfUnion<T>>,
->(obj: T, handler: H): ReturnType<H[keyof H]>;
+    H extends WithDefault<Handler<VariantsOfUnion<T>>>,
+>(obj: T, handler: H): ReturnType<Limit<FuncsOnly<H>, T['type'] | 'default'>[keyof H]>;
 /**
  * Match a variant against it's some of its possible options and do some 
  * processing based on the type of variant received. Finally, take the remaining
@@ -43,7 +52,7 @@ export function match<
     H extends Partial<Handler<VariantsOfUnion<T, K>>>,
     E extends (rest: Exclude<T, TypeExt<K, keyof H>>) => any,
     K extends string = 'type'
->(obj: T, handler: H, _else: E, typeKey?: K): ReturnType<Defined<H[keyof H]>> | ReturnType<E>;
+>(obj: T, handler: H, _else: E, typeKey?: K): ReturnType<Defined<Limit<H, T['type']>[keyof H]>> | ReturnType<E>;
 /**
  * Match a variant against its possible options and do some processing
  * based on the type of variant received. 
@@ -54,15 +63,15 @@ export function match<
  */
 export function match<
     T extends WithProperty<K, string>,
-    H extends Handler<VariantsOfUnion<T, K>>,
+    H extends WithDefault<Handler<VariantsOfUnion<T, K>>>,
     K extends string = 'type'
->(obj: T, handler: H, typeKey?: K): ReturnType<H[keyof H]>;
+>(obj: T, handler: H, typeKey?: K): ReturnType<Limit<FuncsOnly<H>, T['type'] | 'default'>[keyof H]>;
 /**
  * Actual impl
  */
 export function match<
     T extends WithProperty<K, string>,
-    H extends Partial<Handler<VariantsOfUnion<T, K>>>,
+    H extends Partial<Handler<VariantsOfUnion<T, K>>> | WithDefault<Handler<VariantsOfUnion<T, K>>>,
     E extends (rest: Exclude<T, TypeExt<K, keyof H>>) => any,
     K extends string = 'type'
 > (obj: T, handler: H, _elseOrKey?: E | K, key?: K) {
@@ -75,10 +84,14 @@ export function match<
         if (_elseOrKey != undefined && typeof _elseOrKey === 'function') {
             return _elseOrKey(obj as any);
         } else {
+            if ('default' in handler) {
+                return (handler as {default(t: T): any}).default(obj);
+            }
             return undefined;
         }
     }
 }
+
 
 /**
  * Built to describe an object with the same keys as a variant but instead of constructors
@@ -87,6 +100,7 @@ export function match<
  */
 export type DefaultedHandler<T, U = any> = Partial<Handler<T> & {default?: (union: T[keyof T]) => U}>
 
+type Keyless<T> = T & {key: never};
 /**
  * Match a variant against some of its possible options and do some
  * processing based on the type of variant received. May return undefined
@@ -143,4 +157,8 @@ export function matchElse<
  */
 export function matchLiteral<T extends string, H extends UnionHandler<T>>(literal: T, handler: H): ReturnType<H[T]> {
     return handler[literal]?.(literal);
+}
+
+type Limit<T, Keys extends string> = {
+    [P in keyof T]: P extends Keys ? T[P] : never;
 }
