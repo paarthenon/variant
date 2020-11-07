@@ -1,5 +1,5 @@
 import {Func} from './util';
-import {TypeExt, UnionHandler, WithProperty, VariantsOfUnion, VariantModule, KeysOf} from './variant';
+import {TypeExt, UnionHandler, WithProperty, VariantsOfUnion, VariantModule, KeysOf, Variant} from './variant';
 
 
 /**
@@ -24,6 +24,18 @@ type FuncsOnly<T> = {
     [P in keyof T]: T[P] extends Func ? T[P] : never;
 }
 
+export const DEFAULT_KEY = 'default';
+export type DEFAULT_KEY = typeof DEFAULT_KEY;
+
+/**
+ * Catch-all type to express type errors.
+ */
+export interface VariantError<T> { __error: never, __message: T };
+
+export type Limited<T, U> = Exclude<keyof T, U> extends never 
+    ? T 
+    : VariantError<['Expected keys of handler', keyof T, 'to be limited to possible keys', U]>
+;
 /**
  * Match a variant against its possible options and do some processing
  * based on the type of variant received. 
@@ -34,7 +46,7 @@ type FuncsOnly<T> = {
 export function match<
     T extends WithProperty<'type', string>,
     H extends WithDefault<Handler<VariantsOfUnion<T>>>,
->(obj: T, handler: H): ReturnType<Limit<FuncsOnly<H>, T['type'] | 'default'>[keyof H]>;
+>(obj: T, handler: H & Limited<H, T['type'] | DEFAULT_KEY>): ReturnType<Limit<FuncsOnly<H>, T['type'] | DEFAULT_KEY>[keyof H]>;
 /**
  * Match a variant against it's some of its possible options and do some 
  * processing based on the type of variant received. Finally, take the remaining
@@ -52,7 +64,7 @@ export function match<
     H extends Partial<Handler<VariantsOfUnion<T, K>>>,
     E extends (rest: Exclude<T, TypeExt<K, keyof H>>) => any,
     K extends string = 'type'
->(obj: T, handler: H, _else: E, typeKey?: K): ReturnType<Defined<Limit<H, T['type']>[keyof H]>> | ReturnType<E>;
+>(obj: T, handler: H, _else: E, typeKey?: K): ReturnType<Defined<FuncsOnly<H>[keyof H]>> | ReturnType<E>;
 /**
  * Match a variant against its possible options and do some processing
  * based on the type of variant received. 
@@ -65,7 +77,7 @@ export function match<
     T extends WithProperty<K, string>,
     H extends WithDefault<Handler<VariantsOfUnion<T, K>>>,
     K extends string = 'type'
->(obj: T, handler: H, typeKey?: K): ReturnType<Limit<FuncsOnly<H>, T['type'] | 'default'>[keyof H]>;
+>(obj: T, handler: H & Limited<H, WithDefault<Handler<VariantsOfUnion<T, K>>>>, typeKey?: K): ReturnType<Limit<FuncsOnly<H>, T['type'] | DEFAULT_KEY>[keyof H]>;
 /**
  * Actual impl
  */

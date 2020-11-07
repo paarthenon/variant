@@ -25,13 +25,24 @@ test('match with type prop', () => {
 });
 
 
+test('error match with type prop', () => {
+    //@ts-expect-error
+    const rating = (animal: Animal) => match(animal, {
+        [Animal.cat.type]: _ => 2,
+        dogg: () => 5,
+        default: _ => 3,
+    });
+
+    expect(rating(cerberus)).toBe(3);
+});
+
 test('partial match', () => {
     const rating = (animal: Animal) => match(animal, {
         cat: () => 1,
-        default: () => {},
+        default: () => 4,
     });
 
-    expect(rating(cerberus)).toBeUndefined();
+    expect(rating(cerberus)).toBe(4);
     expect(rating(Animal.cat({name: 'Loki', daysSinceDamage: 8}))).toBe(1);
 });
 
