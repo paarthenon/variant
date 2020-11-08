@@ -21,9 +21,10 @@ export function constrainedVariant<T extends {type: string}>(){
 
 type FromVariant<T, K extends string> = Extract<T, {type: K}>;
 type FieldsFromVariant<T, K extends string> = Omit<Extract<T, {type: K}>, 'type'>;
-type ExactVC<T extends {type: string}> = {
+export type ExactVC<T extends {type: string}> = {
     [P in T['type']]: (input: FieldsFromVariant<T, P>) => FieldsFromVariant<T, P>;
 }
+
 export function typedVariant<T extends {type: string}>(def: ExactVC<T>): OutVariant<ExactVC<T>> {
     return variantModule(def);
 }

@@ -64,7 +64,7 @@ export function fields<T>(defaults: Partial<T> = {}) {
 /**
  * Take a single variable of type T and store as 'payload'
  */
-export function payload<T>() {
+export function payload<T>(_example?: T) {
     return (payload: T) => ({payload})
 }
 

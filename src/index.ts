@@ -49,6 +49,7 @@ export {
 export * from './match';
 export * from './lookup';
 export * from './loose';
+export * from './generic';
 
 import {default as variantDefault} from './variant';
 export default variantDefault;

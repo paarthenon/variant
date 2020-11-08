@@ -20,6 +20,8 @@ import {
     pass,
     typedVariant,
     isType,
+    genericVariant,
+    payload,
 } from './index';
 import {Animal, cerberus} from './__test__/animal';
 
@@ -203,8 +205,6 @@ test('YOOOOOO', () => {
     const x = Tree.branch({right: Tree.node({data: 'yolo'})});
 
     expect(x.right?.type === 'node' && x.right.data).toBe('yolo');
-
-    console.log('TREESS', x);
 })
 
 test('YOOOOOO (generic)', () => {
@@ -268,8 +268,6 @@ test('better variantList', () => {
     ]);
 
     expect(Animal.bird().type).toBe('bird');
-
-    console.log(Animal);
 });
 
 test('card variantList', () => {
@@ -324,4 +322,50 @@ test('IsType UDTG wrong', () => {
     } else {
         expect(kerb.type).toBe('dog');
     }
+})
+
+test('Generic 1', () => {
+    type Tree<T> =
+        | Variant<'Branch', {left: Tree<T>, right: Tree<T>}>
+        | Variant<'Leaf', {payload: T}>
+    ;
+
+    const Tree = genericVariant(({A}) => ({
+        Branch: fields<{left: Tree<typeof A>, right: Tree<typeof A>}>(),
+        Leaf: payload(A),
+    }));
+
+    const leaf = Tree.Leaf(4);
+
+    expect(leaf.payload).toBe(4);
+})
+
+test('Generic error', () => {
+    type Tree<T> =
+        | Variant<'Branch', {left: Tree<T>, right: Tree<T>}>
+        | Variant<'Leaf', {payload: T}>
+    ;
+
+    const Tree = genericVariant(({T}) => ({
+        Branch: fields<{left: Tree<typeof T>, right: Tree<typeof T>}>(),
+        Leaf: payload(T),
+    }));
+
+    const branch = Tree.Branch({
+        left: Tree.Leaf('Yo'),
+        //@ts-expect-error
+        right: Tree.Branch({
+            left: Tree.Leaf(4),
+            right: Tree.Leaf(5),
+        })
+    });
+})
+
+test('Generic (maybe)', () => {
+    const Maybe = genericVariant(({T}) => ({
+        Some: payload(T),
+        None: {},
+    }));
+    const somenum = Maybe.Some(4);
+    expect(somenum.payload).toBe(4);
 })

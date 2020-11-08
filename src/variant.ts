@@ -336,10 +336,15 @@ export type Matrix<T extends VariantModule<K>, K extends string = 'type'> = {
  */
 export type Flags<T extends VariantModule> = Partial<Matrix<T>>;
 
-export function flags<T extends WithProperty<K, string>, K extends string = 'type'>(flags: T[]): {[P in T[K]]: ExtractOfUnion<T, P, K>} {
+/**
+ * groupBy list of instances on discriminant key. Assumes unique instance per type.
+ * @param flags 
+ * @param typeKey 
+ */
+export function flags<T extends WithProperty<K, string>, K extends string = 'type'>(flags: T[], typeKey?: K): {[P in T[K]]: ExtractOfUnion<T, P, K>} {
     return flags.reduce((o, v) => ({
         ...o,
-        [v.type]: v,
+        [v[typeKey ?? 'type']]: v,
     }), Object.create(null))
 }
 
