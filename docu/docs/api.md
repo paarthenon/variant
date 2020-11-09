@@ -260,7 +260,7 @@ is the constructor function associated with that key.
 ```typescript
 export const Animal = variantModule({
     dog: fields<{name: string, favoriteBall?: string}>(),
-    cat: fields<{name: string, daysSinceDamage: number}>(),
+    cat: fields<{name: string, furnitureDamaged: number}>(),
     snake: (name: string, pattern = 'striped') => ({name, pattern}),
 });
 ```
@@ -350,7 +350,7 @@ Some of the magic of this library. May be referenced in two ways
 } | {
     type: "cat";
     name: string;
-    daysSinceDamage: number;
+    furnitureDamaged: number;
 } | {
     type: "snake";
     name: string;

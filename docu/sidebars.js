@@ -13,12 +13,13 @@ module.exports = {
     {
       type: 'category',
       label: 'Articles',
-      items: ['articles/that-type', 'articles/augment'],
+      items: ['articles/that-type', 'articles/type-name', 'articles/augment'],
     },
     'api',
   ],
   secondSidebar: [
     'about',
+    'changelog',
     'credits',
   ]
 };

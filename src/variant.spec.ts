@@ -286,7 +286,7 @@ test('Animal filter', () => {
 
 
 test('IsType 0', () => {
-    const kitty = Animal.cat({name: 'Yannis', daysSinceDamage: 0}) as Animal;
+    const kitty = Animal.cat({name: 'Yannis', furnitureDamaged: 0}) as Animal;
 
     const isCat = isType(kitty, 'cat');
     const isDog = isType(kitty, 'dog');

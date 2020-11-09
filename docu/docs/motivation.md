@@ -51,10 +51,10 @@ function dog(name: string, favoriteBall?: string) {
         favoriteBall,
     }
 }
-const cat = (name: string, daysSinceDamage: number) => ({
+const cat = (name: string, furnitureDamaged: number) => ({
     type: CAT_TYPE as typeof CAT_TYPE,
     name,
-    daysSinceDamage,
+    furnitureDamaged,
 })
 const snake = (name: string, patternName?: string) => ({
     type: SNAKE_TYPE as typeof SNAKE_TYPE,
@@ -75,7 +75,7 @@ type Animal =
 ```typescript
 export const Animal = variantModule({
     dog: fields<{name: string, favoriteBall?: string}>(),
-    cat: fields<{name: string, daysSinceDamage: number}>(),
+    cat: fields<{name: string, furnitureDamaged: number}>(),
     snake: (name: string, pattern = 'striped') => ({name, pattern}),
 });
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
@@ -96,7 +96,7 @@ type Animal = {
 } | {
     type: "cat";
     name: string;
-    daysSinceDamage: number;
+    furnitureDamaged: number;
 } | {
     type: "snake";
     name: string;

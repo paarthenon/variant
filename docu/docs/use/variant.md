@@ -53,7 +53,7 @@ We saw `fields` already in our quick start example. Here's that again for refere
 > ```typescript {2-3}
 > export const Animal = variantModule({
 >     dog: fields<{name: string, favoriteBall?: string}>(),
->     cat: fields<{name: string, daysSinceDamage: number}>(),
+>     cat: fields<{name: string, furnitureDamaged: number}>(),
 >     snake: (name: string, pattern = 'striped') => ({name, pattern}),
 > });
 > ```
@@ -72,9 +72,28 @@ console.log(action);
 
 **prints:** `{ type: 'AddAnimal', animal: { type: 'dog', name: 'Lily' }}`
 
+## Checking for a specific type
+
+You may have some wild `animal: Animal` and want to check specifically if you've got a `snake` in your midst.
+
+To do so, use the `isType` function.
+
+```typescript
+if (isType(animal, 'snake')) {
+    console.log('Found a snake with', animal.pattern, 'skin.');
+}
+```
+`isType` is a user-defined type guard, so TypeScript will narrow the type of the variable you pass in. The second parameter, the string literal (`'snake'`) will be restricted to only valid `type`s of the variant. However, it is also possible to call `isType` with the constructor itself, which some users may find more ergonomic.
+
+```ts
+if (isType(animal, Animal.snake)) {
+    console.log('Found a snake with', animal.pattern, 'skin.');
+}
+```
+
 ****
 
-### Conclusion
+## Conclusion
 
 When choosing between the approaches to defining a variant, I recommend this process:
 

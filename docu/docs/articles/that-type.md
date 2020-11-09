@@ -43,7 +43,7 @@ Now we can do `Animal<'snake'>` and `Animal<undefined>` but I can't reference ju
 type Animal<T = undefined> = VariantOf<typeof Animal, T>;
 ```
 
-So now I can do `Animal<'snake'>` and `Animal`. Great! But I can also do `Animal<'Rose'>` which... doesn't make sense. This will require us to restrict the type parameter of Animal. **I love this because it gives me autocomplete for the tag name.**
+So now I can do `Animal<'snake'>` and `Animal`. Great! But I can also do `Animal<'Rose'>` which... doesn't make sense. This will require us to restrict the type parameter of Animal. *I love this because it gives me autocomplete for the tag name when I'm adding the type annotation.*
 
 ```typescript
 type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;

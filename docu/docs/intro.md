@@ -2,20 +2,23 @@
 id: intro
 title: Introduction
 ---
+> _**Variant** is a language feature disguised as a library._
+
+
 Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://basarat.gitbook.io/typescript/type-system/discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domain models and tiny DSLs. However, because [*"TypeScript instead builds on JavaScript patterns as they exist today"*](https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
 
-> [🧠 Click here to jump straight to the API Reference](api.md).
-
-:::note glossary: domain
+:::note [glossary: domain](http://google.com)
 The term [Domain](https://en.wikipedia.org/wiki/Domain_(software_engineering)) has many meanings but here we use domain to mean **your set of concerns**. If you are making a game, you might care about the player state, potential enemies, or items and inventory. If you are writing a budget tracker, your concerns might include income sources and recurring vs. one-time expenses.
 :::
 
+[🧠 Click here to jump straight to the API Reference](api.md)
+
+## Quick Start 
 Variant doesn't have any dependencies and doesn't need any setup. Simply run `npm install`.
 
 ```bash
 npm install --save variant
 ```
-## Quick Start 
 
 Let's use [`variant`](use/variant) to describe a simple domain — **Animals**. [Or if you'd like a redux example...](use/redux)
 
@@ -25,9 +28,10 @@ import {variant, variantModule, VariantOf, fields, TypeNames} from 'variant';
 
 export const Animal = variantModule({
     dog: fields<{name: string, favoriteBall?: string}>(),
-    cat: fields<{name: string, daysSinceDamage: number}>(),
+    cat: fields<{name: string, furnitureDamaged: number}>(),
     snake: (name: string, pattern = 'striped') => ({name, pattern}),
 });
+// optional, but very helpful.
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 ```
 
@@ -73,8 +77,8 @@ If any of this syntax looks unfamiliar, take a look at ES6 [lambda expressions](
 
 ****
 **[`match`](api.md#match)** is...
-  - **exhaustive by default**. If you only need to handle some cases, use [`partialMatch`](api.md#partialmatch).
-    - *Exhaustiveness* means if you add a new animal, TypeScript will remind you to update the `describeAnimal` function! No more tedious guesswork.
+  - **exhaustive by default**. *Exhaustiveness* means if you add a new animal, TypeScript will remind you to update the `describeAnimal` function! No more tedious guesswork.
+    - Partial matching is available by providing a `default` property, or using `match`'s *else* overload.
  - **pure TypeScript.** This will work on any valid discriminated union, made with [`variant`](api.md#variant) or not.
  - **well typed**. `match`'s return type is the union of the return types of all the handler functions.
  - **familiar**. It's meant to imitate the [OCaml / Reason ML **`match`** statement](https://ocaml.org/learn/tutorials/data_types_and_matching.html#Pattern-matching-on-datatypes).
@@ -104,6 +108,9 @@ const Animal = variantList([
     variant('snake', ...),
 ])
 ```
+
+This function can also accept a string literal for a variant that has no body
+ - *Example*: `variantList(['red', 'blue', 'green'])`.
 
 > ...and this is the direct approach.
 ```typescript

@@ -36,13 +36,13 @@ export const Animal = variantModule({
 ```
 
 :::note
-To create a type with no body, include the property name but set it to `undefined` or `nil`.
+To create a type with no body, include the property name but set it to the empty object, `{}`.
 ```typescript
     ...
-    bird: nil,
-    snail: undefined,
+    bird: {},
 });
 ```
+You may also provide `nil`, or `undefined`.
 :::
 
 ### `variantList()`
@@ -95,6 +95,29 @@ Well, two reasons.
     ```
 
     It's much easier to call `Action.addAnimal(...)` than `Action['@action/ADD_ANIMAL'](...)`. Rest assured the variant library functions have all been designed to work with the *actual* type of the generated object, even when that made the type signatures of those functions really frustrating to write.
+
+## Checking for membership
+
+You may want to determine whether or not an object out in the wild is an `Animal` or not. Use the `isOfVariant` function to do so.
+
+```ts
+declare var x: object;
+
+if (isOfVariant(x, Animal)) {
+    console.log('Found animal named', x.name);
+}
+```
+Note this is operating under the assumption you have relatively unique names for your variants. This isn't inspecting the object structure, just the `type` property.
+
+### Ad-hoc matching
+
+It's easy to construct a variant module on the fly with `variantList`. This will still be a valid comparison. 
+
+```ts
+if (isOfVariant(x, variantList([Animal.cat, Animal.dog]))) {
+    console.log('Received a four legged animal');
+}
+```
 
 ## Subsets and Combinations
 

@@ -8,7 +8,7 @@ enum ANIMAL_NAME {
 
 const Animal = variantList([
     variant(ANIMAL_NAME.DOG, fields<{name: string, favoriteBall?: string}>()),
-    variant(ANIMAL_NAME.CAT, fields<{name: string, daysSinceDamage: number}>()),
+    variant(ANIMAL_NAME.CAT, fields<{name: string, furnitureDamaged: number}>()),
     variant(ANIMAL_NAME.SNAKE, (name: string, patternName?: string) => ({
         name,
         pattern: patternName ?? 'striped',

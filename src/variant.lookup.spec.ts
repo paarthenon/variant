@@ -15,7 +15,7 @@ test('partial lookup', () => {
     const cuteName = (animal: Animal) => partialLookup(animal, {
         cat: 'kitten',
     });
-    const cat = Animal.cat({name: 'Amber', daysSinceDamage: -1})
+    const cat = Animal.cat({name: 'Amber', furnitureDamaged: 0})
 
     expect(cuteName(cat)).toBe('kitten');
     expect(cuteName(cerberus)).toBeUndefined();

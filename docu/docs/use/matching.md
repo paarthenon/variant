@@ -30,7 +30,7 @@ const describeAnimal = (animal: Animal) => match(animal, {
 ```
 Not only was `describeAnimal()` able to capture the serene beauty of domestic life with a pet, it did so while referencing information *specific* to the pet, like the color of a dog's favorite ball or the pattern of a snake's skin. It also did so without requiring any casting, null checks, or type checks on the part of the user. 
 
-The `match()` function includes **exhaustiveness checking**. `describeAnimal()` will gain the ease of mind of knowing its covered all the bases. If the intention is to not handle every case, use [`partialMatch()`](matching#partialmatch)
+The `match()` function includes **exhaustiveness checking**. `describeAnimal()` will gain the ease of mind of knowing its covered all the bases. 
 
 ### The Handler
 
@@ -87,12 +87,12 @@ As a type-safe and elegant flow control expression, `match` can be used inline a
 ```typescript
 /**
  * Filter to the animals that are just quake-in-your-booties cool.
- *  - cool cats haven't broken anything in a week
+ *  - cool cats haven't damaged any furniture
  *  - cool dogs like red balls
  *  - every snake is cool
  */
 const coolAnimals = animals.filter(a => match(a, {
-    cat: ({daysSinceDamage}) => daysSinceDamage > 7,
+    cat: ({furnitureDamaged}) => furnitureDamaged === 0,
     dog: ({favoriteBall}) => favoriteBall === 'red',
     snake: _ => true,
 }));
@@ -108,29 +108,36 @@ const coolAnimals = animals.filter(a => match(a, {
     })}
 />
 ```
-- Though [`partialLookup`](matching#partiallookup) is a better candidiate here.
 
-### `partialMatch()`
+## Partial Matching
 
-Specifically for when you don't want to handle every case. Optionaly use `??` to provide default behavior.
 
-```typescript
-const favoriteBallColor = (a: Animal) => partialMatch(a, {
-    dog: ({favoriteBall}) => favoriteBall,
-}) ?? 'none';
-```
+Sometimes it won't be necessary to handle every case, or many cases can be handled in the same way. In this scenario, add a default handler. There are two simple ways to do this.
 
-### `matchElse()`
+ 1. Add a `default` case to the handler object
 
-> A hybrid between `match()` and `partialMatch()`.
+    ```typescript
+    const rating = (animal: Animal) => match(animal, {
+        cat: _ => 1,
+        default: _ => 2,
+    });
+    ```
+    The input to the `default` case is the full union (`Animal`).
+ 1. Add a second parameter to handle the 'else' clause. This is sometimes called the _**`match-else`**_ overload.
+    ```typescript
+    const rating = (animal: Animal) => match(animal, {
+        cat: _ => 1,
+    }, _ => 2);
+    ```
+    The input to this function is more specific. Since we handled `cat` the type of `_` for the else clause isn't `Animal`. It's the more specific subset `Animal<'dog'> | Animal<'snake'>`. As always, users are free to reference any properties common to that union. 
+    ```typescript
+    // describe a file attribute
+    const attributeToString = (attr: Attribute) => match(attr, {
+        Filename: ({payload}) => `Filename: ${payload}`,
+        Resolution: ({width, height}) => `Resolution: ${width} x ${height}`,
+    }, rest => `Unknown Attribute: ${rest.type}`);
+    ```
 
-The `matchElse()` function lets a user handle the specific cases they want, like partialMatch, but then collects the type that the handler *didn't* have branches for and passes that union into a function.
-```typescript
-const attributeToString = (attr: Attribute) => matchElse(attr, {
-    Filename: ({payload}) => `Filename: ${payload}`,
-    Resolution: ({width, height}) => `Resolution: ${width} x ${height}`,
-}, rest => `Unknown Attribute: ${rest.type}`);
-```
 ## `lookup()`
 
 A much simpler kind of pattern matcher, `lookup()` leverages a [lookup table](https://en.wikipedia.org/wiki/Lookup_table) and uses the `type` property of the object as the key.

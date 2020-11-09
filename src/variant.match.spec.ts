@@ -1,4 +1,5 @@
 import {match, partialMatch, matchLiteral, matchElse, partialLookup, lookup} from '.';
+import {isType} from './tools';
 import {strEnum} from './util';
 import {Animal, cerberus} from './__test__/animal'
 
@@ -43,7 +44,7 @@ test('partial match', () => {
     });
 
     expect(rating(cerberus)).toBe(4);
-    expect(rating(Animal.cat({name: 'Loki', daysSinceDamage: 8}))).toBe(1);
+    expect(rating(Animal.cat({name: 'Loki', furnitureDamaged: 8}))).toBe(1);
 });
 
 test('match else', () => {
@@ -63,7 +64,7 @@ test('match else default', () => {
     }, _others => 5);
 
     expect(rating(cerberus)).toBe(5);
-    expect(rating(Animal.cat({name: 'Jenna', daysSinceDamage: 2}))).toBe(4);
+    expect(rating(Animal.cat({name: 'Jenna', furnitureDamaged: 2}))).toBe(4);
 })
 
 const things = strEnum([
@@ -111,7 +112,7 @@ test('default handler', () => {
 });
 
 test('default handler 2', () => {
-    const x = Animal.cat({name: 'Stevie', daysSinceDamage: 0}) as Animal;
+    const x = Animal.cat({name: 'Stevie', furnitureDamaged: 0}) as Animal;
     const result = match(x, {
         cat: _ => 5,
         default: _ => 0,
@@ -124,7 +125,7 @@ test('default handler 2', () => {
 test('partial match2', () => {
     const x = cerberus as Animal;
     const result = match(x, {
-        cat: c => c.daysSinceDamage,
+        cat: c => c.furnitureDamaged,
         zorg: () => new Date(),
         dog: d => d.favoriteBall,
     }, z => z.pattern);
@@ -151,9 +152,9 @@ test('above and beyond', () => {
 
     const namesdfg = getName(cerberus);
 
-    function getDaysSinceDamage(animal: Animal) {
+    function getFurnitureDamaged(animal: Animal) {
         return matchElse(animal, {
-            cat: ({daysSinceDamage}) => daysSinceDamage,
+            cat: ({furnitureDamaged}) => furnitureDamaged,
             dog: ({name}) => name,
         }, _ => {
             return 'yellow';
@@ -162,4 +163,6 @@ test('above and beyond', () => {
     const name = getName(Animal.dog({name: 'Frodo'}));
 
     const result = handleAnimal(Animal.dog({name: 'Frodo'}));
+
+
 });
