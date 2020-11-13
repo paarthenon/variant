@@ -44,13 +44,16 @@ export type VariantModule<K extends string = 'type'> = {
     [name: string]: VariantCreator<string, (...args: any[]) => any, K>
 }
 
+// validator ?
+
+type EnforceEmpty<T extends {}> = keyof T extends never ? {} : never;
+
 /**
  * Use this function to generate a version of the `variant` factory function using
  * some arbitrary key. The default `variant` is just `variantFactory('type')`.
  * @param key The name of the property to use e.g. 'type', 'kind', 'version'
  */
 export function variantFactory<K extends string>(key: K) {
-
     // Type fuckery ensues.
     /**
      * Define a case of a variant type.

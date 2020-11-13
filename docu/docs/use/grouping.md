@@ -8,7 +8,7 @@ A variant's possible cases are most useful *in context*. The variant for `Diamon
 
 ### The Direct Approach
 
-The final result will be a simple JavaScript object. The keys of this object will be the names of the variant's types (its tags), and the values will be the tag constructors. You can make this object yourself.
+The underlying type of every variant module will be a simple JavaScript object. The keys of this object will be the names of the variant's types (its tags), and the values will be the tag constructors. You can make this object yourself.
 
 ```typescript
 export const Animal = {
@@ -147,18 +147,23 @@ export const WingedAnimal = variantList([
     Animal.bird,
     Animal.pegasus,
 ]);
-...
-```
 
+const flap = (animal: WingedAnimal) => {...} 
+
+if (isOfVariant(animal, WingedAnimal)) {
+    // a is now known to be an WingedAnimal
+    // so this is safe.
+    flap(a);
+}
+```
 Our privileged pegasus can also claim membership to the group of animals with four legs.
 
 ```typescript
-export const FourLeggedAnimal = variantList([
+const FourLeggedAnimal = variantList([
     Animal.cat,
     Animal.dog,
     Animal.pegasus,
 ]);
-...
 ```
 
 By maintaining a subset like `WingedAnimal` as its own type you gain the ability to write functions that are scoped to `WingedAnimal`. Any changes to `WingedAnimal` are centralized, and will cause the compiler to inform you of any handlers that don't process the new cases.
@@ -168,16 +173,14 @@ By maintaining a subset like `WingedAnimal` as its own type you gain the ability
 We could also have constructed this in the other direction—creating the subsets first and then combining them into the final `Animal` object. The pegasus being both winged and four legged makes our current set of animals difficult to work with. For this example we'll use a different setup.
 
 ```typescript
-export const LandAnimal = variantList([
-    variant('dog', fields<{name: string, favoriteBall?: string}>()),
-    variant('cat', fields<{name: string, daysSinceDamage: number}>()),
-]);
-export type LandAnimal<T extends TypeNames<typeof LandAnimal> = undefined> = VariantOf<typeof LandAnimal, T>;
+const LandAnimal = variantModule({
+    dog: fields<{name: string, favoriteBall?: string}>(),
+    cat: fields<{name: string, daysSinceDamage: number}>(),
+});
 
-export const WaterAnimal = variantList([
-    variant('goldfish', fields<{memoryInSeconds: number}>()),
-]);
-export type WaterAnimal<T extends TypeNames<typeof WaterAnimal> = undefined> = VariantOf<typeof WaterAnimal, T>;
+const WaterAnimal = variantModule({
+    goldfish: fields<{memoryInSeconds: number}>(),
+});
 ```
 
 From this point it's easy to create the combined set of `Animal`.
@@ -187,7 +190,6 @@ export const Animal = {
     ...LandAnimal,
     ...WaterAnimal,
 };
-export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 ```
 
 A new list (perhaps `SkyAnimal`) could be added in the future and it would simply be another entry next to `LandAnimal` and `WaterAnimal`. We could complicate this yet further with a new genre-bending list of animals, `AmphibiousAnimals`.
@@ -196,12 +198,11 @@ A new list (perhaps `SkyAnimal`) could be added in the future and it would simpl
 export const AmphibiousAnimal = variantList([
     variant('frog', fields<{color: string}>()),
 ]);
-export type AmphibiousAnimal<T extends TypeNames<typeof AmphibiousAnimal> = undefined> = VariantOf<typeof AmphibiousAnimal, T>;
 ```
 
 Amphibious animals may be encountered in both *water* and on *land*. How should this be expressed? It may be tempting to merge `AmphibiousAnimal` into the lists of `LandAnimal` and `WaterAnimal`, but that would be a step backward because we then lose the ability to identify *land only* or *water only* animals. 
 
-The better approach would be to use our friend the union type. Remember that variants are designed to work *with* vanilla typescript and will work seamlessly with [union and intersection types](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html).
+The better approach would be to use our friend the union type. Remember that variants are designed to work with vanilla typescript and will work seamlessly with [union and intersection types](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html).
 
 ### Variants in a union type
 
@@ -223,3 +224,15 @@ function runoverAnimal(roadKill: LandAnimal | AmphibiousAnimal) {
 
  - **Should I use singular or plural names for modules?**
     - Do you want to write `Animal.dog(...)` or `Animals.dog(...)`? Personally I like singular because it makes type annotations read more clearly. I like `x: Animal` over `x: Animals`, since that value is singular. Nothing breaks if you go plural.
+ - **Should I make a type for each variant module?**
+    - I do. This gives you the `Animal` and `Animal<'cat'>` types, which are quite convenient and improve ergonomics by offering intellisense. One of my motivations in writing this library was to simplify the fragile process of discriminant union creation and type generation for my team. Again, your consumers, including your own team members using your types, do not experience this complexity.
+    
+    Some users find the full type intimidating or just plain frustrating. `VariantOf` is designed with a simpler form is common in the community:
+
+    ```ts
+    export type Animal = VariantOf<typeof Animal>;
+    ```
+
+    I admit this is much clearer for the average TypeScript user. You retain `Animal`, but lose `Animal<'cat'>`. You can compute `Animal<'cat'>` through `Extract<Animal, {type: 'cat'}>`. The disadvantage here is you lose the restrictions on the type property ('cat'), and autocomplete with it. So if at some point your application changes from `cat` to `feline`, `Animal<'cat'>` will now raise an error to alert you that it needs updating. `Extract<Animal, {type: 'cat'}>` would not.
+
+    [See the type page explanation](../articles/that-type).

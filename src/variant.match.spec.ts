@@ -153,12 +153,11 @@ test('above and beyond', () => {
     const namesdfg = getName(cerberus);
 
     function getFurnitureDamaged(animal: Animal) {
-        return matchElse(animal, {
+        return match(animal, {
             cat: ({furnitureDamaged}) => furnitureDamaged,
             dog: ({name}) => name,
-        }, _ => {
-            return 'yellow';
-        })
+            snake: ({name}) => name + 'sss',
+        }, 'type')
     }
     const name = getName(Animal.dog({name: 'Frodo'}));
 

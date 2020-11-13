@@ -32,7 +32,8 @@ export const Animal = variantModule({
     snake: (name: string, pattern = 'striped') => ({name, pattern}),
 });
 // optional, but very helpful.
-export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
+export type Animal<T extends TypeNames<typeof Animal> = undefined>
+    = VariantOf<typeof Animal, T>;
 ```
 
 We can now import and use the `Animal` object, which simply collects the tag constructors we care about in one place. To create a new dog, for example, call `Animal.dog({name: 'Guava'})`. When we imported the `Animal` *object* we also imported the [`Animal` *type*](articles/that-type) since we defined these with the same name. This single import will allows us to:
@@ -123,7 +124,9 @@ const Animal = {
 
 Feel free to mix and match styles. This is discussed further in [the page on grouping variants.](use/grouping)
 
-### Applications
+****
+
+## Applications
 
 **Variant** is a language feature disguised as a library. As such, it's relevant to any type of application. I find myself eventually including variant in every project I write, to the point that I include it in my template repo along with my logger of choice, [daslog](https://github.com/paarthenon/daslog) (which also uses variant 🤣).
 

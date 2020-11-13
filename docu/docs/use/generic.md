@@ -3,38 +3,31 @@ id: generic
 title: Generic variants
 ---
 
-While we're being generic let's do a binary tree again.
-
-> ⚠️ This assumes you've read the [recursive variants article](recursive).
+We can use generics to create a more flexible binary tree
 
 ```typescript
-// but better this time
-type TreeNode<T> =
-    | Variant<'Leaf', {data: T}>
-    | Variant<'Branch', {left?: TreeNode<T>, right?: TreeNode<T>}>
+type Tree<T> =
+    | Variant<'Leaf', {payload: T}>
+    | Variant<'Branch', {left: Tree<T>, right: Tree<T>}>
 ;
 
-/**
- * factory for TreeNode<T>
- */
-const treeNode = <T>() => typedVariant<TreeNode<T>>({
-    Leaf: pass,
-    Branch: pass,
+const Tree = genericVariant(({A}) => ({
+    Branch: fields<{left: Tree<typeof A>, right: Tree<typeof A>}>(),
+    Leaf: payload(A),
+}));
+
+const leaf = Tree.Leaf(5);
+
+const numTree = Tree.Branch({
+    left: Tree.Leaf(4),
+    right: Tree.Leaf(66),
 });
-const AnimalTreeNode = treeNode<Animal>();
 
-// and we're back
-const tree = AnimalTreeNode.Branch({
-    left: AnimalTreeNode.Leaf({data: Animal.dog({name: 'Cerberus'})}),
-    right: AnimalTreeNode.Branch({
-        right: AnimalTreeNode.Leaf({data: Animal.cat({name: 'Sikandar'})}),
-    })
-})
-
-// works for other types, too!
-const NumTree = treeNode<number>();
-const numTree = NumTree.Branch({
-    left: NumTree.Leaf({data: 4}),
-    right: NumTree.Leaf({data: 66}),
+const strTree = Tree.Branch({
+    left: Tree.Leaf('hello'),
+    right: Tree.Branch({
+        left: Tree.Leaf('world'),
+        right: Tree.Leaf('people'),
+    }),
 })
 ```

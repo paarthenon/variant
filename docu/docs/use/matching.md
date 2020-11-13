@@ -16,7 +16,7 @@ The `match` expression inspects the type of an unknown variant and executes the 
 ```typescript
 /**
  * Describe how some animal is lounging around the player's room.
-
+ *
  *  returns: description [string]
  * */
 const describeAnimal = (animal: Animal) => match(animal, {

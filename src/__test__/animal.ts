@@ -23,7 +23,6 @@ export const cerberus2 = Animal2.dog({name: 'Cerberus'});
 
 type z = Animal;
 
-
 export const AmphibiousAnimal = variantList([
     variant('frog', fields<{color: string}>()),
 ]);
@@ -33,3 +32,4 @@ export const WaterAnimal = variantList([
     variant('goldfish', fields<{memoryInSeconds: number}>()),
 ]);
 export type WaterAnimal<T extends TypeNames<typeof WaterAnimal> = undefined> = VariantOf<typeof WaterAnimal, T>;
+ 

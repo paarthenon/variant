@@ -36,6 +36,7 @@ export type Limited<T, U> = Exclude<keyof T, U> extends never
     ? T 
     : VariantError<['Expected keys of handler', keyof T, 'to be limited to possible keys', U]>
 ;
+
 /**
  * Match a variant against its possible options and do some processing
  * based on the type of variant received. 
@@ -46,7 +47,8 @@ export type Limited<T, U> = Exclude<keyof T, U> extends never
 export function match<
     T extends WithProperty<'type', string>,
     H extends WithDefault<Handler<VariantsOfUnion<T>>>,
->(obj: T, handler: H & Limited<H, T['type'] | DEFAULT_KEY>): ReturnType<Limit<FuncsOnly<H>, T['type'] | DEFAULT_KEY>[keyof H]>;
+>(obj: T, handler: H & Limited<H, T['type'] | DEFAULT_KEY>):
+ ReturnType<Limit<FuncsOnly<H>, T['type'] | DEFAULT_KEY>[keyof H]>;
 /**
  * Match a variant against it's some of its possible options and do some 
  * processing based on the type of variant received. Finally, take the remaining
@@ -77,7 +79,7 @@ export function match<
     T extends WithProperty<K, string>,
     H extends WithDefault<Handler<VariantsOfUnion<T, K>>>,
     K extends string = 'type'
->(obj: T, handler: H & Limited<H, WithDefault<Handler<VariantsOfUnion<T, K>>>>, typeKey?: K): ReturnType<Limit<FuncsOnly<H>, T['type'] | DEFAULT_KEY>[keyof H]>;
+>(obj: T, handler: H & Limited<H, T[K] | DEFAULT_KEY>, typeKey?: K): ReturnType<Limit<FuncsOnly<H>, T[K] | DEFAULT_KEY>[keyof H]>;
 /**
  * Actual impl
  */
