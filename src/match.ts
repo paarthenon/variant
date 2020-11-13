@@ -50,6 +50,19 @@ export function match<
 >(obj: T, handler: H & Limited<H, T['type'] | DEFAULT_KEY>):
  ReturnType<Limit<FuncsOnly<H>, T['type'] | DEFAULT_KEY>[keyof H]>;
 /**
+ * Match a variant against its possible options and do some processing
+ * based on the type of variant received. 
+ * @param obj the variant in question
+ * @param handler an object whose keys are the type names of the variant's type and values are handler functions for each option.
+ * @param {string?} typeKey override the property to inspect. By default, 'type'.
+ * @returns {The union of the return types of the various branches of the handler object}
+ */
+export function match<
+T extends WithProperty<K, string>,
+H extends WithDefault<Handler<VariantsOfUnion<T, K>>>,
+K extends string = 'type'
+>(obj: T, handler: H & Limited<H, T[K] | DEFAULT_KEY>, typeKey?: K): ReturnType<Limit<FuncsOnly<H>, T[K] | DEFAULT_KEY>[keyof H]>;
+/**
  * Match a variant against it's some of its possible options and do some 
  * processing based on the type of variant received. Finally, take the remaining
  * possibilities and handle them in a function.
@@ -67,19 +80,6 @@ export function match<
     E extends (rest: Exclude<T, TypeExt<K, keyof H>>) => any,
     K extends string = 'type'
 >(obj: T, handler: H, _else: E, typeKey?: K): ReturnType<Defined<FuncsOnly<H>[keyof H]>> | ReturnType<E>;
-/**
- * Match a variant against its possible options and do some processing
- * based on the type of variant received. 
- * @param obj the variant in question
- * @param handler an object whose keys are the type names of the variant's type and values are handler functions for each option.
- * @param {string?} typeKey override the property to inspect. By default, 'type'.
- * @returns {The union of the return types of the various branches of the handler object}
- */
-export function match<
-    T extends WithProperty<K, string>,
-    H extends WithDefault<Handler<VariantsOfUnion<T, K>>>,
-    K extends string = 'type'
->(obj: T, handler: H & Limited<H, T[K] | DEFAULT_KEY>, typeKey?: K): ReturnType<Limit<FuncsOnly<H>, T[K] | DEFAULT_KEY>[keyof H]>;
 /**
  * Actual impl
  */

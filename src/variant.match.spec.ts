@@ -1,7 +1,7 @@
 import {match, partialMatch, matchLiteral, matchElse, partialLookup, lookup} from '.';
 import {isType} from './tools';
 import {strEnum} from './util';
-import {Animal, cerberus} from './__test__/animal'
+import {Animal, cerberus, TaggedAnimal} from './__test__/animal'
 
 test('match with string', () => {
     const rating = (animal: Animal) => match(animal, {
@@ -155,9 +155,8 @@ test('above and beyond', () => {
     function getFurnitureDamaged(animal: Animal) {
         return match(animal, {
             cat: ({furnitureDamaged}) => furnitureDamaged,
-            dog: ({name}) => name,
-            snake: ({name}) => name + 'sss',
-        }, 'type')
+            default: _ => 0,
+        })
     }
     const name = getName(Animal.dog({name: 'Frodo'}));
 
