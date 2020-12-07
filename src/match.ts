@@ -176,3 +176,8 @@ export function matchLiteral<T extends string, H extends UnionHandler<T>>(litera
 type Limit<T, Keys extends string> = {
     [P in keyof T]: P extends Keys ? T[P] : never;
 }
+
+
+export const noop = (..._: any[]) => {};
+export const unpack = <T>(x: {payload: T}) => x.payload;
+export const just = <T>(x: T) => (..._: any[]) => x;

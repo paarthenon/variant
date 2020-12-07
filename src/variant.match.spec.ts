@@ -1,5 +1,6 @@
-import {match, partialMatch, matchLiteral, matchElse, partialLookup, lookup} from '.';
-import {isType} from './tools';
+import {match, partialMatch, matchLiteral, matchElse, partialLookup, lookup, TypeNames, variantModule, VariantOf} from '.';
+import {just, unpack} from './match';
+import {fields, isType, payload} from './tools';
 import {strEnum} from './util';
 import {Animal, cerberus, TaggedAnimal} from './__test__/animal'
 
@@ -164,3 +165,22 @@ test('above and beyond', () => {
 
 
 });
+
+
+test('unpack', () => {
+    const Test1 = variantModule({
+        Alpha: payload<string>(),
+        Beta: fields<{prop: string}>(),
+        Gamma: {},
+    });
+    type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
+
+    const thing = Test1.Alpha('yolo') as Test1;
+    
+    const result = match(thing, {
+        Alpha: unpack,
+        Beta: ({prop}) => prop,
+        Gamma: just('gamma'),
+    });
+
+})
