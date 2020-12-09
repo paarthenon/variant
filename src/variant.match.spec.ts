@@ -166,21 +166,56 @@ test('above and beyond', () => {
 
 });
 
+const Test1 = variantModule({
+    Alpha: payload<string>(),
+    Beta: fields<{prop: string}>(),
+    Gamma: {},
+});
+type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
+
+const test1Result = (thing: Test1) => match(thing, {
+    Alpha: unpack,
+    Beta: ({prop}) => prop,
+    Gamma: just('gamma'),
+});
 
 test('unpack', () => {
-    const Test1 = variantModule({
-        Alpha: payload<string>(),
-        Beta: fields<{prop: string}>(),
-        Gamma: {},
-    });
-    type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
-
     const thing = Test1.Alpha('yolo') as Test1;
     
-    const result = match(thing, {
-        Alpha: unpack,
-        Beta: ({prop}) => prop,
-        Gamma: just('gamma'),
-    });
+    expect(test1Result(thing)).toBe('yolo');
+})
+test('solo unpack', () => {
+    const thing = Test1.Alpha('yolo');
 
+    const ret = match(thing, {
+        Alpha: unpack,
+    })
+
+    expect(ret).toBe('yolo');
+})
+
+test('solo just', () => {
+    const thing = Test1.Alpha('yolo');
+
+    const ret = match(thing, {
+        Alpha: just(5),
+    })
+
+    expect(ret).toBe(5);
+})
+
+test('complex just', () => {
+    const result = test1Result(Test1.Gamma());
+
+    expect(result).toBe('gamma');
+})
+
+test('obj just', () => {
+    const result = (animal: Animal) => match(animal, {
+        snake: just({
+            hello: 'world',
+            complex: 4,
+        }),
+        default: just(2),
+    })
 })
