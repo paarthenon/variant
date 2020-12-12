@@ -7,6 +7,7 @@ export {
     augment,
     AugmentVariant,
     cast,
+    contractedModule,
     isOfVariant,
     keymap,
     KeyMap,

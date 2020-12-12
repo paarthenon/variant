@@ -156,6 +156,7 @@ function safeKeys<O extends {}>(o: O) {
 }
 
 export type RawVariant = {[type: string]: Func | {}};
+export type ConstrainedRawVariant<F extends Func> = {[type: string]: (...args: [...Parameters<F>, ...any[]]) => ReturnType<F>}
 
 type CleanResult<T, U> = T extends undefined ? U : T extends Func ? T : T extends object ? U : T;
 
@@ -180,6 +181,22 @@ export function variantModule<
     }, {} as OutVariant<T>);
 }
 
+/**
+ * Unstable. 
+ * @param v 
+ * @param _contract 
+ */
+export function contractedModule<
+    T extends ConstrainedRawVariant<F>,
+    F extends Func,
+>(_contract: F, v: T): Identity<OutVariant<T>> {
+    return safeKeys(v).reduce((acc, key) => {
+        return {
+            ...acc,
+            [key]: variant(key, typeof v[key] === 'function' ? v[key] as any : identityFunc),
+        };
+    }, {} as OutVariant<T>);
+}
 /**
  * Give an array of output types for a given variant collection.
  * Useful for checking whether or not a message belongs in your

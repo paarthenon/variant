@@ -23,6 +23,7 @@ import {
     genericVariant,
     payload,
 } from './index';
+import {contractedModule} from './variant';
 import {Animal, cerberus} from './__test__/animal';
 
 test('empty variant', () => {
@@ -368,4 +369,17 @@ test('Generic (maybe)', () => {
     }));
     const somenum = Maybe.Some(4);
     expect(somenum.payload).toBe(4);
+})
+
+
+test('constrained', () => {
+    const Test1 = contractedModule((_x: string) => ({min: 4}), {
+        Yo: (_x: string, min: number) => ({min}),
+    });
+    type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
+
+    const instance = Test1.Yo('hello', 4);
+
+    expect(instance.type).toBe('Yo');
+    expect(instance.min).toBe(4);
 })
