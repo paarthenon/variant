@@ -158,6 +158,12 @@ function safeKeys<O extends {}>(o: O) {
 export type RawVariant = {[type: string]: Func | {}};
 export type ConstrainedRawVariant<F extends Func> = {[type: string]: (...args: [...Parameters<F>, ...any[]]) => ReturnType<F>}
 
+/**
+ * Patched Constrained Raw Variant
+ */
+type PatchedCRV<T extends ConstrainedRawVariant<F>, F extends Func> = {
+    [P in keyof T]: (...args: Parameters<T[P]>) => ReturnType<T[P]> & ReturnType<F>;
+}
 type CleanResult<T, U> = T extends undefined ? U : T extends Func ? T : T extends object ? U : T;
 
 export type OutVariant<T extends RawVariant>
@@ -189,7 +195,7 @@ export function variantModule<
 export function contractedModule<
     T extends ConstrainedRawVariant<F>,
     F extends Func,
->(_contract: F, v: T): Identity<OutVariant<T>> {
+>(_contract: F, v: T): Identity<OutVariant<PatchedCRV<T, F>>> {
     return safeKeys(v).reduce((acc, key) => {
         return {
             ...acc,

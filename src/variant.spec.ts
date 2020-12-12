@@ -22,6 +22,7 @@ import {
     isType,
     genericVariant,
     payload,
+    just,
 } from './index';
 import {contractedModule} from './variant';
 import {Animal, cerberus} from './__test__/animal';
@@ -382,4 +383,27 @@ test('constrained', () => {
 
     expect(instance.type).toBe('Yo');
     expect(instance.min).toBe(4);
+})
+
+test('constrained 2', () => {
+    enum HairLength {
+        Bald,
+        Buzzed,
+        Short,
+        Medium,
+        Long,
+        BackLength,
+    }
+
+    const HairStyle = contractedModule(just<{min?: HairLength, max?: HairLength}>({}), {
+        Bald: just({max: HairLength.Bald}),
+        Pixie: just({min: HairLength.Short, max: HairLength.Medium}),
+        Straight: just({min: HairLength.Short}),
+        Waves: just({min: HairLength.Medium}),
+    });
+    type HairStyle<T extends TypeNames<typeof HairStyle> = undefined> = VariantOf<typeof HairStyle, T>;
+
+    const baldie = HairStyle.Bald() as HairStyle;
+
+    expect(baldie.max).toBe(HairLength.Bald);
 })
