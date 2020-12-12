@@ -210,4 +210,4 @@ export const unpack = <T>(x: {payload: T}) => x.payload;
  * ```
  * @param x 
  */
-export const just = <T>(x: T) => (..._: any[]) => x;
+export const just = <T>(x: T) => () => x;
