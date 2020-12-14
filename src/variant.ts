@@ -155,8 +155,12 @@ function safeKeys<O extends {}>(o: O) {
     return Object.keys(o) as (keyof O & string)[];
 }
 
+/**
+ * Input type for VariantModule
+ */
 export type RawVariant = {[type: string]: Func | {}};
 export type ConstrainedRawVariant<F extends Func> = {[type: string]: (...args: [...Parameters<F>, ...any[]]) => ReturnType<F>}
+export type PatternedRawVariant<F extends Func> = {[type: string]: F}
 
 /**
  * Patched Constrained Raw Variant
@@ -164,6 +168,13 @@ export type ConstrainedRawVariant<F extends Func> = {[type: string]: (...args: [
 type PatchedCRV<T extends ConstrainedRawVariant<F>, F extends Func> = {
     [P in keyof T]: (...args: Parameters<T[P]>) => ReturnType<T[P]> & ReturnType<F>;
 }
+/**
+ * Patched Constrained Raw Variant
+ */
+type PatchedPRV<T extends ConstrainedRawVariant<F>, F extends Func> = {
+    [P in keyof T]: (...args: Parameters<T[P]>) => ReturnType<T[P]> & ReturnType<F>;
+}
+
 type CleanResult<T, U> = T extends undefined ? U : T extends Func ? T : T extends object ? U : T;
 
 export type OutVariant<T extends RawVariant>
@@ -192,7 +203,7 @@ export function variantModule<
  * @param v 
  * @param _contract 
  */
-export function contractedModule<
+export function constrainedVariant<
     T extends ConstrainedRawVariant<F>,
     F extends Func,
 >(_contract: F, v: T): Identity<OutVariant<PatchedCRV<T, F>>> {
@@ -203,6 +214,48 @@ export function contractedModule<
         };
     }, {} as OutVariant<T>);
 }
+/**
+ * Unstable. 
+ * @param v 
+ * @param _contract 
+ */
+export function patternedVariant<
+    T extends PatternedRawVariant<F>,
+    F extends Func,
+>(_contract: F, v: T): Identity<OutVariant<PatchedPRV<T, F>>> {
+    return safeKeys(v).reduce((acc, key) => {
+        return {
+            ...acc,
+            [key]: variant(key, typeof v[key] === 'function' ? v[key] as any : identityFunc),
+        };
+    }, {} as OutVariant<T>);
+}
+
+
+// WAIT UNTIL VARIANT 3.0 FOR TYPESCRIPT 4.1 FEATURES
+// 
+// type ScopedVariant<T extends RawVariant, Scope extends string> = {
+//     [P in (keyof T & string)]: VariantCreator<`${Scope}__${P}`, CleanResult<T[P], () => {}>>;
+// }
+
+// /**
+//  * Unstable. 
+//  * @param v 
+//  * @param _contract 
+//  */
+// export function scopedVariant<
+//     T extends RawVariant,
+//     Scope extends string,
+// >(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>> {
+//     return safeKeys(v).reduce((acc, key) => {
+//         return {
+//             ...acc,
+//             [key]: variant(`${scope}__${key}`, typeof v[key] === 'function' ? v[key] as any : identityFunc),
+//         };
+//     }, {} as ScopedVariant<T, Scope>);
+// }
+
+
 /**
  * Give an array of output types for a given variant collection.
  * Useful for checking whether or not a message belongs in your

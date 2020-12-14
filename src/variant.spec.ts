@@ -24,7 +24,7 @@ import {
     payload,
     just,
 } from './index';
-import {contractedModule} from './variant';
+import {constrainedVariant, patternedVariant} from './variant';
 import {Animal, cerberus} from './__test__/animal';
 
 test('empty variant', () => {
@@ -374,7 +374,7 @@ test('Generic (maybe)', () => {
 
 
 test('constrained', () => {
-    const Test1 = contractedModule((_x: string) => ({min: 4}), {
+    const Test1 = constrainedVariant((_x: string) => ({min: 4}), {
         Yo: (_x: string, min: number) => ({min}),
     });
     type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
@@ -395,7 +395,7 @@ test('constrained 2', () => {
         BackLength,
     }
 
-    const HairStyle = contractedModule(just<{min?: HairLength, max?: HairLength}>({}), {
+    const HairStyle = constrainedVariant(just<{min?: HairLength, max?: HairLength}>({}), {
         Bald: just({max: HairLength.Bald}),
         Pixie: just({min: HairLength.Short, max: HairLength.Medium}),
         Straight: just({min: HairLength.Short}),
@@ -406,4 +406,22 @@ test('constrained 2', () => {
     const baldie = HairStyle.Bald() as HairStyle;
 
     expect(baldie.max).toBe(HairLength.Bald);
-})
+});
+
+
+// test('scoped', () => {
+//     const Animal2 = scopedVariant('Animal', {
+//         Cat: fields<{name: string}>(),
+//         Dog: fields<{name: string, toy?: string}>(),
+//     });
+//     type Animal2<T extends TypeNames<typeof Animal2> = undefined> = VariantOf<typeof Animal2, T>;
+
+//     const rating = (animal: Animal2) => match(animal, {
+//         [Animal2.Cat.type]: c => c.name,
+//         default: just('yo'),
+//     })
+
+//     expect(rating(Animal2.Cat({name: 'steve'}))).toBe('steve');
+// });
+
+// test('scopedMatch')

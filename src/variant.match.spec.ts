@@ -1,9 +1,9 @@
-import {match, partialMatch, matchLiteral, matchElse, partialLookup, lookup, TypeNames, variantModule, VariantOf} from '.';
+import {match, partialMatch, matchLiteral, matchElse, partialLookup, lookup, TypeNames, variantModule, VariantOf, variantList, variant} from '.';
 import {just, unpack} from './match';
 import {fields, isType, payload} from './tools';
 import {strEnum} from './util';
-import {Animal, cerberus, TaggedAnimal} from './__test__/animal'
-
+import {Animal, Animal2, cerberus, TaggedAnimal} from './__test__/animal'
+import {matcher} from './matcher';
 test('match with string', () => {
     const rating = (animal: Animal) => match(animal, {
         dog: _ => 1,
@@ -218,4 +218,57 @@ test('obj just', () => {
         }),
         default: just(2),
     })
+})
+
+
+test('matcher', () => {
+    const rating = (anim: Animal) => {
+        const answer = matcher(anim)
+            .when(['cat', 'dog'], c => c.name)
+            .when({
+                snake: just(4),
+                bird: just(4),
+            })
+            .complete();
+        return answer;
+    }
+    const Animal = Animal2;
+    type Animal = Animal2;
+
+    const greetAnimal = (animal: Animal) => matcher(animal)
+        .when({
+            snake: just('You offer your snake a new rat.'),
+            bird: just('You let your bird perch on your finger.'),
+        })
+        .when(['cat', 'dog'], e => e)
+        .complete();
+
+    const asdf = greetAnimal(cerberus);
+    expect(rating(Animal.snake('steve'))).toBe(4);
+    expect(rating(cerberus)).toBe(cerberus.name);
+})
+
+test('matcher else', () => {
+    const rating = (anim: Animal) => {
+        const answer = matcher(anim)
+            .when(['cat', 'dog'], c => c.name)
+            .else(just(4))
+        ;
+        return answer;
+    }
+    const Animal = Animal2;
+    type Animal = Animal2;
+
+    expect(rating(Animal.snake('steve'))).toBe(4);
+    expect(rating(cerberus)).toBe(cerberus.name);
+})
+
+
+test('defff', () => {
+    const Anim2 = variantList([
+        ...Object.values(Animal),
+        variant('default', payload<string>()),
+        'pegasus',
+    ]);
+    type Anim2<T extends TypeNames<typeof Anim2> = undefined> = VariantOf<typeof Anim2, T>;
 })

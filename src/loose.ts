@@ -13,11 +13,6 @@ export const nil = () => {};
 type ExtractVC<T extends {type: string}> = {
     [P in T['type']]: (...args: any[]) => Omit<Extract<T, {type: P}>, 'type'>;
 }
-export function constrainedVariant<T extends {type: string}>(){
-    return function<D extends ExtractVC<T>>(def: D & ThisType<D>): OutVariant<D> {
-        return variantModule(def);
-    }
-}
 
 type FromVariant<T, K extends string> = Extract<T, {type: K}>;
 type FieldsFromVariant<T, K extends string> = Omit<Extract<T, {type: K}>, 'type'>;

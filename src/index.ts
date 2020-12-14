@@ -7,7 +7,7 @@ export {
     augment,
     AugmentVariant,
     cast,
-    contractedModule,
+    constrainedVariant,
     isOfVariant,
     keymap,
     KeyMap,
@@ -48,6 +48,7 @@ export {
 } from './util';
 
 export * from './match';
+export * from './matcher';
 export * from './lookup';
 export * from './loose';
 export * from './generic';
