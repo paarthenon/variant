@@ -262,7 +262,7 @@ export function patternedVariant<
  * variant set at runtime.
  * @param variantObject 
  */
-export function outputTypes<T extends {[name: string]: Outputs<string, string>}>(variantObject: T) {
+export function outputTypes<T extends {[name: string]: Outputs<string, string>}>(variantObject: T): T[keyof T]['type'][] {
     return Object.keys(variantObject).map(key => variantObject[key].type);
 }
 

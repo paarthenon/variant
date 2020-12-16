@@ -3,6 +3,10 @@ title: Changelog
 ---
 Summary of the changes in each patch.
 
+## 2.0.3
+ - Added `matcher()` function
+ - Added `constrainedVariant()` and `patternedVariant()`.
+ - Added match helpers `just()` and `unpack()`
 ## 2.0.2
  - Added `isType` utility
     - and a curried overload

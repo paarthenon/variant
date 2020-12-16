@@ -2,19 +2,61 @@ import {Handler, Limited, match} from './match';
 import {ExtractOfUnion, Func, Identity} from './util';
 import {KeysOf, TypeExt, Variant, VariantCreator, VariantsOfUnion} from './variant';
 
+/**
+ * UNSTABLE.
+ * 
+ * A stateful "match" clause represented by an object.
+ * 
+ * Create the matcher on some instance of a variant.
+ * Express handlers for clauses through `.when()`. 
+ * Finish handling with a terminal: `.complete()`, `.execute()`, or `.else()`.
+ */
 export type Matcher<
     T extends TypeExt<'type', string>,
     H extends Partial<Handler<VariantsOfUnion<T>>>,
     K extends string = 'type',
 > = {
     readonly handler?: H;
+    /**
+     * The target object being matched
+     */
     readonly target: T;
+    /**
+     * Handle one or more cases using a `match`-like handler object.
+     */
     when<HPrime extends SplayPartial<Exclude<T, TypeExt<'type', keyof H>>>>(hp: HPrime): Matcher<T, H & HPrime, K>;
-    when<KPrime extends (Exclude<T['type'], keyof H>|VariantCreator<Exclude<T['type'], keyof H>, Func>), HFunc extends (x: ExtractOfUnion<T, GetKey<KPrime>>) => any>(keys: KPrime[], handler: HFunc): Matcher<T, H & Record<GetKey<KPrime>, HFunc>, K>;
-    execute(): Exclude<T['type'], keyof H> extends never ? ReturnType<EnsureFunc<H[keyof H]>> : (ReturnType<EnsureFunc<H[keyof H]>> | undefined);
+    /**
+     * Handle one or more cases by specifying the relevant types in an array
+     * then providing a function to process a variant of one of those types.
+     */
+    when<
+        KPrime extends (Exclude<T['type'], keyof H> | VariantCreator<Exclude<T['type'], keyof H>, Func>),
+        HFunc extends (x: ExtractOfUnion<T, GetKey<KPrime>>) => any,
+    >(
+        keys: KPrime[],
+        handler: HFunc,
+    ): Matcher<T, H & Record<GetKey<KPrime>, HFunc>, K>;
+    /**
+     * Execute the match immediately. Exhaustiveness is not guaranteed, but if the matcher
+     * has missing cases this function may return `undefined`. In that scenario the `undefined` 
+     * type will be added to this function's possible return types.
+     */
+    execute(): Exclude<T['type'], keyof H> extends never 
+        ? ReturnType<EnsureFunc<H[keyof H]>> 
+        : (ReturnType<EnsureFunc<H[keyof H]>> | undefined)
+    ;
+    /**
+     * Take any remaining cases and handle them in a single function. This is a terminal and
+     * will execute the match immediately. If a previous `when()` statement 
+     */
     else<F extends (variant: Exclude<T, TypeExt<'type', keyof H>>) => any>(f: F): ReturnType<EnsureFunc<H[keyof H]> | F>;
 
-} & (Exclude<T['type'], keyof H> extends never ? {complete: () => ReturnType<EnsureFunc<H[keyof H]>>} : {});
+} & (Exclude<T['type'], keyof H> extends never ? {
+    /**
+     * Only exists if all cases are handled.
+     */
+    complete: () => ReturnType<EnsureFunc<H[keyof H]>>
+} : {});
 
 
 type GetKey<T extends (string | VariantCreator<string, Func>)> = T extends string ? T : T extends VariantCreator<infer TT, Func> ? TT : never;

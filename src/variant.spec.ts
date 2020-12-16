@@ -24,7 +24,7 @@ import {
     payload,
     just,
 } from './index';
-import {constrainedVariant, patternedVariant} from './variant';
+import {constrainedVariant, keylist, patternedVariant} from './variant';
 import {Animal, cerberus} from './__test__/animal';
 
 test('empty variant', () => {
@@ -168,6 +168,7 @@ test('keymap', () => {
     type Anim<T extends TypeNames<typeof Anim> = undefined> = VariantOf<typeof Anim, T>;
     
     const thing = keymap(Anim);
+    const list = keylist(Anim);
     type asdf = KeyMap<typeof Anim>;
     thing.dog;
 })

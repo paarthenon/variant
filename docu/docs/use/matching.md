@@ -109,7 +109,7 @@ const coolAnimals = animals.filter(a => match(a, {
 />
 ```
 
-## Partial Matching
+### Partial Matching
 
 
 Sometimes it won't be necessary to handle every case, or many cases can be handled in the same way. In this scenario, add a default handler. There are two simple ways to do this.
@@ -138,23 +138,110 @@ Sometimes it won't be necessary to handle every case, or many cases can be handl
     }, rest => `Unknown Attribute: ${rest.type}`);
     ```
 
-## `lookup()`
+### Match Helpers
 
-A much simpler kind of pattern matcher, `lookup()` leverages a [lookup table](https://en.wikipedia.org/wiki/Lookup_table) and uses the `type` property of the object as the key.
+I have added two functions to assist with common use cases.
 
-```typescript
-const cuteName = lookup(animal, {
-    cat: 'kitty',
-    dog: 'pupper',
-    snake: 'snek',
+ 1. Returning a constant (**`just()`**).
+
+    As a user engages with match more, their ring finger may become tired from typing excessive numbers of `() =>` and `_ =>`expressions. I've made the function `just()` available as shorthand for this use case. `just(x)` returns a function `() => x`.
+
+    Note that `just()` can also be used in variant *creation* as a way of creating a case that takes no parameters and yet returns an object with multiple fields.
+ 2. Extracting the payload (**`unpack()`**).
+
+    `payload<T>()` is an extremely commonly used function. Instead of repeatedly typing `({payload}) => payload` in order to extract the data, use `unpack`.
+
+```ts
+// Variant variety (payload, fields, empty).
+const Test1 = variantModule({
+    Alpha: payload<string>(),
+    Beta: fields<{prop: string}>(),
+    Gamma: {},
+});
+type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
+
+// Example of unpack, the regular way of doing things, and just.
+const test1Result = (thing: Test1) => match(thing, {
+    Alpha: unpack,
+    Beta: ({prop}) => prop,
+    Gamma: just('gamma'),
 });
 ```
-### `partialLookup()`
 
-The same as before, but none of the properties are required. If there is not a branch that matches the variant's type, this function returns `undefined`.
+## 🔮 `matcher()` 
+
+:::note Preview Content
+🔮 denotes preview content. These are features that are available, but not well-documented and may be modified in the near future as they see better integration.
+:::
+
+The `match` function is wonderful, but requires explicit handling of individual cases and so can be tiresome to use when multiple cases follow the same flow. This library provides an alternate matching tool called `matcher()` that operates in a builder pattern. Here's our original describeAnimal function, but with a `matcher()` instead.
+
 ```typescript
-<Icon
-    icon='upload'
-    color={partialLookup(uploadState, {failure: 'red'})}
-/>
+const describeAnimal = (animal: Animal) => matcher(animal)
+    .when({
+        cat: ({name}) => `${name} is sleeping on a sunlit window sill.`,
+        dog: ({name, favoriteBall}) => [
+            `${name} is on the rug`,
+            favoriteBall ? `nuzzling a ${favoriteBall} ball.` : '.' 
+        ].join(' '),
+        snake: s => `${s.name} is enjoying the heat of the lamp on his ${s.pattern} skin`,
+    })
+    .complete();
 ```
+
+It seems pretty familiar. This function shines when we can combine branches, so let's do that here. Unlike a snake, cats and dogs both have fur and enjoy having it pet.
+
+```typescript
+const describeAnimal = (animal: Animal) => matcher(animal)
+    .when({
+        snake: s => `${s.name} is enjoying the heat of the lamp on his ${s.pattern} skin`,
+    })
+    .when(['cat', 'dog'], ({name}) => `${name} is hoping you will pet their fur.`)
+    .complete();
+```
+
+The matcher type is smart enough to understand which cases have already been handled. Attempting to handle a case twice will result in a compiler error. The `.complete()` function is only available when all cases are handled. Partial matching is still entirely possible by using `.execute()` instead.
+
+****
+
+Let's take a look at `matcher()` in detail. This function accepts a single object as its only parameter. It returns a `Matcher<T, H, K?>` where T is the instance of the variant, H is the current state of the handler object being built, and K is an optional type key (if your variants do not use `type` and instead use `__typeName` or `kind`).
+
+The return type of `matcher()` follows the same rules as `match()` (it will be a union of the handler return types). To actually *execute* the matcher, use one of its **terminal** methods, like `complete()`.
+
+### To use this function
+
+ 1. **Call `matcher()` on a variable** to create the matcher object.
+    ```ts
+    const greeting = matcher(animal)
+        ...
+    ```
+ 1. **Handle one or more cases** with one or more `.when()` calls.
+    
+    The `.when()` method has two overloads.
+
+    1. The first accepts an object, which will operate just like `match()`
+    
+        ```ts
+            ...
+            .when({
+                snake: just('Hello, snake.'),
+            })
+        ```
+
+    1. The second accepts an array of keys a function to handle the variant types corresponding to those keys.
+        ```ts
+        ...
+        .when(['cat', 'dog'], just('Hello, furry one.'))
+        ```
+        Just like `isType`, it's okay to use the constructor in this array instead.
+        ```ts
+        ...
+        .when([Animal.cat, Animal.dog], just('Hello, furry one.'))
+        ```
+ 1. **Execute the handler** with a **terminal** method. So far you've seen `complete()`, but that won't always be applicable or even available. The `complete()` method only exists on the matcher if every case has been handled. There are three terminals, `.complete()`, `.execute()`, and `.else()`.
+
+    1. **`.complete()`** gives you **exhaustiveness checking**. This function will only be defined if the handler completely covers the variant. Adding a new case will raise a compiler error in the relevant matchers as the `complete()` function will disappear until the new case is handled.
+    1. **`.execute()`** immediately executes the handler whether or not every case can be processed, a form of *partial matching*. If the handler is complete, `.execute()` is functionally equivalent to `.complete()`. However, if there are some cases unhandled, `.execute()` may return `undefined` (and the return type will be updated to reflect this).
+    1. **`.else(e => ...)`** immediately executes the handler and processes any unhandled cases with the function passed into the `.else()` method. Another form of *partial matching*, this is most similar to the match-else overload of `match()`.
+
+

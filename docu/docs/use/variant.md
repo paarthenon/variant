@@ -3,7 +3,7 @@ id: variant
 title: Variant
 ---
 
-A **variant** is a single object that can take many forms. Each of those forms has a *type*, sometimes called a *tag*, and optionally a *body* that tells us what kind of data we have available if in that form. In the introduction we saw how several types of animals could be grouped into the *module* `Animal`.
+A **variant** is a single object that can take many forms. Each of those forms has a *type*, sometimes called a *tag*, and optionally a *body* that tells us what kind of data we have available if in that form. In the introduction we saw how several types of animals could be grouped into the *module* `Animal`. In this section we'll take a look at the underlying building block that `variantModule` and `variantList` use, the `variant()` function, which can also be used alone.
 
 At this point we can express the data, but I'd like the ability to interact with our virtual menagerie. Let's create our first *action* or command, `AddAnimal`.
 
@@ -21,7 +21,7 @@ const action = addAnimal();
 ```
 **result:** `typeof action: { type: 'AddAnimal' }`
 
-To add additional properties, provide a function as a second parameter. The arguments of this function will become the arguments of the tag constructor, and the properties in the returned object will become the properties of that form of the variant. The `type: ...` property will be merged in for you. 
+To add additional properties, provide a function as a second parameter. The arguments of this function will become the arguments of the tag constructor, and the properties in the returned object will become the properties of that form of the variant. The `type: ...` property will be merged in for you. Ultimately this is how every variant creation function works. 
 
 ```typescript {4}
 import variant from 'variant';
