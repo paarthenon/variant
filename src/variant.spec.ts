@@ -24,8 +24,8 @@ import {
     payload,
     just,
 } from './index';
-import {augmented, constrained, flags, patterned} from './variant';
-import {Animal, cerberus} from './__test__/animal';
+import {augmented, constrained, descope, descopeType, flags, patterned, types} from './variant';
+import {Animal, cerberus, scopedCerberus} from './__test__/animal';
 
 test('empty variant', () => {
     const func = variant('');
@@ -71,6 +71,11 @@ test('output type', () => {
 
 test('output types', () => {
     expect(outputTypes(Animal)).toEqual(['dog', 'cat', 'snake']);
+})
+
+
+test('output types', () => {
+    expect(types(Animal)).toEqual(['dog', 'cat', 'snake']);
 })
 
 test('augment', () => {
@@ -187,6 +192,10 @@ test('keymap', () => {
     thing.dog;
 })
 
+test('descopeType', () => {
+    const type = descopeType(scopedCerberus.type);
+    expect(type).toBe('dog');
+})
 
 test('variantModule', () => {
     const AnimClone = typedVariant<Animal>({

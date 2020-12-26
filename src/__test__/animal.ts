@@ -1,5 +1,5 @@
 import {variantList, variant, fields, TypeNames, VariantOf} from '..';
-import {OutVariant, RawVariant, Variant, VariantCreator, variantFactory, variantModule} from '../variant';
+import {OutVariant, RawVariant, scopedVariant, Variant, VariantCreator, variantFactory, variantModule} from '../variant';
 export const Animal = variantList([
     variant('dog', fields<{name: string, favoriteBall?: string}>()),
     variant('cat', fields<{name: string, furnitureDamaged: number}>()),
@@ -29,8 +29,18 @@ export const Animal2 = variantModule({
 });
 export type Animal2<T extends TypeNames<typeof Animal2> = undefined> = VariantOf<typeof Animal2, T>;
 
+export const ScopedAnimal = scopedVariant('animal', {
+    dog: fields<{name: string, favoriteBall?: string}>(),
+    cat: fields<{name: string, furnitureDamaged: number}>(),
+    snake: (name: string, pattern = 'striped') => ({name, pattern}),
+    bird: {},
+});
+export type ScopedAnimal<T extends TypeNames<typeof ScopedAnimal> = undefined> = VariantOf<typeof ScopedAnimal, T>;
+
+
 export const cerberus = Animal.dog({name: 'Cerberus'});
 export const cerberus2 = Animal2.dog({name: 'Cerberus'});
+export const scopedCerberus = ScopedAnimal.dog({name: 'Cerberus'});
 
 type z = Animal;
 

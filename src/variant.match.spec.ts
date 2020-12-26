@@ -1,9 +1,10 @@
 import {match, partialMatch, matchLiteral, matchElse, partialLookup, lookup, TypeNames, variantModule, VariantOf, variantList, variant} from '.';
 import {just, unpack} from './match';
-import {fields, isType, payload} from './tools';
+import {constant, fields, isType, payload} from './tools';
 import {strEnum} from './util';
-import {Animal, Animal2, cerberus, TaggedAnimal} from './__test__/animal'
+import {Animal, Animal2, cerberus, ScopedAnimal, scopedCerberus, TaggedAnimal} from './__test__/animal'
 import {matcher} from './matcher';
+import {atScope, descope} from './variant';
 test('match with string', () => {
     const rating = (animal: Animal) => match(animal, {
         dog: _ => 1,
@@ -271,4 +272,27 @@ test('defff', () => {
         'pegasus',
     ]);
     type Anim2<T extends TypeNames<typeof Anim2> = undefined> = VariantOf<typeof Anim2, T>;
+})
+
+
+test('scoped match', () => {
+    const rating = (a: ScopedAnimal) => match(a, {
+        "animal/dog": constant(4),
+        default: constant(5),
+    });
+
+    expect(rating(scopedCerberus)).toBe(4);
+})
+
+test('scoped match', () => {
+    const rating2 = (a: ScopedAnimal) => {
+        return match(descope(a), {
+            bird: constant(1),
+            cat: constant(2),
+            dog: constant(3),
+            snake: constant(4),
+        })
+    }
+
+    expect(rating2(scopedCerberus)).toBe(3);
 })

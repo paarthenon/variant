@@ -1,4 +1,5 @@
 import variantDefault from '.';
+import {Handler} from './match';
 import {Identity, Func, identityFunc, GetDataType, ExtractOfUnion, strEnum, isPromise} from './util';
 
 /**
@@ -300,28 +301,57 @@ export function augmented<T extends RawVariant, F extends (x: OutVariant<T>) => 
     }, {}) as AugmentedRawVariant<T, F>;
 }
 
-// WAIT UNTIL VARIANT 3.0 FOR TYPESCRIPT 4.1 FEATURES
-// 
-// type ScopedVariant<T extends RawVariant, Scope extends string> = {
-//     [P in (keyof T & string)]: VariantCreator<`${Scope}__${P}`, CleanResult<T[P], () => {}>>;
-// }
+type ScopedVariant<T extends RawVariant, Scope extends string> = {
+    [P in (keyof T & string)]: VariantCreator<ScopedType<Scope, P>, CleanResult<T[P], () => {}>>;
+}
 
-// /**
-//  * Unstable. 
-//  * @param v 
-//  * @param _contract 
-//  */
-// export function scopedVariant<
-//     T extends RawVariant,
-//     Scope extends string,
-// >(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>> {
-//     return safeKeys(v).reduce((acc, key) => {
-//         return {
-//             ...acc,
-//             [key]: variant(`${scope}__${key}`, typeof v[key] === 'function' ? v[key] as any : identityFunc),
-//         };
-//     }, {} as ScopedVariant<T, Scope>);
-// }
+type ScopedType<Scope extends string, Type extends string = ''> = `${Scope}/${Type}`;
+export const scopeType = <Scope extends string, Type extends string>(scope: Scope, type: Type) => `${scope}/${type}` as ScopedType<Scope, Type>
+
+
+/**
+ * Unstable. 
+ * @param v 
+ * @param _contract 
+ */
+export function scopedVariant<
+    T extends RawVariant,
+    Scope extends string,
+>(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>> {
+    return safeKeys(v).reduce((acc, key) => {
+        return {
+            ...acc,
+            [key]: variant(`${scope}/${key}`, typeof v[key] === 'function' ? v[key] as any : identityFunc),
+        };
+    }, {} as ScopedVariant<T, Scope>);
+}
+
+export type ScopedObject<Scope extends string, T extends {}> = {[P in (keyof T & string) as ScopedType<Scope, P>]: T[P]};
+export function atScope<S extends string, T extends {}>(s: S, obj: T) {
+    return Object.entries(obj).reduce((acc, [key, val]) => {
+        return {
+            ...acc,
+            [scopeType(s, key)]: val,
+        }
+    }, {}) as ScopedObject<S, T>;
+}
+
+export function descopeType<S extends string, T extends string>(s: ScopedType<S, T>): T {
+    return (s.split('/')[1] ?? s) as T;
+}
+
+/**
+ * Remove the scope from an instance of a variant so that its easier to match against it.
+ * @param obj 
+ * @param key 
+ */
+export function descope<T extends Property<K, ScopedType<string, string>>, K extends string = 'type'>(obj: T, key?: K): T extends Property<K, ScopedType<string, infer TType>> ? Identity<Omit<T, K> & Property<K, TType>> : T {
+    const typeStr = key ?? 'type' as K;
+    return {
+        ...obj,
+        [typeStr]: descopeType(obj[typeStr] as ScopedType<string, string>),
+    } as any
+}
 
 
 /**
@@ -341,6 +371,16 @@ export function outputTypes<
     return Object.keys(variantObject).map(key => variantObject[key].type);
 }
 
+export function types<T extends VariantModule<K>, K extends string = 'type'>(content: T, key?: K): KeysOf<T, K>[];
+export function types<T extends Property<K, string>, K extends string = 'type'>(content: T[], key?: K): T[K][];
+export function types<K extends string = 'type'>(content: VariantModule<K> | Property<K, string>[], key?: K) {
+    const typeStr = key ?? 'type' as K;
+    if (Array.isArray(content)) {
+        return content.map(c => c[typeStr]);
+    } else {
+        return Object.values(content).map(c => c.type);
+    }
+}
 /**
  * Checks if an object was created from one of a set of variants. This function is a 
  * [user-defined type guard](https://www.typescriptlang.org/docs/handbook/advanced-types.html#user-defined-type-guards) 
