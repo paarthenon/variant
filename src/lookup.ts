@@ -1,4 +1,4 @@
-import {WithProperty, VariantsOfUnion} from './variant';
+import {Property, VariantsOfUnion} from './variant';
 
 /**
  * An object that has the same keys as a variant but has arbitrary values for the data. 
@@ -15,7 +15,7 @@ export type Lookup<T, U = any> = {
  * @param typeKey the key used as the discriminant.
  */
 export function lookup<
-    T extends WithProperty<K, string>,
+    T extends Property<K, string>,
     L extends Lookup<VariantsOfUnion<T, K>>,
     K extends string = 'type'
 >(obj: T, handler: L, typeKey?: K): L[keyof L] {
@@ -31,7 +31,7 @@ export function lookup<
  * @param typeKey the key used as the discriminant.
  */
 export function partialLookup<
-    T extends WithProperty<K, string>,
+    T extends Property<K, string>,
     L extends Lookup<VariantsOfUnion<T, K>>,
     K extends string = 'type'
 >(obj: T, handler: Partial<L>, typeKey?: K): L | undefined {

@@ -24,7 +24,7 @@ import {
     payload,
     just,
 } from './index';
-import {constrainedVariant, keylist, patternedVariant} from './variant';
+import {augmented, constrained, flags, patterned} from './variant';
 import {Animal, cerberus} from './__test__/animal';
 
 test('empty variant', () => {
@@ -81,6 +81,21 @@ test('augment', () => {
     expect(snek.name).toBe('steve');
     expect(snek.better).toBeDefined();
     expect(snek.better).toBe(true);
+})
+
+test('augmented', () => {
+    const BetterAnimal = variantModule(augmented(() => ({better: 4}),{
+        dog: fields<{name: string, favoriteBall?: string}>(),
+        cat: fields<{name: string, furnitureDamaged: number}>(),
+        snake: (name: string, pattern = 'striped') => ({name, pattern}),
+    }));
+    type BetterAnimal<T extends TypeNames<typeof BetterAnimal> = undefined> = VariantOf<typeof BetterAnimal, T>;
+
+
+    const snek = BetterAnimal.snake('steve');
+    expect(snek.name).toBe('steve');
+    expect(snek.better).toBeDefined();
+    expect(snek.better).toBe(4);
 })
 
 test('cast', () => {
@@ -168,7 +183,6 @@ test('keymap', () => {
     type Anim<T extends TypeNames<typeof Anim> = undefined> = VariantOf<typeof Anim, T>;
     
     const thing = keymap(Anim);
-    const list = keylist(Anim);
     type asdf = KeyMap<typeof Anim>;
     thing.dog;
 })
@@ -375,9 +389,9 @@ test('Generic (maybe)', () => {
 
 
 test('constrained', () => {
-    const Test1 = constrainedVariant((_x: string) => ({min: 4}), {
+    const Test1 = variantModule(constrained((_x: string) => ({min: 4}), {
         Yo: (_x: string, min: number) => ({min}),
-    });
+    }));
     type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
 
     const instance = Test1.Yo('hello', 4);
@@ -396,12 +410,12 @@ test('constrained 2', () => {
         BackLength,
     }
 
-    const HairStyle = constrainedVariant(just<{min?: HairLength, max?: HairLength}>({}), {
+    const HairStyle = variantModule(constrained(just<{min?: HairLength, max?: HairLength}>({}), {
         Bald: just({max: HairLength.Bald}),
         Pixie: just({min: HairLength.Short, max: HairLength.Medium}),
         Straight: just({min: HairLength.Short}),
         Waves: just({min: HairLength.Medium}),
-    });
+    }));
     type HairStyle<T extends TypeNames<typeof HairStyle> = undefined> = VariantOf<typeof HairStyle, T>;
 
     const baldie = HairStyle.Bald() as HairStyle;

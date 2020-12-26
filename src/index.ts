@@ -3,11 +3,12 @@ export {
     Anonymous,
 } from './nominal';
 
+export * from './deprecated';
+
 export {
-    augment,
-    AugmentVariant,
+    augmented,
     cast,
-    constrainedVariant,
+    constrained,
     isOfVariant,
     keymap,
     KeyMap,
@@ -18,6 +19,8 @@ export {
     Matrix,
     narrow,
     outputTypes,
+    patterned,
+    Property,
     TypeExt,
     TypeNames,
     variant,

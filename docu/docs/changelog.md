@@ -5,8 +5,9 @@ Summary of the changes in each patch.
 
 ## 2.0.3
  - Added `matcher()` function
- - Added `constrainedVariant()` and `patternedVariant()`.
- - Added match helpers `just()` and `unpack()`
+ - Added `constrained()`, `patterned()`, and `augmented()`.
+ - Added match helpers `just()` (alias for `constant()`) and `unpack()`
+ - `outputTypes()` gets a more specific return type.
 ## 2.0.2
  - Added `isType` utility
     - and a curried overload
@@ -18,6 +19,8 @@ Summary of the changes in each patch.
     - their functionality is now covered by `match`
  - `variantModule` also accepts `{}`
  - improved generic handling (`genericVariant`)
+ - Acknowledgments
+     - *Thank you [@ohana54](https://github.com/paarthenon/variant/issues/7) for the discussion that led to `isType` and the `match` overloads.*
 
 ## 2.0.1
  - exposed `variantModule`
@@ -27,4 +30,4 @@ Summary of the changes in each patch.
  - added recursive and generic variants
  - added `variantModule`
  - `variantList` now accepts raw string literals
- - match 
+ - match gets a helper, `constant()`

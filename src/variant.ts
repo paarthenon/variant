@@ -1,9 +1,20 @@
 import variantDefault from '.';
 import {Identity, Func, identityFunc, GetDataType, ExtractOfUnion, strEnum, isPromise} from './util';
 
-// Consider calling this ObjectEntry or Entry. Also Pair? No, more like KVPair. Mapping?
-export type TypeExt<K extends string, T> = K extends keyof infer LitK ? {[P in keyof LitK]: T} : never;
-export type WithProperty<K extends string, T> = TypeExt<K, T>;
+/**
+ * A type representing an object with a single property.
+ *  - `Property<K, T>` evaluates to `{ [K: string]: T }`
+ */
+export type Property<K extends string, T> = K extends keyof infer LitK ? {[P in keyof LitK]: T} : never;
+/**
+ * @deprecated
+ * Alias of `Property<K extends string, T>`
+ */
+export type WithProperty<K extends string, T> = Property<K, T>;
+/**
+ * Alias of `Property<K extends string, T>`
+ */
+export type TypeExt<K extends string, T> = Property<K, T>;
 
 /**
  * The type marking metadata. It's useful to know the type of the items the function will generate.
@@ -13,6 +24,9 @@ export type WithProperty<K extends string, T> = TypeExt<K, T>;
  * prefer to use [Animal.dog.type]: rather than dog: . 
  */
 export type Outputs<K, T> = {
+    /**
+     * Discriminant property key
+     */
     key: K
     /**
      * The type of object created by this function.
@@ -28,27 +42,47 @@ export type Stringable<ReturnType extends string> = {
 }
 
 /**
- * The constructor for one tag of a variant type. 
+ * The constructor for one tag of a variant type.
+ * 
+ *  - `T` extends `string` — The literal string used as the type
+ *  - `F` extends `(...args: any[]) => {}` = `() => {}` — The function that serves as the variant's *body definition*
+ *  - `K` extends `string` = `'type'` — The discriminant
  */
 export type VariantCreator<
     T extends string,
     F extends (...args: any[]) => {} = () => {},
     K extends string = 'type'>
-= Stringable<T> & ((...args: Parameters<F>) => PatchObjectOrPromise<ReturnType<F>, WithProperty<K, T>>) & Outputs<K, T>;
-export type PatchObjectOrPromise<T extends {} | PromiseLike<{}>, U extends {}> = T extends PromiseLike<infer R> ? PromiseLike<Identity<U & R>> : Identity<U & T>;
+= ((...args: Parameters<F>) => PatchObjectOrPromise<ReturnType<F>, Property<K, T>>) 
+    & Outputs<K, T>
+    & Stringable<T>
+;
 
 /**
- * The overall module of variants. This is equivalent to a polymorphic variant. 
+ * Given an object or a promise containing an object, patch it to
+ * include some extra properties.
+ * 
+ * This is mostly used to merge the `{type: ______}` property into
+ * the body definition of a variant.
+ */
+export type PatchObjectOrPromise<
+    T extends {} | PromiseLike<{}>,
+    U extends {}
+> = T extends PromiseLike<infer R> 
+    ? PromiseLike<Identity<U & R>> 
+    : Identity<U & T>
+;
+
+/**
+ * A variant module definition. Literally an object to group together
+ * a set of variant constructors.
  */
 export type VariantModule<K extends string = 'type'> = {
     [name: string]: VariantCreator<string, (...args: any[]) => any, K>
 }
 
-// validator ?
-
-type EnforceEmpty<T extends {}> = keyof T extends never ? {} : never;
 
 /**
+ * Create the `variant` function set to a new discriminant.
  * Use this function to generate a version of the `variant` factory function using
  * some arbitrary key. The default `variant` is just `variantFactory('type')`.
  * @param key The name of the property to use e.g. 'type', 'kind', 'version'
@@ -107,9 +141,17 @@ export type Creators<VM extends VariantModule<K>, K extends string = 'type'> = {
 
 /**
  * Used in writing cases of a type-first variant.
+ * 
+ * `Variant<'One', {a: number, b: string}>>` generates
+ *  - `{type: 'One', a: number, b: string}`
+ * 
+ * You may write the literals directly, using this is recommended
+ * if you'd like to update the literal as this library updates.
  */
-export type Variant<Type extends string, Fields extends {} = {}, Key extends string = 'type'>
-    = WithProperty<Key, Type> & Fields;
+export type Variant<
+    Type extends string, Fields extends {} = {},
+    Key extends string = 'type',
+> = Property<Key, Type> & Fields;
 
 type InternalVariantsOf<VM extends VariantModule<K>, K extends string ='type'> = GetDataType<Creators<VM, K>, K>;
 
@@ -166,17 +208,14 @@ export type PatternedRawVariant<F extends Func> = {[type: string]: F}
  * Patched Constrained Raw Variant
  */
 type PatchedCRV<T extends ConstrainedRawVariant<F>, F extends Func> = {
-    [P in keyof T]: (...args: Parameters<T[P]>) => ReturnType<T[P]> & ReturnType<F>;
-}
-/**
- * Patched Constrained Raw Variant
- */
-type PatchedPRV<T extends ConstrainedRawVariant<F>, F extends Func> = {
-    [P in keyof T]: (...args: Parameters<T[P]>) => ReturnType<T[P]> & ReturnType<F>;
+    [P in keyof T]: (...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & ReturnType<F>>;
 }
 
 type CleanResult<T, U> = T extends undefined ? U : T extends Func ? T : T extends object ? U : T;
 
+type FullyFuncRawVariant<V extends RawVariant> = {
+    [P in keyof V & string]: CleanResult<V[P], () => {}>
+}
 export type OutVariant<T extends RawVariant>
     = {[P in (keyof T & string)]: VariantCreator<P, CleanResult<T[P], () => {}>>}
 ;
@@ -198,39 +237,68 @@ export function variantModule<
     }, {} as OutVariant<T>);
 }
 
-/**
- * Unstable. 
- * @param v 
- * @param _contract 
- */
-export function constrainedVariant<
+export function constrained<
     T extends ConstrainedRawVariant<F>,
     F extends Func,
->(_contract: F, v: T): Identity<OutVariant<PatchedCRV<T, F>>> {
-    return safeKeys(v).reduce((acc, key) => {
-        return {
-            ...acc,
-            [key]: variant(key, typeof v[key] === 'function' ? v[key] as any : identityFunc),
-        };
-    }, {} as OutVariant<T>);
+>(_constraint_: F, v: T) {
+    return v as PatchedCRV<T, F>;
 }
-/**
- * Unstable. 
- * @param v 
- * @param _contract 
- */
-export function patternedVariant<
+export function patterned<
     T extends PatternedRawVariant<F>,
     F extends Func,
->(_contract: F, v: T): Identity<OutVariant<PatchedPRV<T, F>>> {
-    return safeKeys(v).reduce((acc, key) => {
-        return {
-            ...acc,
-            [key]: variant(key, typeof v[key] === 'function' ? v[key] as any : identityFunc),
-        };
-    }, {} as OutVariant<T>);
+>(_constraint_: F, v: T) {
+    return v as PatchedCRV<T, F>;
 }
 
+/**
+ * Take a variant, including some potential `{}` cases
+ * and generate an object with those replaced with the `noop` function.
+ */
+function funcifyRawVariant<V extends RawVariant>(v: V) {
+    return safeKeys(v).reduce((acc, cur) => {
+        return {
+            ...acc,
+            [cur]: typeof v[cur] === 'function' ? v[cur] : () => {},
+        }
+    }, {}) as FullyFuncRawVariant<V>
+}
+
+export type AugmentedRawVariant<V extends RawVariant, F extends Func> = {
+    [P in keyof V & string]: (...args: Parameters<FullyFuncRawVariant<V>[P]>) => (ReturnType<F> & ReturnType<FullyFuncRawVariant<V>[P]>)
+}
+/**
+ * Expand the functionality of a variant as a whole by tacking on properties
+ * generated by a thunk.
+ * 
+ * Used in conjunction with `variantModule`
+ * 
+ * ```typescript
+ * export const Action = variantModule(augmented(
+ *     () => ({created: Date.now()}), 
+ *     {
+ *         AddTodo: fields<{text: string, due?: number}>(),
+ *         UpdateTodo: fields<{todoId: number, text?: string, due?: number, complete?: boolean}>(),
+ *     },
+ * ));
+ * ```
+ * @param variantDef 
+ * @param f 
+ */
+export function augmented<T extends RawVariant, F extends (x: OutVariant<T>) => any>(f: F, variantDef: T) {
+    const funkyDef = funcifyRawVariant(variantDef);
+    return safeKeys(funkyDef).reduce((acc, key) => {
+        return {
+            ...acc,
+            [key]: (...args: Parameters<FullyFuncRawVariant<T>[typeof key]>) => {
+                const item = funkyDef[key](...args);
+                return {
+                    ...f(item),
+                    ...item,
+                }
+            }
+        }
+    }, {}) as AugmentedRawVariant<T, F>;
+}
 
 // WAIT UNTIL VARIANT 3.0 FOR TYPESCRIPT 4.1 FEATURES
 // 
@@ -257,12 +325,19 @@ export function patternedVariant<
 
 
 /**
+ * Get a list of types a given module will support.
+ * 
+ * These are the concrete types, not the friendly keys in the module.
+ * This is mostly used internally to check whether or not a message is of
+ * a given variant (`outputTypes(Animal).includes(x.type)`)
  * Give an array of output types for a given variant collection.
  * Useful for checking whether or not a message belongs in your
  * variant set at runtime.
  * @param variantObject 
  */
-export function outputTypes<T extends {[name: string]: Outputs<string, string>}>(variantObject: T): T[keyof T]['type'][] {
+export function outputTypes<
+    T extends {[name: string]: Outputs<string, string>}
+>(variantObject: T): T[keyof T]['type'][] {
     return Object.keys(variantObject).map(key => variantObject[key].type);
 }
 
@@ -316,12 +391,8 @@ export type UnionHandler<T extends string> = {
 /**
  * From a given union type, extract the the variant object's type. 
  */
-export type VariantsOfUnion<T extends WithProperty<K, string>, K extends string = 'type'> = {
+export type VariantsOfUnion<T extends Property<K, string>, K extends string = 'type'> = {
     [P in T[K]]: ExtractOfUnion<T, P, K>
-}
-
-export type AugmentVariant<T extends VariantModule, U> = {
-    [P in keyof T]: ((...args: Parameters<T[P]>) => Identity<ReturnType<T[P]> & U>) & Outputs<T[P]['key'], T[P]['type']>
 }
 
 /**
@@ -330,7 +401,7 @@ export type AugmentVariant<T extends VariantModule, U> = {
  * @param _type new type tag. Restricted to keys of the variant.
  * @param _typeKey discriminant key.
  */
-export function cast<O extends WithProperty<K, string>, T extends O[K], K extends string = 'type'>(obj: O, _type: T, _typeKey?: K) {
+export function cast<O extends Property<K, string>, T extends O[K], K extends string = 'type'>(obj: O, _type: T, _typeKey?: K) {
     return obj as ExtractOfUnion<O, T, K>;
 }
 /**
@@ -339,26 +410,11 @@ export function cast<O extends WithProperty<K, string>, T extends O[K], K extend
  * @param type new type. Restricted to keys of the variant.
  * @param typeKey discriminant key.
  */
-export function narrow<O extends WithProperty<K, string>, T extends O[K], K extends string = 'type'>(obj: O, type: T, typeKey?: K) {
+export function narrow<O extends Property<K, string>, T extends O[K], K extends string = 'type'>(obj: O, type: T, typeKey?: K) {
     const typeString = obj[typeKey ?? 'type' as K];
     return typeString === type ? obj as ExtractOfUnion<O, T, K> : undefined;
 }
 
-/**
- * Expand the functionality of a variant as a whole by tacking on properties
- * generated by a thunk.
- * @param variantDef 
- * @param f 
- */
-export function augment<T extends VariantModule, F extends Func>(variantDef: T, f: F) {
-    return Object.keys(variantDef).reduce((acc, key) => {
-        const augmentedFuncWrapper = (...args: any[]) => (Object.assign({}, f(), variantDef[key](...args)));
-        return {
-            ...acc,
-            [key]: Object.assign(augmentedFuncWrapper, {key: variantDef[key].key, type: variantDef[key].type})
-        };
-    }, {} as AugmentVariant<T, ReturnType<F>>);
-}
 
 export type SumType<T extends VariantModule<K>, K extends string = 'type'> = InternalVariantsOf<T, K>[keyof T];
 export type KeyMap<T extends VariantModule<K>, K extends string = 'type'> = {
@@ -420,7 +476,7 @@ export type Flags<T extends VariantModule> = Partial<Matrix<T>>;
  * @param flags 
  * @param typeKey 
  */
-export function flags<T extends WithProperty<K, string>, K extends string = 'type'>(flags: T[], typeKey?: K): {[P in T[K]]: ExtractOfUnion<T, P, K>} {
+export function flags<T extends Property<K, string>, K extends string = 'type'>(flags: T[], typeKey?: K): {[P in T[K]]: ExtractOfUnion<T, P, K>} {
     return flags.reduce((o, v) => ({
         ...o,
         [v[typeKey ?? 'type']]: v,

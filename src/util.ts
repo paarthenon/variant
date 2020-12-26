@@ -1,4 +1,4 @@
-import {WithProperty, VariantModule} from './variant';
+import {VariantModule, Property} from './variant';
 
 /**
  * Useful in generating friendly types. Intersections are rendered as the type of the intersection, not as A & B.
@@ -7,10 +7,9 @@ export type Identity<T> = {} & {
     [P in keyof T]: T[P]
 };
 
-export const identityFunc = <T>(x?: T) => (x || {}) as T extends unknown ? {} : T ;
+export const identityFunc = <T>(x = {} as T) => x as T extends unknown ? {} : T ;
 
 export type Func = (...args: any[]) => any;
-
 
 export interface FuncObject {
     [key: string]: Func
@@ -22,7 +21,7 @@ export interface FuncObject {
  */
 export type GetDataType<T extends VariantModule<K>, K extends string = 'type'> = {
     [P in keyof T]: ReturnType<T[P]> extends PromiseLike<infer R>
-        ? R extends WithProperty<K, string> ? R : never
+        ? R extends Property<K, string> ? R : never
         : ReturnType<T[P]>
 }
 
@@ -30,7 +29,7 @@ export type GetDataType<T extends VariantModule<K>, K extends string = 'type'> =
  * Given a union of types all of which meet the contract {[K]: string}
  * extract the type that is specifically {[K]: TType}
  */
-export type ExtractOfUnion<T, TType extends string, K extends string = 'type'> = T extends WithProperty<K, TType> ? T : never;
+export type ExtractOfUnion<T, TType extends string, K extends string = 'type'> = T extends Property<K, TType> ? T : never;
 
 /** 
  * Utility function to create a K:V from a list of strings 
