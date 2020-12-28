@@ -128,7 +128,6 @@ export function matcher<
 
         } as Func,
         execute: function(this: Matcher<T, H, K>) {
-            console.log(this.handler);
             const result: (x: T) => unknown = (this.handler as any)[this.target[this.key]]
             return result(this.target);
         } as Func,

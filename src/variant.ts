@@ -300,7 +300,7 @@ export function augmented<T extends RawVariant, F extends (x: OutVariant<T>) => 
     }, {}) as AugmentedRawVariant<T, F>;
 }
 
-// WAIT UNTIL VARIANT 3.0 FOR TYPESCRIPT 4.1 FEATURES
+// WAIT UNTIL VARIANT 2.1 FOR TYPESCRIPT 4.1 FEATURES
 // 
 // type ScopedVariant<T extends RawVariant, Scope extends string> = {
 //     [P in (keyof T & string)]: VariantCreator<`${Scope}__${P}`, CleanResult<T[P], () => {}>>;
@@ -339,6 +339,27 @@ export function outputTypes<
     T extends {[name: string]: Outputs<string, string>}
 >(variantObject: T): T[keyof T]['type'][] {
     return Object.keys(variantObject).map(key => variantObject[key].type);
+}
+
+/**
+ * Get the types from a VariantModule
+ * @param content 
+ * @param key 
+ */
+export function types<T extends VariantModule<K>, K extends string = 'type'>(content: T, key?: K): KeysOf<T, K>[];
+/**
+ * Get the types from a list of variant creators *or* a list of variant instances.
+ * @param content 
+ * @param key 
+ */
+export function types<T extends Property<K, string>, K extends string = 'type'>(content: T[], key?: K): T[K][];
+export function types<K extends string = 'type'>(content: VariantModule<K> | Property<K, string>[], key?: K) {
+    const typeStr = key ?? 'type' as K;
+    if (Array.isArray(content)) {
+        return content.map(c => c[typeStr]);
+    } else {
+        return Object.values(content).map(c => c.type);
+    }
 }
 
 /**

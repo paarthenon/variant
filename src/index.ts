@@ -23,6 +23,7 @@ export {
     Property,
     TypeExt,
     TypeNames,
+    types,
     variant,
     VariantCreator,
     variantList,

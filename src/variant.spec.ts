@@ -24,7 +24,7 @@ import {
     payload,
     just,
 } from './index';
-import {augmented, constrained, flags, patterned} from './variant';
+import {augmented, constrained, flags, patterned, types} from './variant';
 import {Animal, cerberus} from './__test__/animal';
 
 test('empty variant', () => {
@@ -423,6 +423,35 @@ test('constrained 2', () => {
     expect(baldie.max).toBe(HairLength.Bald);
 });
 
+test('types func on module', () => {
+    const animalTypes = types(Animal);
+
+    expect(animalTypes.includes('cat')).toBeTruthy();
+    expect(animalTypes.includes('dog')).toBeTruthy();
+    expect(animalTypes.includes('snake')).toBeTruthy();
+    expect(animalTypes.length).toBe(3);
+});
+
+test('types func on creator list', () => {
+    const animalTypes = types(Object.values(Animal));
+
+    expect(animalTypes.includes('cat')).toBeTruthy();
+    expect(animalTypes.includes('dog')).toBeTruthy();
+    expect(animalTypes.includes('snake')).toBeTruthy();
+    expect(animalTypes.length).toBe(3);
+});
+
+test('types func on instance list', () => {
+    const dogAndCat = [
+        cerberus,
+        Animal.cat({name: 'Zagreus', furnitureDamaged: 2}),
+    ];
+    const animalTypes = types(dogAndCat);
+
+    expect(animalTypes.includes('cat')).toBeTruthy();
+    expect(animalTypes.includes('dog')).toBeTruthy();
+    expect(animalTypes.length).toBe(2);
+});
 
 // test('scoped', () => {
 //     const Animal2 = scopedVariant('Animal', {
