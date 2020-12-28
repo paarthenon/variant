@@ -1,9 +1,9 @@
 ---
 id: filter
-title: Filtering
+title: Filtering & Analyzing
 ---
 
-> The last section covered how to create and group variants. Here, we'll cover how to narrow variant types into more specific subsets and automatically extract variants from a module based on various types.
+The last section covered how to create and group variants. Here, we'll cover how to narrow variant types into more specific subsets and automatically extract variants from a module based on various types.
 
 
 ## Filtering the discriminated union
