@@ -1,19 +1,19 @@
-import {payload, variantList, TypeNames, VariantOf} from '.';
+import {payload, variantList, TypeNames, VariantOf, match, just} from '.';
 import {fields} from './tools';
 import {Func, Identity} from './util';
-import {flags, Matrix, OutVariant, RawVariant, Variant, variantFactory, variantModule} from './variant';
+import {flags, Matrix, Outputs, OutVariant, Property, RawVariant, Variant, variantFactory, variantModule} from './variant';
 
 type primitive = number | string | symbol | boolean;
 
 type GenericMapping = {[key: string]: any};
 
 type VGenericTuple<T extends ReadonlyArray<any>, Map extends GenericMapping> = {
-    [P in keyof T]: Generify<T[P], Map>;
+    [P in keyof T]: Identity<Generify<T[P], Map>>;
 };
 
 type VGenericFunction<T, Map extends GenericMapping> = 
     T extends (...args: infer TArgs) => infer TR 
-        ? (...anonArgs: VGenericTuple<TArgs, Map>) => Generify<TR, Map> 
+        ? (...anonArgs: VGenericTuple<TArgs, Map>) => Identity<Generify<TR, Map>>
         : T;
 ;
 
@@ -73,7 +73,7 @@ const Alpha = flags(Object.values(GParam).map(f => f()), gParamKey);
 type Alpha = Matrix<typeof GParam, typeof gParamKey>;
 
 export type GFunc<TFunc> = TFunc extends (...args: infer TArgs) => infer TR 
-    ? <T> (...args: VGenericTuple<TArgs, {[GP: string]: T}>) => Generify<TR, {[GP: string]: T}>
+    ? <T> (...args: VGenericTuple<TArgs, {[GP: string]: T}>) => Identity<Generify<TR, {[GP: string]: T}>>
     : TFunc
 ;
 export type GFunced<T> = {
@@ -82,6 +82,20 @@ export type GFunced<T> = {
 
 export function gg<T extends RawVariant>(f: (alpha: Alpha) => T) {
     const rawModule = f(Alpha);
-    return variantModule(rawModule) as Identity<GFunced<OutVariant<T>>>;
+    const vmod = variantModule(rawModule);
+    return [vmod as Identity<GFunced<OutVariant<T>>>, vmod as Identity<OutVariant<T>>] as const;
 }
 export const genericVariant = gg;
+
+type BaselineG<K extends string = 'type'> = {[key: string]: (...args: any[]) => Property<K, string>};
+export type GSum<T extends BaselineG<K>, K extends string = 'type'> = ReturnType<T[keyof T]>;
+export type GKeysOf<T extends BaselineG<K>, K extends string = 'type'> = ReturnType<T[keyof T]>[K];
+export type GTypeNames<T extends BaselineG<K>, K extends string = 'type'> = GKeysOf<T, K> | undefined;
+export type GVariantOf<T extends BaselineG, TType extends GTypeNames<T>, TypeReplacement extends {[GP: string]: any}>
+ = TType extends undefined 
+    ? Identity<Generify<GSum<T>, TypeReplacement>>
+    : TType extends GKeysOf<T>
+        ? Generify<Extract<GSum<T>, Property<'type', TType>>, TypeReplacement>
+        : Identity<Generify<GSum<T>, TypeReplacement>>
+;
+
