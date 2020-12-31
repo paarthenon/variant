@@ -1,10 +1,10 @@
-import {CompareResult, order} from './order';
+import {CompareResult, sequence} from './sequence';
 import {Animal, cerberus} from './__test__/animal';
 
-const rank = order(Animal, [
+const rank = sequence(Animal, [
     'dog',
     'cat',
-    'snake',
+    Animal.snake,
 ])
 
 const perseus = rank.new.cat({name: 'Perseus', furnitureDamaged: 0});

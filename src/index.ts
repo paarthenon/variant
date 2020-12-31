@@ -57,7 +57,7 @@ export * from './lookup';
 export * from './loose';
 export * from './generic';
 export * from './remote';
-export * from './order';
+export * from './sequence';
 
 import {default as variantDefault} from './variant';
 export default variantDefault;

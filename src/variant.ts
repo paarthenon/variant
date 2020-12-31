@@ -170,6 +170,10 @@ type validListType = VariantCreator<any, Func, any> | string;
  */
 type Variantify<T extends validListType> = T extends string ? VariantCreator<T> : T;
 
+export type VariantModuleFromList<T extends validListType> = {
+    [P in Variantify<T>['type']]: FilterVariants<Variantify<T>, P>
+}
+
 /**
  * Create a variant module based on a list of variants.
  * 
@@ -178,7 +182,7 @@ type Variantify<T extends validListType> = T extends string ? VariantCreator<T> 
  * 
  * @param variants a list of variant creators and `string`s for tags that have no body
  */
-export function variantList<T extends validListType>(variants: Array<T>): {[P in Variantify<T>['type']]: FilterVariants<Variantify<T>, P>} {
+export function variantList<T extends validListType>(variants: Array<T>): VariantModuleFromList<T> {
     return variants
         .map((v): VariantCreator<string> => {
             if (typeof v === 'string') {

@@ -17,10 +17,10 @@ function isFunctions<T extends VariantModule<K>, K extends string = 'type'>(vmod
 }
 
 export interface Remote<T extends VariantModule<K>, K extends string = 'type'> {
-    key: K;
-    is: IsFunctions<T, K>;
-    new: T;
-    match: <H extends Handler<T>> (obj: VariantOf<T, undefined, K>, handler: H) => ReturnType<H[keyof H]>
+    readonly key: K;
+    readonly is: IsFunctions<T, K>;
+    readonly new: T;
+    readonly match: <H extends Handler<T>> (obj: VariantOf<T, undefined, K>, handler: H) => ReturnType<H[keyof H]>
 }
 
 export function remote<T extends VariantModule<K>, K extends string = 'type'>(vmod: T, keyProp?: K): Remote<T, K> {
