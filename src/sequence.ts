@@ -48,9 +48,9 @@ type validListType = VariantCreator<string, Func, any> | string;
 type Variantify<T extends validListType> = T extends string ? VariantCreator<T> : T;
 
 /**
+ * @alpha
  * 
  */
-    // L extends ValidTypeInput<K, KeysOf<T, K>>[], 
 export interface Sequence<
     T extends VariantModule<K>,
     L extends ValidTypeInput<K, KeysOf<T, K>>[], 
@@ -65,7 +65,9 @@ export interface Sequence<
      * Get the index of some type in the sequence.
      */
     index: (a: ValidTypeInput<K, KeysOf<RT, K>>) => number;
+    get: (index: number) => T[keyof T];
     readonly length: number;
+    readonly types: KeysOf<T, K>[];
 }
 
 function _sequenceFromScratch<L extends ValidTypeCreatorInput<'type', T>[], T extends string>(list: L): Sequence<
@@ -103,7 +105,12 @@ function _sequence<
             const diff = ai - bi;
             return diff === 0 ? diff : (diff / Math.abs(diff)) as CompareResult;
         },
+        get(i: number) {
+            const type = this.types[i];
+            return (this.new as VariantModule<K>)[type] as any;
+        },
         index: a => rawStringOrder.findIndex(i => i === getType(a)),
+        types: rawStringOrder,
     }
 }
 
@@ -144,21 +151,3 @@ function getType<
         }
     }
 }
-
-
-type AAA = 'a' | 'b';
-
-type aa = [...(AAA[])]
-
-type ExactLength<T extends readonly ValidTypeInput[], N extends number> = T['length'] extends N ? T : never;
-
-// export function doThing<L extends [...K]>(list: L): Record<ExtractKeys<L>, unknown> extends Record<AAA, unknown> ? true : false {
-//     return undefined as any;
-// }
-
-// type aaaa = Record<AAA, unknown>;
-// const a = doThing([
-//     'a',
-//     'b',
-// ])
-

@@ -27,3 +27,8 @@ test('order index', () => {
     expect(rank.index('cat')).toBe(1);
     expect(rank.index(Animal.snake)).toBe(2);
 })
+
+test('get', () => {
+    expect(rank.get(0).type).toBe('dog');
+    expect(rank.types[0]).toBe('dog');
+})
