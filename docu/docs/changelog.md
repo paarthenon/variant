@@ -4,6 +4,9 @@ title: Changelog
 Summary of the changes in each patch.
 
 ## 2.0.3
+ - added `remote()` and `sequence()`.
+ - Improved handling of primitives in conditional types
+ - Added `types()` function to replace `outputTypes()` and extend its functionality.
  - Added `matcher()` function
  - Added `constrained()`, `patterned()`, and `augmented()`.
  - Added match helpers `just()` (alias for `constant()`) and `unpack()`

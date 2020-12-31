@@ -27,6 +27,7 @@ export {
     scopeType,
     TypeExt,
     TypeNames,
+    types,
     variant,
     VariantCreator,
     variantList,
@@ -59,6 +60,8 @@ export * from './matcher';
 export * from './lookup';
 export * from './loose';
 export * from './generic';
+export * from './remote';
+export * from './sequence';
 
 import {default as variantDefault} from './variant';
 export default variantDefault;

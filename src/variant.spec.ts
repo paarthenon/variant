@@ -23,9 +23,16 @@ import {
     genericVariant,
     payload,
     just,
+    GTypeNames,
+    GVariantOf,
+    unpack,
+    augmented,
+    constrained,
+    descopeType,
+    typed,
+    types,
 } from './index';
-import {augmented, constrained, descope, descopeType, flags, patterned, types} from './variant';
-import {Animal, cerberus, scopedCerberus} from './__test__/animal';
+import {Animal, cerberus, scopedCerberus} from './__test__/animal'
 
 test('empty variant', () => {
     const func = variant('');
@@ -212,6 +219,46 @@ test('variantModule', () => {
 
     Anim.bird()
 
+});
+
+test('variantModuleTyped', () => {
+    const AnimClone = variantModule(typed<Animal>({
+        dog: pass,
+        cat: pass,
+        snake: pass,
+    }))
+    type AnimClone<T extends TypeNames<typeof AnimClone> = undefined> = VariantOf<typeof AnimClone, T>;
+
+    const dog = AnimClone.dog({name: 'Twix'});
+
+    expect(dog.name).toBe('Twix');
+    expect(dog.favoriteBall).toBeUndefined();
+
+})
+
+test('variantModuleTyped match', () => {
+    const AnimClone = variantModule(typed<Animal>({
+        dog: pass,
+        cat: pass,
+        snake: pass,
+    }))
+    type AnimClone<T extends TypeNames<typeof AnimClone> = undefined> = VariantOf<typeof AnimClone, T>;
+
+    const dog = AnimClone.dog({name: 'Twix'});
+
+    const getName = (a: AnimClone) => match(a, {
+        cat: c => c.name,
+        dog: d => d.name,
+        snake: s => s.name,
+    });
+    const betterGetName = (a: AnimClone) => a.name;
+
+    expect(dog.name).toBe('Twix');
+    expect(dog.favoriteBall).toBeUndefined();
+
+    expect(getName(dog)).toBe('Twix');
+    expect(betterGetName(dog)).toBe('Twix');
+
 })
 test('YOOOOOO', () => {
     
@@ -231,6 +278,73 @@ test('YOOOOOO', () => {
     const x = Tree.branch({right: Tree.node({data: 'yolo'})});
 
     expect(x.right?.type === 'node' && x.right.data).toBe('yolo');
+})
+
+test('New Generics', () => {
+    
+    const [Tree, __Tree] = genericVariant(({T}) => {
+        type Tree<T> =
+            | Variant<'Branch', {payload: T, left: Tree<T>, right: Tree<T>}>
+            | Variant<'Leaf', {payload: T}>
+        ;
+        return {
+            Branch: fields<{left: Tree<typeof T>, right: Tree<typeof T>, payload: typeof T}>(),
+            Leaf: payload(T),
+        }
+    });
+    type Tree<T, TType extends GTypeNames<typeof __Tree> = undefined> 
+        = GVariantOf<typeof __Tree, TType, {T: T}>;
+
+
+    const binTree = Tree.Branch({
+        payload: 1,
+        left: Tree.Branch({
+            payload: 2,
+            left: Tree.Leaf(4),
+            right: Tree.Leaf(5),
+        }),
+        right: Tree.Leaf(3),
+    })
+
+    function depthFirst<T>(node: Tree<T>): T[] {
+        return match(node, {
+            Leaf: ({payload}) => [payload],
+            Branch: ({payload, left, right}) => {
+                return [payload, ...depthFirst(left), ...depthFirst(right)];
+            }
+        })
+    }
+
+    const [d1, d2, d3, d4, d5] = depthFirst(binTree);
+    expect(d1).toBe(1);
+    expect(d2).toBe(2);
+    expect(d3).toBe(4);
+    expect(d4).toBe(5);
+    expect(d5).toBe(3);
+})
+
+test('New Generics (Option)', () => {
+    const [Option, __Option] = genericVariant(({T}) => ({
+        Some: payload(T),
+        None: {},
+    }));
+    type Option<T, TType extends GTypeNames<typeof __Option> = undefined>
+        = GVariantOf<typeof __Option, TType, {T: T}>;
+
+    const num = Option.Some(4);
+    const name = Option.Some('Steve');
+
+    // Option<T> -> T | undefined
+    function extract<T>(opt: Option<T>) {
+        return match(opt, {
+            Some: unpack,
+            None: just(undefined),
+        });
+    }
+    expect(num.payload).toBe(4);
+    expect(extract(num)).toBe(4);
+    expect(extract(name)).toBe('Steve');
+    expect(extract(Option.None())).toBeUndefined();
 })
 
 test('YOOOOOO (generic)', () => {
@@ -350,53 +464,6 @@ test('IsType UDTG wrong', () => {
     }
 })
 
-test('Generic 1', () => {
-    type Tree<T> =
-        | Variant<'Branch', {left: Tree<T>, right: Tree<T>}>
-        | Variant<'Leaf', {payload: T}>
-    ;
-
-    const Tree = genericVariant(({A}) => ({
-        Branch: fields<{left: Tree<typeof A>, right: Tree<typeof A>}>(),
-        Leaf: payload(A),
-    }));
-
-    const leaf = Tree.Leaf(4);
-
-    expect(leaf.payload).toBe(4);
-})
-
-test('Generic error', () => {
-    type Tree<T> =
-        | Variant<'Branch', {left: Tree<T>, right: Tree<T>}>
-        | Variant<'Leaf', {payload: T}>
-    ;
-
-    const Tree = genericVariant(({T}) => ({
-        Branch: fields<{left: Tree<typeof T>, right: Tree<typeof T>}>(),
-        Leaf: payload(T),
-    }));
-
-    const branch = Tree.Branch({
-        left: Tree.Leaf('Yo'),
-        //@ts-expect-error
-        right: Tree.Branch({
-            left: Tree.Leaf(4),
-            right: Tree.Leaf(5),
-        })
-    });
-})
-
-test('Generic (maybe)', () => {
-    const Maybe = genericVariant(({T}) => ({
-        Some: payload(T),
-        None: {},
-    }));
-    const somenum = Maybe.Some(4);
-    expect(somenum.payload).toBe(4);
-})
-
-
 test('constrained', () => {
     const Test1 = variantModule(constrained((_x: string) => ({min: 4}), {
         Yo: (_x: string, min: number) => ({min}),
@@ -432,6 +499,35 @@ test('constrained 2', () => {
     expect(baldie.max).toBe(HairLength.Bald);
 });
 
+test('types func on module', () => {
+    const animalTypes = types(Animal);
+
+    expect(animalTypes.includes('cat')).toBeTruthy();
+    expect(animalTypes.includes('dog')).toBeTruthy();
+    expect(animalTypes.includes('snake')).toBeTruthy();
+    expect(animalTypes.length).toBe(3);
+});
+
+test('types func on creator list', () => {
+    const animalTypes = types(Object.values(Animal));
+
+    expect(animalTypes.includes('cat')).toBeTruthy();
+    expect(animalTypes.includes('dog')).toBeTruthy();
+    expect(animalTypes.includes('snake')).toBeTruthy();
+    expect(animalTypes.length).toBe(3);
+});
+
+test('types func on instance list', () => {
+    const dogAndCat = [
+        cerberus,
+        Animal.cat({name: 'Zagreus', furnitureDamaged: 2}),
+    ];
+    const animalTypes = types(dogAndCat);
+
+    expect(animalTypes.includes('cat')).toBeTruthy();
+    expect(animalTypes.includes('dog')).toBeTruthy();
+    expect(animalTypes.length).toBe(2);
+});
 
 // test('scoped', () => {
 //     const Animal2 = scopedVariant('Animal', {

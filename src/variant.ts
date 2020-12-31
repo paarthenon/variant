@@ -171,6 +171,10 @@ type validListType = VariantCreator<any, Func, any> | string;
  */
 type Variantify<T extends validListType> = T extends string ? VariantCreator<T> : T;
 
+export type VariantModuleFromList<T extends validListType> = {
+    [P in Variantify<T>['type']]: FilterVariants<Variantify<T>, P>
+}
+
 /**
  * Create a variant module based on a list of variants.
  * 
@@ -179,7 +183,7 @@ type Variantify<T extends validListType> = T extends string ? VariantCreator<T> 
  * 
  * @param variants a list of variant creators and `string`s for tags that have no body
  */
-export function variantList<T extends validListType>(variants: Array<T>): {[P in Variantify<T>['type']]: FilterVariants<Variantify<T>, P>} {
+export function variantList<T extends validListType>(variants: Array<T>): VariantModuleFromList<T> {
     return variants
         .map((v): VariantCreator<string> => {
             if (typeof v === 'string') {
@@ -235,7 +239,7 @@ export function variantModule<
             ...acc,
             [key]: variant(key, typeof v[key] === 'function' ? v[key] as Func : identityFunc),
         };
-    }, {} as OutVariant<T>);
+    }, {} as Identity<OutVariant<T>>);
 }
 
 export function constrained<
@@ -323,7 +327,7 @@ export function scopedVariant<
             ...acc,
             [key]: variant(`${scope}/${key}`, typeof v[key] === 'function' ? v[key] as any : identityFunc),
         };
-    }, {} as ScopedVariant<T, Scope>);
+    }, {} as Identity<ScopedVariant<T, Scope>>);
 }
 
 export type ScopedObject<Scope extends string, T extends {}> = {[P in (keyof T & string) as ScopedType<Scope, P>]: T[P]};
@@ -371,7 +375,17 @@ export function outputTypes<
     return Object.keys(variantObject).map(key => variantObject[key].type);
 }
 
+/**
+ * Get the types from a VariantModule
+ * @param content 
+ * @param key 
+ */
 export function types<T extends VariantModule<K>, K extends string = 'type'>(content: T, key?: K): KeysOf<T, K>[];
+/**
+ * Get the types from a list of variant creators *or* a list of variant instances.
+ * @param content 
+ * @param key 
+ */
 export function types<T extends Property<K, string>, K extends string = 'type'>(content: T[], key?: K): T[K][];
 export function types<K extends string = 'type'>(content: VariantModule<K> | Property<K, string>[], key?: K) {
     const typeStr = key ?? 'type' as K;
@@ -381,6 +395,7 @@ export function types<K extends string = 'type'>(content: VariantModule<K> | Pro
         return Object.values(content).map(c => c.type);
     }
 }
+
 /**
  * Checks if an object was created from one of a set of variants. This function is a 
  * [user-defined type guard](https://www.typescriptlang.org/docs/handbook/advanced-types.html#user-defined-type-guards) 
@@ -406,19 +421,6 @@ export function isOfVariant<
     return instance != undefined && 
         outputTypes(variant).some(type => type === (instance as any)[typeKey ?? 'type']);
 }
-
-
-/**
- * Unused at the moment. Intended to develop the idea of an "ordered" variant.
- * @param variants 
- */
-function progression<T extends VariantCreator<any, Func, any>>(variants: Array<T>): {[P in T['type']]: FilterVariants<T, P>} {
-    return variants.reduce((o, v) => ({
-        ...o,
-        [v.type]: v,
-    }), Object.create(null))
-}
-
 
 
 /**

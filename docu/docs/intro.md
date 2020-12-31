@@ -130,7 +130,7 @@ Feel free to mix and match styles. This is discussed further in [the page on gro
 
 **Variant** is a language feature disguised as a library. As such, it's relevant to any type of application. I find myself eventually including variant in every project I write, to the point that I include it in my template repo along with my logger of choice, [daslog](https://github.com/paarthenon/daslog) (which also uses variant 🤣).
 
-However there are certainly applications where variants *excel*
+However there are certainly applications where variants *excel*.
 
  - **Actions**. Variant types are the ideal solution for expressing a set of possible actions that need dispatching. That's exactly why this example is used in every conversation about discriminated unions.
  - **Optionals and result objects**. The [`Option<T>` type](https://en.wikipedia.org/wiki/Option_type) is familiar and loved for good reason. Variants allow you to express this and more powerful versions of result types with partial success and progress information.

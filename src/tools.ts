@@ -17,24 +17,6 @@ export function exhaust(x: never, options = {key: 'type', throw: false}) {
     }
 }
 
-function _set<T, X, Y>(func: (x: X) => Y, data: T) {
-    // remove T from inputs, add T to outputs
-    return (input: Identity<Omit<X, keyof T>>) => {
-        const combined = Object.assign({}, data, input) as T & X;
-        return func(combined) as Identity<Y & T>;
-    }
-}
-
-type MarkOptional<T, O> = {
-    [P in keyof T]: P extends keyof O ? (T[P] | undefined) : T[P]
-}
-
-function _default<T, X, Y>(func: (x: X) => Y, data: T) {
-    return (input: MarkOptional<X, T>) => {
-        const combined = Object.assign({}, data, input) as T & X;
-        return func(combined) as Y;
-    }
-}
 
 /**
  * Handles boilerplate with the most common function definiton.

@@ -3,9 +3,9 @@ import {VariantModule, Property} from './variant';
 /**
  * Useful in generating friendly types. Intersections are rendered as the type of the intersection, not as A & B.
  */
-export type Identity<T> = {} & {
+export type Identity<T> = T extends object ? {} & {
     [P in keyof T]: T[P]
-};
+} : T;
 
 export const identityFunc = <T>(x = {} as T) => x as T extends unknown ? {} : T ;
 
