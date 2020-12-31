@@ -56,6 +56,8 @@ export * from './matcher';
 export * from './lookup';
 export * from './loose';
 export * from './generic';
+export * from './remote';
+export * from './order';
 
 import {default as variantDefault} from './variant';
 export default variantDefault;

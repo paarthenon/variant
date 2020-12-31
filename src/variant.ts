@@ -234,7 +234,7 @@ export function variantModule<
             ...acc,
             [key]: variant(key, typeof v[key] === 'function' ? v[key] as Func : identityFunc),
         };
-    }, {} as OutVariant<T>);
+    }, {} as Identity<OutVariant<T>>);
 }
 
 export function constrained<

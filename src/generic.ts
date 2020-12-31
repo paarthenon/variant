@@ -17,9 +17,9 @@ type VGenericFunction<T, Map extends GenericMapping> =
         : T;
 ;
 
-type VGenericObject<T, Map extends GenericMapping> = {
+type VGenericObject<T, Map extends GenericMapping> = Identity<{
     [P in keyof T]: Generify<T[P], Map>;
-};
+}>;
 
 export type Generify<T, Map extends GenericMapping> = 
     T extends VGeneric<infer Label> 
