@@ -2,6 +2,9 @@
 title: Advanced Creation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 We may wish to have more control or convenience in our variant creation. This library provides a series of *inline* and *top-level* helper functions to assist with these efforts. The inline functions are called as an element of `variantModule` and can be chained. The top-level helpers require special handling.
 
 Inline helpers:
@@ -151,7 +154,102 @@ const AnimalTree = typedVariant<AnimalTree>({
 
 ## Generic Variants
 
-We can use generics to create a more flexible binary tree
+Generic variants will enable us to create a more flexible binary tree, among many other structures.
+
+To use the `genericVariant()`, pass in a function that returns a variant module. `genericVariant` will provide *your* function with a set of sigils that you can use as **placeholder** types. These will be replaced by true generics in the resulting type! In the example, I use T, but this is actually a property of a larger object being destructured which contains the full alphabet `{A: _, B: _, C: _, ..., Z: _}`. Use whichever letter best fits your use case.
+
+<Tabs
+    groupId="generic-version-differences"
+    defaultValue="new"
+    values={[
+        {value: "new", label: "Variant 2.1+"},
+        {value: "old", label: "Variant 2.0"}
+    ]}
+>
+<TabItem value="new">
+
+Before we hit the recursive and generic nature of trees, let's make a pit-stop in the classic and well-loved [Option type](https://en.wikipedia.org/wiki/Option_type).
+
+```typescript
+const [Option, __Option] = genericVariant(({T}) => ({
+    Some: payload(T),
+    None: {},
+}));
+type Option<T, TType extends GTypeNames<typeof __Option> = undefined>
+    = GVariantOf<typeof __Option, TType, {T: T}>;
+
+const num = Option.Some(4);
+const name = Option.Some('Steve');
+```
+
+In this example, `Option` is the actual module. `__Option` is a local version with the original tokens intact which is only used for type calculations. For various reasons, it is difficult for TypeScript to re-interpret the manifestly generic `Option` object.
+
+We can also write functions that operate on the generic type.
+
+```typescript
+// Option<T> -> T | undefined
+function extract<T>(opt: Option<T>) {
+    return match(opt, {
+        Some: unpack,
+        None: just(undefined),
+    });
+}
+// results
+expect(num.payload).toBe(4);
+expect(extract(num)).toBe(4);
+expect(extract(name)).toBe('Steve');
+expect(extract(Option.None())).toBeUndefined();
+```
+### Tree
+
+Trees are a bit more complex than the option type because they are recursive by nature. Much like in the recursive variants example, we'll need to define a type first.
+
+```typescript
+const [Tree, __Tree] = genericVariant(({T}) => {
+    type Tree<T> =
+        | Variant<'Branch', {payload: T, left: Tree<T>, right: Tree<T>}>
+        | Variant<'Leaf', {payload: T}>
+    ;
+    return {
+        Branch: fields<{left: Tree<typeof T>, right: Tree<typeof T>, payload: typeof T}>(),
+        Leaf: payload(T),
+    }
+});
+type Tree<T, TType extends GTypeNames<typeof __Tree> = undefined> 
+    = GVariantOf<typeof __Tree, TType, {T: T}>;
+
+// in use
+const binTree = Tree.Branch({
+    payload: 1,
+    left: Tree.Branch({
+        payload: 2,
+        left: Tree.Leaf(4),
+        right: Tree.Leaf(5),
+    }),
+    right: Tree.Leaf(3),
+})
+```
+
+With this definition of `Tree<T>` I'm able to write the kind of recursive depth-first traversal function many of us are familiar with.
+```typescript
+function depthFirst<T>(node: Tree<T>): T[] {
+    return match(node, {
+        Leaf: ({payload}) => [payload],
+        Branch: ({payload, left, right}) => {
+            return [payload, ...depthFirst(left), ...depthFirst(right)];
+        }
+    })
+}
+
+const [d1, d2, d3, d4, d5] = depthFirst(binTree);
+expect(d1).toBe(1);
+expect(d2).toBe(2);
+expect(d3).toBe(4);
+expect(d4).toBe(5);
+expect(d5).toBe(3);
+```
+</TabItem>
+<TabItem value="old">
 
 ```typescript
 type Tree<T> =
@@ -179,8 +277,8 @@ const strTree = Tree.Branch({
     }),
 })
 ```
-
-To use the `genericVariant()`, pass in a function that returns a variant module. `genericVariant` will provide *your* function with a set of sigils that you can use as **placeholder** types. These will be replaced by true generics in the resulting type! In the above example, I use T, but this is actually an object that is being destructured and that object contains the full alphabet `{A: _, B: _, C: _, ..., Z: _}`. Use whichever letter best fits your use case.
+</TabItem>
+</Tabs>
 
 ## Scoped Variants
 
@@ -188,7 +286,7 @@ To use the `genericVariant()`, pass in a function that returns a variant module.
 🔮 denotes preview content. These are features that are available, but not well-documented and may be modified in the near future as they see better integration.
 :::
 
-As of TypeScript 4.1 it is possible to create template literal types, enabling type-safe *scoped* variants. This feature will be available in `variant@2.1`, and may be tried now through `npm i variant@test`.
+As of TypeScript 4.1 it is possible to create template literal types, enabling type-safe *scoped* variants. This feature will be available in `variant@2.2`, and may be tried now through `npm i variant@test`.
 
 We may eventually run into name conflicts with our `type` properties, for example when multiple collections of actions are combined into one large `Action` type. We can address this by using `scopedVariant` to prefix our types with some distinguishing name.
 
