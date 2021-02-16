@@ -1,4 +1,3 @@
-import variantDefault from '.';
 import {Identity, Func, identityFunc, GetDataType, ExtractOfUnion, strEnum, isPromise} from './util';
 
 /**

@@ -1,7 +1,6 @@
-import {payload, variantList, TypeNames, VariantOf, match, just} from '.';
 import {fields} from './tools';
 import {Func, Identity} from './util';
-import {flags, Matrix, Outputs, OutVariant, Property, RawVariant, Variant, variantFactory, variantModule} from './variant';
+import {flags, Matrix, Outputs, OutVariant, Property, RawVariant, TypeNames, Variant, variantFactory, variantList, variantModule, VariantOf} from './variant';
 
 type primitive = number | string | symbol | boolean;
 
