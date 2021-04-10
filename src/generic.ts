@@ -79,11 +79,18 @@ export type GFunced<T> = {
     [P in keyof T]: GFunc<T[P]>;
 };
 
+/**
+ * @alpha - Unstable API
+ * @param f 
+ */
 export function gg<T extends RawVariant>(f: (alpha: Alpha) => T) {
     const rawModule = f(Alpha);
     const vmod = variantModule(rawModule);
     return [vmod as Identity<GFunced<OutVariant<T>>>, vmod as Identity<OutVariant<T>>] as const;
 }
+/**
+ * @alpha - Unstable API
+ */
 export const genericVariant = gg;
 
 type BaselineG<K extends string = 'type'> = {[key: string]: (...args: any[]) => Property<K, string>};

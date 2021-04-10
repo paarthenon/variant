@@ -21,6 +21,7 @@ export {
     outputTypes,
     patterned,
     Property,
+    scopedVariant,
     TypeExt,
     TypeNames,
     types,

@@ -31,7 +31,8 @@ type ExtractType<T, K extends string = 'type'>
                     : never
         : never;
 ;
-type ExtractKeys<T extends readonly ValidTypeInput<K>[], K extends string = 'type'> = T extends readonly (infer R)[] ? ExtractType<R, K> : never;
+// TODO: Rewrite
+type ExtractKeys<T extends readonly ValidTypeInput<K>[], K extends string = 'type'> = T extends readonly (infer R)[] ? R extends unknown ? never : ExtractType<R, K> : never;
 
 type Objectify<T extends readonly ValidTypeInput<K>[], K extends string = 'type'> = {
     [P in ExtractKeys<T, K>]: undefined;

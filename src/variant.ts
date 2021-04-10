@@ -303,28 +303,28 @@ export function augmented<T extends RawVariant, F extends (x: OutVariant<T>) => 
     }, {}) as AugmentedRawVariant<T, F>;
 }
 
-// WAIT UNTIL VARIANT 2.1 FOR TYPESCRIPT 4.1 FEATURES
-// 
-// type ScopedVariant<T extends RawVariant, Scope extends string> = {
-//     [P in (keyof T & string)]: VariantCreator<`${Scope}__${P}`, CleanResult<T[P], () => {}>>;
-// }
 
-// /**
-//  * Unstable. 
-//  * @param v 
-//  * @param _contract 
-//  */
-// export function scopedVariant<
-//     T extends RawVariant,
-//     Scope extends string,
-// >(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>> {
-//     return safeKeys(v).reduce((acc, key) => {
-//         return {
-//             ...acc,
-//             [key]: variant(`${scope}__${key}`, typeof v[key] === 'function' ? v[key] as any : identityFunc),
-//         };
-//     }, {} as ScopedVariant<T, Scope>);
-// }
+type ScopedVariant<T extends RawVariant, Scope extends string> = {
+    [P in (keyof T & string)]: VariantCreator<`${Scope}__${P}`, CleanResult<T[P], () => {}>>;
+}
+
+/**
+ * Unstable.
+ * @alpha - unstable API
+ * @param v 
+ * @param _contract 
+ */
+export function scopedVariant<
+    T extends RawVariant,
+    Scope extends string,
+>(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>> {
+    return safeKeys(v).reduce((acc, key) => {
+        return {
+            ...acc,
+            [key]: variant(`${scope}__${key}`, typeof v[key] === 'function' ? v[key] as any : identityFunc),
+        };
+    }, {} as Identity<ScopedVariant<T, Scope>>);
+}
 
 
 /**
