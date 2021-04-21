@@ -1,7 +1,6 @@
 import {
     variant, 
     variantFactory, 
-    outputTypes, 
     augment, 
     TypeNames, 
     VariantOf, 
@@ -75,7 +74,7 @@ test('output type', () => {
 })
 
 test('output types', () => {
-    expect(outputTypes(Animal)).toEqual(['dog', 'cat', 'snake']);
+    expect(types(Animal)).toEqual(['dog', 'cat', 'snake']);
 })
 
 test('augment', () => {
@@ -162,6 +161,22 @@ test('async variant', async () => {
     expect(thing.type).toBe('extract_metadata');
     expect(thing.stuff1).toBe('hello');
 });
+
+test('', () => {
+    const Anim2 = variantModule({
+        dog(name: string) {
+            return {
+                name,
+            }
+        },
+        frog(name: string, color: string) {
+            return {
+                name,
+                color,
+            }
+        },
+    })
+})
 
 test('async variant output types', async () => {
     const nonce = Promise.resolve(5);

@@ -146,6 +146,20 @@ export function matcher<
 
 
 
+// type asdf = PartialPlus<{a: string, b: number}, 'a' | 'b'>;
+
+// type asdf2 = SplayPartial2<{a: string, b: string}>;
+
+// function testFunc<I extends SplayPartial2<{a: string, b: number}>> (info: I) {
+
+// }
+
+// testFunc({
+//     a: 'no',
+//     c: 5,
+
+// })
+
 type SplayPartial<T extends TypeExt<K, string>, K extends string = 'type'> =
     Identity<SplayCase<T, K>[T[K]]>;
 

@@ -1,64 +1,11 @@
-export {
-    Nominal,
-    Anonymous,
-} from './nominal';
+import {variantCosmos} from './cosmos';
 
-export * from './deprecated';
-
-export {
-    augmented,
-    cast,
-    constrained,
-    isOfVariant,
-    keymap,
-    KeyMap,
-    keys,
-    KeysOf,
+export const {
     flags,
-    Flags,
-    Matrix,
-    narrow,
-    outputTypes,
-    patterned,
-    Property,
-    scopedVariant,
-    TypeExt,
-    TypeNames,
-    types,
-    variant,
-    VariantCreator,
-    variantList,
-    variantFactory,
-    variantModule,
-    VariantModule,
-    Variant,
-    VariantOf,
-    VariantsOfUnion,
-    WithProperty,
-} from './variant';
-
-export {
-    fields,
-    data,
+    isOfVariant,
     isType,
-    payload,
-    property,
-    exhaust,
-    constant
-} from './tools';
-
-export {
-    ExtractOfUnion,
-    strEnum,
-} from './util';
-
-export * from './match';
-export * from './matcher';
-export * from './lookup';
-export * from './loose';
-export * from './generic';
-export * from './remote';
-export * from './sequence';
-
-import {default as variantDefault} from './variant';
-export default variantDefault;
+    match,
+    onLiteral,
+    types,
+    variation,
+} = variantCosmos({key: 'type'});

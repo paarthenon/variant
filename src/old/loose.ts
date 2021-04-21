@@ -5,10 +5,6 @@
 import {OutVariant, Property, variantModule} from './variant';
 
 export const pass = <T>(x: T) => x;
-/**
- * Used in conjunction with variantModule to have empty tags.
- */
-export const nil = () => {};
 
 type ExtractVC<T extends {type: string}> = {
     [P in T['type']]: (...args: any[]) => Omit<Extract<T, {type: P}>, 'type'>;
