@@ -4,7 +4,7 @@ import {Identity, identityFunc, isPromise} from './util';
 /**
  * A variant as an object.
  */
-type VariantRecord<T extends RawVariant, K extends string> = {
+export type VariantRecord<T extends RawVariant, K extends string> = {
     [P in keyof T]: VariantCreator<(P & string), T[P] extends Func ? T[P] : () => {}, K>
 }
 

@@ -3,7 +3,7 @@ import {DEFAULT_KEY, Limited, Message, Func} from './precepts'
 /**
  * A set of functions meant to handle the variations of an object.
  */
-type Handler<T extends Record<K, string>, K extends string> = {
+export type Handler<T extends Record<K, string>, K extends string> = {
     [P in T[K]]: (instance: Extract<T, Record<K, P>>) => any;
 }
 type AdvertiseDefault<T> = T & {

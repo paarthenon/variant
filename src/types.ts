@@ -1,6 +1,4 @@
 import {KeysOf, VariantModule} from './precepts';
-
-
 export interface TypesFunc<K extends string> {
     /**
      * Get the types from a VariantModule

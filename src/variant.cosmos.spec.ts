@@ -1,6 +1,7 @@
 import {variantCosmos} from './cosmos';
 import {Matrix} from './flags';
-import {constant} from './match.tools';
+import {constant, just} from './match.tools';
+import {matcher} from './matcher';
 import {GetTypeLabel, TypeNames, VariantOf} from './precepts';
 import {fields} from './variant.tools';
 
@@ -29,7 +30,7 @@ const Animal = variantModule({
     snake: (name: string, pattern: string = 'striped') => ({
         name,
         pattern,
-    })
+    }),
 })
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 
@@ -158,4 +159,16 @@ test('variant list', () => {
 
     expect(thing2.timestamp).toBeGreaterThan(0);
     
+})
+declare var animal: Animal;
+
+test('asdfa', () => {
+    const thing = matcher(animal, {}, 'tag')
+        .when('cat', c => c.furnitureDamaged)
+        .when({
+            dog: d => d.favoriteBall ?? '',
+            fjakj: just(45),
+        })
+        .when('snake', just('asdfaa'))
+        .complete();
 })
