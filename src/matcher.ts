@@ -11,7 +11,7 @@ import {Identity, TypeStr} from './util';
  */
 export type Matcher<
     T extends Record<K, string>,
-    H extends {[P in T[K]]?: (insance: Extract<T, Record<K, P>>) => any},
+    H extends {[P in T[K]]?: (instance: Extract<T, Record<K, P>>) => any},
     K extends string,
 > = {
     /**
@@ -75,6 +75,7 @@ type EnsureFunc<T> = T extends Func ? T : never;
 
 /**
  * *Extremely* beta, do not use unless you've spoken to me.
+ * @deprecated - rewrite w/ 3.0 in mind (in closure).
  * @param target 
  * @param handler 
  * @param _typeKey 

@@ -55,7 +55,7 @@
 // export * from './matcher';
 // export * from './lookup';
 // export * from './loose';
-export * from './generic';
+// export * from './generic';
 // export * from '../remote';
 // export * from './sequence';
 

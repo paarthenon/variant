@@ -20,9 +20,9 @@ type VMFromVC<T extends VariantCreator<string, Func, string>> = {
     [P in T['type']]: Extract<T, Record<'type', P>>;
 }
 
-// type VMFVC<T extends ValidListType> = {
-//     [P in ListTypeString<T>]: P extends ListTypeString<T> ? VariantCreator
-// }
+/**
+ * The functions involved in variant creation.
+ */
 export interface VariantFuncs<K extends string> {
     /**
      * From list.
@@ -34,6 +34,17 @@ export interface VariantFuncs<K extends string> {
      * @param template 
      */
     variantModule<VM extends RawVariant>(template: VM): Identity<VariantRecord<VM, K>>,
+
+    /**
+     * `variantModule`-like call.
+     * @param template 
+     */
+    variant<VM extends RawVariant>(template: VM): Identity<VariantRecord<VM, K>>,
+    /**
+     * `variantList`-like call.
+     * @param template 
+     */
+    variant<T extends ValidListType>(template: T[]): Identity<VMFromVC<CreatorFromListType<T, K>>>;
 
     /**
      * A single case of a variant.
@@ -48,8 +59,12 @@ export interface VariantFuncs<K extends string> {
 
 export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
 
-    // function variation<T extends string>(type: T): VariantCreator<T, () => {}, K>;
-    // function variation<T extends string, F extends Func>(type: T, creator: F): VariantCreator<T, F, K>;
+    /**
+     * 
+     * @param type 
+     * @param creator 
+     * @returns 
+     */
     function variation<T extends string, F extends Func = () => {}>(type: T, creator?: F) {
         let maker = (...args: Parameters<F>) => {
             const returned = (creator ?? identityFunc)(...args);
@@ -71,8 +86,9 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
     }
 
     /**
-     * Scoped variantModule
+     * 
      * @param template 
+     * @returns 
      */
     function variantModule<VM extends RawVariant>(template: VM): Identity<VariantRecord<VM, K>> {
         return Object.entries(template).reduce((result, [vmKey, vmVal]) => {
@@ -83,6 +99,11 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
         }, {} as Identity<VariantRecord<VM, K>>);
     }
 
+    /**
+     * 
+     * @param template 
+     * @returns 
+     */
     function variantList<T extends ValidListType>(template: T[]): Identity<VMFromVC<CreatorFromListType<T, K>>> {
         return template.map((t) => {
             if (typeof t === 'string') {
@@ -100,5 +121,18 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
         }, {} as Identity<VMFromVC<CreatorFromListType<T, K>>>)
     }
 
-    return {variantList, variantModule, variation};
+    /**
+     * Impl
+     * @param template 
+     * @returns 
+     */
+    function variant(template: {} | []) {
+        if (Array.isArray(template)) {
+            return variantList(template);
+        } else {
+            return variantModule(template);
+        }
+    }
+
+    return {variant, variantList, variantModule, variation};
 }

@@ -1,10 +1,5 @@
 
 /**
- * Used in conjunction with variantModule to have empty tags.
- */
-export const nil = () => {};
-
-/**
  * Meant to be used inside of a `match`
  * @param x 
  */

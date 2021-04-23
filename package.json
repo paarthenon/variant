@@ -1,6 +1,6 @@
 {
   "name": "variant",
-  "version": "3.0.0-dev.0",
+  "version": "3.0.0-dev.1",
   "description": "Variant types (a.k.a. Discriminated Unions) in TypeScript",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,11 +28,11 @@
   },
   "homepage": "https://github.com/paarthenon/variant#readme",
   "devDependencies": {
-    "@types/chance": "^1.0.9",
-    "@types/jest": "^26.0.14",
-    "chance": "^1.1.4",
-    "jest": "^26.5.3",
-    "ts-jest": "^26.4.1",
-    "typescript": "^4.1.5"
+    "@types/chance": "^1.1.1",
+    "@types/jest": "^26.0.22",
+    "chance": "^1.1.7",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
   }
 }

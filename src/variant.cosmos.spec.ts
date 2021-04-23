@@ -3,10 +3,10 @@ import {Matrix} from './flags';
 import {constant, just} from './match.tools';
 import {matcher} from './matcher';
 import {GetTypeLabel, TypeNames, VariantOf} from './precepts';
-import {fields} from './variant.tools';
+import {fields, payload} from './variant.tools';
 
 const DISCRIMINANT = 'tag';
-const {isType, match, onLiteral, variantModule, variantList, variation} = variantCosmos({key: 'tag'});
+const {isType, match, onLiteral, variantModule, variantList, variation, variant} = variantCosmos({key: 'tag'});
 
 
 // tag('dog', fields<{name: string, favoriteBall?: string}>()),
@@ -34,6 +34,22 @@ const Animal = variantModule({
 })
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 
+// test('', () => {
+//     const kitty = Animal.cat({name: 'Yannis', furnitureDamaged: 0}) as Animal;
+//     match(kitty, {
+//         cat: just(5),
+//     })
+// })
+
+test('', () => {
+    const thing = variant({
+        cat: {},
+    })
+    const thing2 = variant([
+        'reddit',
+        variation('yoho', payload<number>()),
+    ])
+})
 test('IsType 0', () => {
     const kitty = Animal.cat({name: 'Yannis', furnitureDamaged: 0}) as Animal;
 

@@ -1,3 +1,5 @@
+export * from './slim';
+
 import {variantCosmos} from './cosmos';
 
 export const {
@@ -7,5 +9,8 @@ export const {
     match,
     onLiteral,
     types,
+    variant,
+    variantList,
+    variantModule,
     variation,
 } = variantCosmos({key: 'type'});

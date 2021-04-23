@@ -24,17 +24,24 @@ export interface VariantCosmos<
 }
 
 export interface VariantCosmosConfig<K extends string> {
+    /**
+     * The discriminant to be used by these functions.
+     */
     key: K
 }
 
+/**
+ * Generate a series of functions to work off a given key.
+ * @param config the key to use.
+ * @returns `VariantCosmos<K>`
+ */
 export function variantCosmos<
     K extends string,
 >({key}: VariantCosmosConfig<K>): VariantCosmos<K> {
     const {isType} = isTypeImpl(key);
     const {flags} = flagsImpl(key);
     const {match, onLiteral} = matchImpl(key);
-    // can do it either way.
-
+    
     return {
         key,
         isType,
