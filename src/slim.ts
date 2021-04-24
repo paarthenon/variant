@@ -1,10 +1,11 @@
 export {augmented} from './augmented';
 export {constrained} from './constrained';
+export {variantCosmos} from './cosmos';
 export {Flags, Matrix} from './flags';
 export {KeyMap, Keynum, keymap, keynum} from './keynum';
 export {constant, just, unpack} from './match.tools';
 export {matcher} from './matcher';
 export {patterned} from './patterned';
-export {KeysOf, Variant, VariantOf, VariantModule} from './precepts';
+export {KeysOf, TypeNames, Variant, VariantOf, VariantModule} from './precepts';
 export {typed, pass} from './typed';
-export {variantCosmos} from './cosmos';
+export {fields, nil, payload} from './variant.tools';

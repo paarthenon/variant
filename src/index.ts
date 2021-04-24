@@ -3,11 +3,15 @@ export * from './slim';
 import {variantCosmos} from './cosmos';
 
 export const {
+    descope,
     flags,
     isOfVariant,
     isType,
     match,
     onLiteral,
+    remote,
+    scopedVariant,
+    sequence,
     types,
     variant,
     variantList,

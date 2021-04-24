@@ -20,10 +20,51 @@ export type VMFromVC<T extends VariantCreator<string, Func, string>> = {
     [P in T['type']]: Extract<T, Record<'type', P>>;
 }
 
+type CleanResult<T, U> = T extends undefined ? U : T extends Func ? T : T extends object ? U : T;
+
+type ScopedVariant<T extends RawVariant, Scope extends string> = {
+    [P in (keyof T & string)]: VariantCreator<ScopedType<Scope, P>, CleanResult<T[P], () => {}>>;
+}
+
+type ScopedType<Scope extends string, Type extends string = ''> = `${Scope}/${Type}`;
+export const scopeType = <Scope extends string, Type extends string>(scope: Scope, type: Type) => `${scope}/${type}` as ScopedType<Scope, Type>
+
+
+export type ScopedObject<Scope extends string, T extends {}> = {[P in (keyof T & string) as ScopedType<Scope, P>]: T[P]};
+
+function atScope<S extends string, T extends {}>(s: S, obj: T) {
+    return Object.entries(obj).reduce((acc, [key, val]) => {
+        return {
+            ...acc,
+            [scopeType(s, key)]: val,
+        }
+    }, {}) as ScopedObject<S, T>;
+}
+
+function descopeType<S extends string, T extends string>(s: ScopedType<S, T>): T {
+    return (s.split('/')[1] ?? s) as T;
+}
+
 /**
  * The functions involved in variant creation.
  */
 export interface VariantFuncs<K extends string> {
+    /**
+     * Match helper, remove prefix.
+     * @param obj 
+     */
+    descope<
+        T extends Record<K, ScopedType<string, string>>,
+    >(obj: T): T extends Record<K, ScopedType<string, infer TType>> ? Identity<Omit<T, K> & Record<K, TType>> : T;
+    /**
+     * 
+     * @param scope 
+     * @param v 
+     */
+    scopedVariant<
+        T extends RawVariant,
+        Scope extends string,
+    >(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>>;
     /**
      * From list.
      * @param template 
@@ -58,6 +99,32 @@ export interface VariantFuncs<K extends string> {
 }
 
 export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
+
+    function scopedVariant<
+        T extends RawVariant,
+        Scope extends string,
+    >(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>> {
+        return Object.keys(v).reduce((acc, key) => {
+            return {
+                ...acc,
+                [key]: variation(`${scope}/${key}`, typeof v[key] === 'function' ? v[key] as any : identityFunc),
+            };
+        }, {} as Identity<ScopedVariant<T, Scope>>)
+    }
+
+    /**
+     * Remove the scope from an instance of a variant so that its easier to match against it.
+     * @param obj 
+     * @param key 
+     */
+    function descope<
+        T extends Record<K, ScopedType<string, string>>,
+    >(obj: T): T extends Record<K, ScopedType<string, infer TType>> ? Identity<Omit<T, K> & Record<K, TType>> : T {
+        return {
+            ...obj,
+            [key]: descopeType(obj[key] as ScopedType<string, string>),
+        } as any
+    }
 
     /**
      * 
@@ -134,5 +201,5 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
         }
     }
 
-    return {variant, variantList, variantModule, variation};
+    return {descope, scopedVariant, variant, variantList, variantModule, variation};
 }
