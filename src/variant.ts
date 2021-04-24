@@ -8,7 +8,7 @@ export type VariantRecord<T extends RawVariant, K extends string> = {
     [P in keyof T]: VariantCreator<(P & string), T[P] extends Func ? T[P] : () => {}, K>
 }
 
-type ValidListType = string | VariantCreator<string, Func, string>;
+export type ValidListType = string | VariantCreator<string, Func, string>;
 type CreatorFromListType<T extends ValidListType, K extends string> = T extends VariantCreator<string, Func, string> ? T : T extends string ? VariantCreator<T, () => {}, K> : never;
 type ListTypeString<T extends ValidListType> = T extends VariantCreator<infer VCType, Func, string> ? VCType : T;
 
@@ -16,7 +16,7 @@ type VMFromList<T extends ValidListType, K extends string> = {
     [P in CreatorFromListType<T, K>['type']]: CreatorFromListType<T, K>
 }
 
-type VMFromVC<T extends VariantCreator<string, Func, string>> = {
+export type VMFromVC<T extends VariantCreator<string, Func, string>> = {
     [P in T['type']]: Extract<T, Record<'type', P>>;
 }
 

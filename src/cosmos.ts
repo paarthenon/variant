@@ -1,11 +1,10 @@
 import {IsTypeFunc, isTypeImpl} from './isType';
 import {MatchFuncs, matchImpl} from './match';
-import {Identity, identityFunc, isPromise} from './util';
-import {Func, Outputs, RawVariant, Stringable, VariantCreator} from './precepts';
 import {VariantFuncs, variantImpl} from './variant';
 import {TypesFunc, typesImpl} from './types';
 import {FlagsFunc, flagsImpl} from './flags';
 import {IsOfVariantFunc, isOfVariantImpl} from './isOfVariant';
+import {RemoteFuncs, remoteImpl} from './remote';
 
 /**
  * All the `type`-centric functions in the library.
@@ -17,8 +16,9 @@ export interface VariantCosmos<
     IsTypeFunc<K>,
     FlagsFunc<K>,
     MatchFuncs<K>,
-    VariantFuncs<K>,
-    TypesFunc<K>
+    RemoteFuncs<K>,
+    TypesFunc<K>,
+    VariantFuncs<K>
 {
     key: K;
 }
@@ -41,7 +41,7 @@ export function variantCosmos<
     const {isType} = isTypeImpl(key);
     const {flags} = flagsImpl(key);
     const {match, onLiteral} = matchImpl(key);
-    
+
     return {
         key,
         isType,
@@ -49,6 +49,7 @@ export function variantCosmos<
         match,
         onLiteral,
         ...isOfVariantImpl(key),
+        ...remoteImpl(key),
         ...typesImpl(key),
         ...variantImpl(key),
     }
