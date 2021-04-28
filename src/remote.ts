@@ -1,7 +1,8 @@
 import {variantCosmos} from './cosmos';
+import {isTypeImpl} from './isType';
 import {Handler, MatchFuncs, matchImpl} from './match';
 import {Func, KeysOf, VariantCreator, VariantModule, VariantOf} from './precepts';
-import {VMFromVC} from './variant';
+import {variantImpl, VMFromVC} from './variant';
 
 
 type IsFunctions<T extends VariantModule<K>, K extends string = 'type'> = {
@@ -81,7 +82,9 @@ export interface RemoteFuncs<K extends string> {
 }
 
 export function remoteImpl<K extends string>(key: K): RemoteFuncs<K> {
-    const {isType, match, variantList} = variantCosmos({key});
+    const {isType} = isTypeImpl(key);
+    const {match} = matchImpl(key);
+    const {variantList} = variantImpl(key);
 
     function isFunctions<T extends VariantModule<K>>(vmod: T) {
         const keys = Object.keys(vmod) as Array<string & keyof T>;

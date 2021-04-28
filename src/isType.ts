@@ -31,7 +31,7 @@ export function isTypeImpl<K extends string>(key: K): IsTypeFunc<K> {
      * @param object 
      * @param type 
      */
-    function isType<O extends Record<K, T>, T extends (string | VariantCreator<string, Func, K>)>(object: O, type: T): object is Extract<O, Record<K, TypeStr<T, K>>>;
+    function isType<O extends Record<K, T>, T extends (string | VariantCreator<string, Func, K>)>(object: O | null | undefined, type: T): object is Extract<O, Record<K, TypeStr<T, K>>>;
     function isType<
         T extends (O[K] | VariantCreator<O[K], Func, K>),
         O extends Record<K, string>,
