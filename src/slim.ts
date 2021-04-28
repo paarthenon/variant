@@ -3,6 +3,7 @@ export {constrained} from './constrained';
 export {variantCosmos} from './cosmos';
 export {Flags, Matrix} from './flags';
 export {KeyMap, Keynum, keymap, keynum} from './keynum';
+export {literalist} from './literalist';
 export {constant, just, unpack} from './match.tools';
 export {matcher} from './matcher';
 export {patterned} from './patterned';
