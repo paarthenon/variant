@@ -176,15 +176,15 @@ test('variant list', () => {
     expect(thing2.timestamp).toBeGreaterThan(0);
     
 })
-declare var animal: Animal;
+// declare var animal: Animal;
 
-test('asdfa', () => {
-    const thing = matcher(animal, {}, 'tag')
-        .when('cat', c => c.furnitureDamaged)
-        .when({
-            dog: d => d.favoriteBall ?? '',
-            fjakj: just(45),
-        })
-        .when('snake', just('asdfaa'))
-        .complete();
-})
+// test('asdfa', () => {
+//     const thing = matcher(animal, {}, 'tag')
+//         .when('cat', c => c.furnitureDamaged)
+//         .when({
+//             dog: d => d.favoriteBall ?? '',
+//             fjakj: just(45),
+//         })
+//         .when('snake', just('asdfaa'))
+//         .complete();
+// })

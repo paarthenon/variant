@@ -1,11 +1,12 @@
 import {KeysOf, VariantModule} from './precepts';
+import {Identity} from './util';
 export interface TypesFunc<K extends string> {
     /**
      * Get the types from a VariantModule
      * @param content 
      * @param key 
      */
-    types<T extends VariantModule<K>>(content: T): KeysOf<T>[];
+    types<T extends VariantModule<K>>(content: T): Identity<KeysOf<T>>[];
     /**
      * Get the types from a list of variant creators *or* a list of variant instances.
      * @param content 

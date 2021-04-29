@@ -12,7 +12,7 @@ export interface IsTypeFunc<K extends string> {
       * @param object 
       * @param type 
       */
-     isType<O extends Record<K, string>, T extends (O[K] | VariantCreator<O[K], Func, K>)>(object: O, type: T): object is Extract<O, Record<K, TypeStr<T, K>>>,
+     isType<O extends Record<K, string>, T extends (O[K] | VariantCreator<O[K], Func, K>)>(object: O | null | undefined, type: T): object is Extract<O, Record<K, TypeStr<T, K>>>,
      /**
       * The underlying key to use
       * 
