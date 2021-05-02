@@ -128,7 +128,6 @@ export type VariantOf<
     TType = undefined,
 > = TType extends undefined ? SumType<T> : TType extends KeysOf<T> ? Extract<SumType<T>, Record<T[keyof T]['key'], TType>> : SumType<T>;
 
-
 /**
  * Input type for VariantModule
  */

@@ -2,6 +2,7 @@ export {augmented} from './augmented';
 export {constrained} from './constrained';
 export {variantCosmos} from './cosmos';
 export {Flags, Matrix} from './flags';
+export {onTerms, GVariantOf} from './generic';
 export {KeyMap, Keynum, keymap, keynum} from './keynum';
 export {literalist} from './literalist';
 export {constant, just, unpack} from './match.tools';

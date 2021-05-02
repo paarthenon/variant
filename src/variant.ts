@@ -1,3 +1,4 @@
+import {GenericTemplate, GenericVariantRecord} from './generic';
 import {Func, Outputs, RawVariant, VariantCreator} from './precepts';
 import {Identity, identityFunc, isPromise} from './util';
 
@@ -76,6 +77,11 @@ export interface VariantFuncs<K extends string> {
      */
     variantModule<VM extends RawVariant>(template: VM): Identity<VariantRecord<VM, K>>,
 
+    /**
+     * `variantModule`-like call (GENERIC).
+     * @param template 
+     */
+    variant<VM extends RawVariant>(template: GenericTemplate<VM>): Identity<GenericVariantRecord<VM, K>>,
     /**
      * `variantModule`-like call.
      * @param template 
