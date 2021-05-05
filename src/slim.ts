@@ -9,5 +9,5 @@ export {constant, just, unpack} from './match.tools';
 export {matcher} from './matcher';
 export {patterned} from './patterned';
 export {KeysOf, TypeNames, Variant, VariantOf, VariantModule} from './precepts';
-export {typed, pass} from './typed';
+export {pass} from './typed';
 export {fields, nil, payload} from './variant.tools';

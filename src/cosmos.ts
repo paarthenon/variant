@@ -5,6 +5,7 @@ import {TypesFunc, typesImpl} from './types';
 import {FlagsFunc, flagsImpl} from './flags';
 import {IsOfVariantFunc, isOfVariantImpl} from './isOfVariant';
 import {RemoteFuncs, remoteImpl} from './remote';
+import {TypedFunc, typedImpl} from './typed';
 
 /**
  * All the `type`-centric functions in the library.
@@ -17,6 +18,7 @@ export interface VariantCosmos<
     FlagsFunc<K>,
     MatchFuncs<K>,
     RemoteFuncs<K>,
+    TypedFunc<K>,
     TypesFunc<K>,
     VariantFuncs<K>
 {
@@ -50,6 +52,7 @@ export function variantCosmos<
         onLiteral,
         ...isOfVariantImpl(key),
         ...remoteImpl(key),
+        ...typedImpl(key),
         ...typesImpl(key),
         ...variantImpl(key),
     }

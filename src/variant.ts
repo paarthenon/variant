@@ -1,12 +1,14 @@
 import {GenericTemplate, GenericVariantRecord} from './generic';
-import {Func, Outputs, RawVariant, VariantCreator} from './precepts';
+import {Func, Outputs, RawVariant, Variant, VariantCreator} from './precepts';
 import {Identity, identityFunc, isPromise} from './util';
 
 /**
  * A variant as an object.
  */
 export type VariantRecord<T extends RawVariant, K extends string> = {
-    [P in keyof T]: VariantCreator<(P & string), T[P] extends Func ? T[P] : () => {}, K>
+    [P in keyof T]: T[P] extends VariantCreator<string, Func, string> 
+        ? T[P]
+        : VariantCreator<(P & string), T[P] extends Func ? T[P] : () => {}, K>
 }
 
 export type ValidListType = string | VariantCreator<string, Func, string>;
@@ -46,6 +48,15 @@ function descopeType<S extends string, T extends string>(s: ScopedType<S, T>): T
     return (s.split('/')[1] ?? s) as T;
 }
 
+const VARIANT_CREATOR_BRAND = Symbol('Variant Creator');
+
+export interface CreatorBranded {
+    [VARIANT_CREATOR_BRAND]: typeof VARIANT_CREATOR_BRAND;
+}
+
+export function isVariantCreator(func: Function): func is VariantCreator<string> {
+    return VARIANT_CREATOR_BRAND in func;
+}
 /**
  * The functions involved in variant creation.
  */
@@ -101,7 +112,7 @@ export interface VariantFuncs<K extends string> {
     variation<
         T extends string,
         F extends Func = () => {}
-    >(type: T, creator?: F): VariantCreator<T, F, K>;
+    >(type: T, creator?: F): VariantCreator<T, F extends VariantCreator<string, infer VF> ? VF : F, K>;
 }
 
 export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
@@ -155,7 +166,14 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
         };
         Object.defineProperty(maker, 'name', {value: type, writable: false});
         const outputs: Outputs<K, T> = {key, type};
-        return Object.assign(maker, outputs, {toString: function(this: Outputs<K, T>){return this.type}});
+        return Object.assign(
+            maker,
+            outputs,
+            {
+                [VARIANT_CREATOR_BRAND]: VARIANT_CREATOR_BRAND,
+                toString: function(this: Outputs<K, T>){return this.type}
+            }
+        ) as VariantCreator<T, F extends VariantCreator<string, infer VF> ? VF : F, K>;
     }
 
     /**
@@ -165,9 +183,16 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
      */
     function variantModule<VM extends RawVariant>(template: VM): Identity<VariantRecord<VM, K>> {
         return Object.entries(template).reduce((result, [vmKey, vmVal]) => {
+            // whether to use the existing value (pass-through variations), or create a new variation.
+            const creator = typeof vmVal === 'function'
+                ? isVariantCreator(vmVal)
+                    ? vmVal
+                    : variation(vmKey, vmVal as Func)
+                : variation(vmKey, identityFunc)
+            ;
             return {
                 ...result,
-                [vmKey]: variation(vmKey, typeof vmVal === 'function' ? vmVal as Func : identityFunc),
+                [vmKey]: creator,
             }
         }, {} as Identity<VariantRecord<VM, K>>);
     }

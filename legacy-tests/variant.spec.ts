@@ -1,86 +1,5 @@
-// import {
-//     variant, 
-//     variantFactory, 
-//     augment, 
-//     TypeNames, 
-//     VariantOf, 
-//     narrow,
-//     cast,
-//     VariantsOfUnion, 
-//     KeysOf,
-//     keys,
-//     KeyMap,
-//     Variant,
-//     keymap,
-//     variantModule,
-//     variantList,
-//     fields,
-//     match,
-//     pass,
-//     typedVariant,
-//     isType,
-//     genericVariant,
-//     payload,
-//     just,
-//     GTypeNames,
-//     GVariantOf,
-//     unpack,
-// } from './index';
-// import {ExactDefinition, typed, typedWithKey} from './loose';
-// import {Identity} from './util';
-// import {augmented, constrained, flags, patterned, types} from './variant';
-// import {Animal, cerberus} from './__test__/animal';
 
 
-// test('nice variant (complex)', () => {
-//     const niceVariant = variantFactory('kind');
-//     const func = niceVariant('TestType', (testData: number) => ({testData}));
-//     const result = func(45);
-
-//     expect(result).toEqual({kind: 'TestType', testData: 45});
-// })
-
-
-// test('augment', () => {
-//     const BetterAnimal = augment(Animal, () => ({better: true}));
-//     type BetterAnimal<T extends TypeNames<typeof BetterAnimal> = undefined> = VariantOf<typeof BetterAnimal, T>;
-
-//     const snek = BetterAnimal.snake('steve');
-//     expect(snek.name).toBe('steve');
-//     expect(snek.better).toBeDefined();
-//     expect(snek.better).toBe(true);
-// })
-
-// test('augmented', () => {
-//     const BetterAnimal = variantModule(augmented(() => ({better: 4}),{
-//         dog: fields<{name: string, favoriteBall?: string}>(),
-//         cat: fields<{name: string, furnitureDamaged: number}>(),
-//         snake: (name: string, pattern = 'striped') => ({name, pattern}),
-//     }));
-//     type BetterAnimal<T extends TypeNames<typeof BetterAnimal> = undefined> = VariantOf<typeof BetterAnimal, T>;
-
-
-//     const snek = BetterAnimal.snake('steve');
-//     expect(snek.name).toBe('steve');
-//     expect(snek.better).toBeDefined();
-//     expect(snek.better).toBe(4);
-// })
-
-
-// test('keynum', () => {
-//     const aKeys = keys(Animal);
-
-//     expect(aKeys).toHaveProperty(Animal.dog.type);
-//     expect(aKeys).toHaveProperty('cat');
-// });
-
-// test('keynum values', () => {
-//     const aKeys = keys(Animal);
-
-//     expect(aKeys.cat).toBe('cat');
-//     expect(aKeys.dog).toBe('dog');
-//     expect(aKeys.snake).toBe('snake');
-// });
 
 // test('async variant', async () => {
 //     // from issue #3 on github
@@ -100,21 +19,6 @@
 //     expect(thing.stuff1).toBe('hello');
 // });
 
-// test('', () => {
-//     const Anim2 = variantModule({
-//         dog(name: string) {
-//             return {
-//                 name,
-//             }
-//         },
-//         frog(name: string, color: string) {
-//             return {
-//                 name,
-//                 color,
-//             }
-//         },
-//     })
-// })
 
 // test('async variant output types', async () => {
 //     const nonce = Promise.resolve(5);
@@ -133,75 +37,7 @@
 //     expect((await result).four).toBe(4);
 // })
 
-// test('keymap', () => {
-//     const Anim = {
-//         dog: Animal.dog,
-//         kitty: Animal.cat,
-//     };
-//     type Anim<T extends TypeNames<typeof Anim> = undefined> = VariantOf<typeof Anim, T>;
-    
-//     const thing = keymap(Anim);
-//     type asdf = KeyMap<typeof Anim>;
-//     thing.dog;
-// })
 
-
-// test('variantModule', () => {
-//     const AnimClone = typedVariant<Animal>({
-//         cat: pass,
-//         dog: pass,
-//         snake: pass,
-//     })
-//     const Anim = variantModule({
-//         dog(name: string) {
-//             return {name};
-//         },
-//         bird: {},
-//     })
-
-//     Anim.bird()
-
-// });
-
-// test('variantModuleTyped', () => {
-//     const AnimClone = variantModule(typed<Animal>({
-//         dog: pass,
-//         cat: pass,
-//         snake: pass,
-//     }))
-//     type AnimClone<T extends TypeNames<typeof AnimClone> = undefined> = VariantOf<typeof AnimClone, T>;
-
-//     const dog = AnimClone.dog({name: 'Twix'});
-
-//     expect(dog.name).toBe('Twix');
-//     expect(dog.favoriteBall).toBeUndefined();
-
-// })
-
-// test('variantModuleTyped match', () => {
-//     const AnimClone = variantModule(typed<Animal>({
-//         dog: pass,
-//         cat: pass,
-//         snake: pass,
-//     }))
-//     type AnimClone<T extends TypeNames<typeof AnimClone> = undefined> = VariantOf<typeof AnimClone, T>;
-
-//     const dog = AnimClone.dog({name: 'Twix'});
-
-//     const getName = (a: AnimClone) => match(a, {
-//         cat: c => c.name,
-//         dog: d => d.name,
-//         snake: s => s.name,
-//     });
-//     const betterGetName = (a: AnimClone) => a.name;
-
-//     expect(dog.name).toBe('Twix');
-//     expect(dog.favoriteBall).toBeUndefined();
-
-//     expect(getName(dog)).toBe('Twix');
-//     expect(betterGetName(dog)).toBe('Twix');
-
-// })
 // test('YOOOOOO', () => {
     
 //     type Tree =
@@ -343,20 +179,7 @@
 //     expect(showFetchedStatus(FetchedAnimal.fetching({progress: 10}))).toBe('fetching 10%');
 // })
 
-// test('better variantList', () => {
-//     const Animal = variantList([
-//         variant('dog', fields<{name: string}>()),
-//         'bird',
-//     ]);
 
-//     expect(Animal.bird().type).toBe('bird');
-// });
-
-// test('card variantList', () => {
-//     const Suit = variantList(['Diamonds', 'Hearts', 'Spades', 'Clubs']);
-
-//     expect(Suit.Clubs().type).toBe('Clubs');
-// })
 
 // test('Animal filter', () => {
 //     const animals = [cerberus, Animal.snake('Steve')];
@@ -406,56 +229,6 @@
 //     }
 // })
 
-// test('constrained', () => {
-//     const Test1 = variantModule(constrained((_x: string) => ({min: 4}), {
-//         Yo: (_x: string, min: number) => ({min}),
-//     }));
-//     type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
 
-//     const instance = Test1.Yo('hello', 4);
-
-//     expect(instance.type).toBe('Yo');
-//     expect(instance.min).toBe(4);
-// })
-
-// test('constrained 2', () => {
-//     enum HairLength {
-//         Bald,
-//         Buzzed,
-//         Short,
-//         Medium,
-//         Long,
-//         BackLength,
-//     }
-
-//     const HairStyle = variantModule(constrained(just<{min?: HairLength, max?: HairLength}>({}), {
-//         Bald: just({max: HairLength.Bald}),
-//         Pixie: just({min: HairLength.Short, max: HairLength.Medium}),
-//         Straight: just({min: HairLength.Short}),
-//         Waves: just({min: HairLength.Medium}),
-//     }));
-//     type HairStyle<T extends TypeNames<typeof HairStyle> = undefined> = VariantOf<typeof HairStyle, T>;
-
-//     const baldie = HairStyle.Bald() as HairStyle;
-
-//     expect(baldie.max).toBe(HairLength.Bald);
-// });
-
-// // test('scoped', () => {
-// //     const Animal2 = scopedVariant('Animal', {
-// //         Cat: fields<{name: string}>(),
-// //         Dog: fields<{name: string, toy?: string}>(),
-// //     });
-// //     type Animal2<T extends TypeNames<typeof Animal2> = undefined> = VariantOf<typeof Animal2, T>;
-
-// //     const rating = (animal: Animal2) => match(animal, {
-// //         [Animal2.Cat.type]: c => c.name,
-// //         default: just('yo'),
-// //     })
-
-// //     expect(rating(Animal2.Cat({name: 'steve'}))).toBe('steve');
-// // });
-
-// // test('scopedMatch')
 
 test('', () => {})

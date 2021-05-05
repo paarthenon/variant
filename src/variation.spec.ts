@@ -1,4 +1,4 @@
-import {scopeType, variantImpl} from './variant';
+import {isVariantCreator, scopeType, variantImpl} from './variant';
 import {fields, payload} from './variant.tools';
 
 const str = {
@@ -64,6 +64,16 @@ test('variation (fields)', () => {
 })
 
 
+test('variation (fields, empty)', () => {
+    const dog = variation('dog', fields());
+
+    const kerberos = dog();
+
+    expect(kerberos.type).toBe('dog');
+    expect(Object.keys(kerberos).length).toBe(1);
+})
+
+
 test('variation .toString()', () => {
     const yoc = variation('yo');
 
@@ -82,4 +92,24 @@ test('variation outputs', () => {
 
     expect(yoc.key).toBe(DISCRIMINANT);
     expect(yoc.type).toBe('yo');
+})
+
+test('isVariantCreator', () => {
+    const dog = variation('dog');
+
+    expect(isVariantCreator(dog)).toBe(true);
+})
+
+test('isVariantCreator', () => {
+    const dog = () => ({type: 'dog'} as const);
+
+    expect(isVariantCreator(dog)).toBe(false);
+})
+
+test('cyclical variation', () => {
+    const one = variation('one');
+    const two = variation('two', one);
+
+    const first = one();
+    const second = two();
 })

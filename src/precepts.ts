@@ -27,8 +27,8 @@ export type PatchObjectOrPromise<
     T extends {} | PromiseLike<{}>,
     U extends {}
 > = T extends PromiseLike<infer R> 
-    ? PromiseLike<Identity<U & R>> 
-    : Identity<U & T>
+    ? PromiseLike<Identity<R & U>> 
+    : Identity<T & U>
 ;
 
 /**
@@ -121,7 +121,7 @@ export type VariantTypeSpread<T extends VariantModule<string>> = {
     [P in keyof T]: CreatorOutput<T[P]>
 }
 
-export type SumType<T extends VariantModule<string>> = VariantTypeSpread<T>[keyof T];
+export type SumType<T extends VariantModule<string>> = Identity<VariantTypeSpread<T>[keyof T]>;
 
 export type VariantOf<
     T extends VariantModule<string>,
@@ -132,6 +132,8 @@ export type VariantOf<
  * Input type for VariantModule
  */
 export type RawVariant = {[type: string]: Func | {}};
+
+export type LessRawVariant = {[type: string]: Func};
 
 /**
  * Catch-all type to express type errors.

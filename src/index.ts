@@ -12,6 +12,7 @@ export const {
     remote,
     scopedVariant,
     sequence,
+    typed,
     types,
     variant,
     variantList,

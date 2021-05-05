@@ -3,8 +3,8 @@
  * Describe the shape of the variant.
  * @param defaults set some default values for the object. Note this does not adjust the return type.
  */
-export function fields<T>(defaults: Partial<T> = {}) {
-    return (input: T) => ({
+export function fields<T extends {}>(defaults: Partial<T> = {}) {
+    return (input: {} extends T ? void : T) => ({
         ...defaults,
         ...input,
     }) as T;

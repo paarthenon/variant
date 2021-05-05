@@ -19,7 +19,7 @@ export function keynum<T extends VariantModule<string>>(variant: T) {
             ...result,
             [vc.type]: vc.type,
         }
-    }, {} as KeyMap<T>)
+    }, {} as Keynum<T>)
 }
 
 /**
