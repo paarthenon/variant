@@ -4,7 +4,7 @@ export {variantCosmos} from './cosmos';
 export {Flags, Matrix} from './flags';
 export {onTerms, GVariantOf} from './generic';
 export {KeyMap, Keynum, keymap, keynum} from './keynum';
-export {catalog} from './catalog';
+export {catalog, literalist} from './catalog';
 export {constant, just, unpack} from './match.tools';
 export {matcher} from './matcher';
 export {patterned} from './patterned';
