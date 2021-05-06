@@ -21,4 +21,4 @@ export function payload<T>(_example?: T) {
 /**
  * Used in conjunction with variantModule to have empty tags.
  */
-export const nil = () => {};
+export const nil = () => ({});

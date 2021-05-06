@@ -1,7 +1,29 @@
-import {fields, match, scopedVariant, TypeNames, VariantOf, variation} from '.';
+import {fields, match, matcher, scopedVariant, TypeNames, VariantOf, variation} from '.';
 import {keymap} from './keynum';
 import {just} from './match.tools';
-import {CapsAnimal, sample} from './__test__/animal';
+import {Animal, CapsAnimal, sample} from './__test__/animal';
+
+test('match (basic)', () => {
+    const rate = (animal: Animal) => match(animal, {
+        cat: _ => _.furnitureDamaged,
+        dog: _ => 4,
+        snake: just(5),
+    })
+
+    expect(rate(sample.cerberus)).toBe(4);
+    expect(rate(Animal.cat({name: 'Yellow', furnitureDamaged: 2}))).toBe(2);
+    expect(rate(Animal.snake('Paleos'))).toBe(5);
+})
+
+test('match (partial)', () => {
+    const rate = (animal: Animal) => match(animal, {
+        cat: _ => _.furnitureDamaged,
+        default: _ => 5,
+    });
+
+    expect(rate(Animal.cat({name: 'Yellow', furnitureDamaged: 2}))).toBe(2);
+    expect(rate(sample.cerberus)).toBe(5);
+})
 
 test('caps animal', () => {
     const cat = CapsAnimal.cat({name: 'Steve', furnitureDamaged: 0}) as CapsAnimal;

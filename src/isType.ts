@@ -6,7 +6,7 @@ export interface IsTypeFunc<K extends string> {
      * Interface one.
      * @param type `
      */
-     isType<T extends (string | VariantCreator<string, Func, K>)>(type: T): <O extends Record<K, T>> (object: O, type: T) => object is Extract<O, Record<K, TypeStr<T, K>>>,
+     isType<T extends (string | VariantCreator<string, Func, K>)>(type: T): <O extends Record<K, string>> (object: O) => object is Extract<O, Record<K, TypeStr<T, K>>>,
      /**
       * Interface two.
       * @param object 

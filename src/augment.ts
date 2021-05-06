@@ -11,7 +11,7 @@ import {isVariantCreator, VariantRecord} from './variant';
  * Used in conjunction with `variantModule` or `variant`.
  * 
  * ```typescript
- * export const Action = variant(augmented(
+ * export const Action = variant(augment(
  *     () => ({created: Date.now()}), 
  *     {
  *         AddTodo: fields<{text: string, due?: number}>(),
@@ -22,7 +22,7 @@ import {isVariantCreator, VariantRecord} from './variant';
  * @param variantDef 
  * @param f
  */
-export function augmented<T extends RawVariant, F extends (x: VariantOf<VariantRecord<T, string>>) => any>(f: F, variantDef: T) {
+export function augment<T extends RawVariant, F extends (x: VariantOf<VariantRecord<T, string>>) => any>(variantDef: T, f: F) {
     return Object.keys(variantDef).reduce((acc, key: keyof T) => {
         let inputFunc = variantDef[key] as Func
 
@@ -51,7 +51,6 @@ export function augmented<T extends RawVariant, F extends (x: VariantOf<VariantR
     }, {}) as AugmentedRawVariant<T, F>;
 }
 
-type asdf = VariantCreator<'test', (name: string) => {four: 5}>;
 type CleanResult<T, U> = T extends undefined ? U : T extends Func ? T : T extends object ? U : T;
 
 type FullyFuncRawVariant<V extends RawVariant> = {

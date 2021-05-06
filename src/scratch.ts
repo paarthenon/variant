@@ -1,7 +1,10 @@
-// import {fields, match, payload, TypeNames, Variant, variant, just, typed, augmented, variation} from '.';
+// import {fields, match, payload, TypeNames, Variant, variant, just, typed, augment, variation} from '.';
 // import {GenericVariantTypeSpread, GVariantOf, onTerms} from './generic';
 // import {ExactDefinition, pass} from './typed';
 // import {CapsAnimal} from './__test__/animal';
+
+import {match} from './index.onType';
+import {Animal} from './__test__/animal';
 
 // const Opt2 = variant(onTerms(({T}) => {
 //     return {
@@ -125,12 +128,12 @@
 
 
 
-// // const asdf = augmented(() => ({better: true}), CapsAnimal)
+// // const asdf = augment(() => ({better: true}), CapsAnimal)
 // // type af = typeof asdf['cat'];
 // // const thing = variation('thing', asdf.cat);
 // // type a = ReturnType<typeof thing>;
 // // const cat1 = thing({name: 'Test', furnitureDamaged: 0});
-// // const BetterCapsAnimal = variant(augmented(() => ({better: true}), CapsAnimal));
+// // const BetterCapsAnimal = variant(augment(() => ({better: true}), CapsAnimal));
 // // const test = BetterCapsAnimal.cat({name: 'Test', furnitureDamaged: 0});
 
 // // const snek = BetterCapsAnimal.snake('steve');

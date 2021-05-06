@@ -4,60 +4,6 @@
 // import {strEnum} from './util';
 // import {Animal, Animal2, cerberus, TaggedAnimal} from './__test__/animal'
 // import {matcher} from './matcher';
-// test('match with string', () => {
-//     const rating = (animal: Animal) => match(animal, {
-//         dog: _ => 1,
-//         cat: _ => 2,
-//         snake: _ => 3,
-//     });
-
-//     const animal = Animal.dog({name: 'Cerberus'});
-
-//     expect(rating(animal)).toBe(1);
-// });
-
-// test('match with type prop', () => {
-//     const rating = (animal: Animal) => match(animal, {
-//         [Animal.dog.type]: _ => 1,
-//         [Animal.cat.type]: _ => 2,
-//         [Animal.snake.type]: _ => 3,
-//     });
-
-//     expect(rating(cerberus)).toBe(1);
-// });
-
-
-// test('error match with type prop', () => {
-//     //@ts-expect-error
-//     const rating = (animal: Animal) => match(animal, {
-//         [Animal.cat.type]: _ => 2,
-//         dogg: () => 5,
-//         default: _ => 3,
-//     });
-
-//     expect(rating(cerberus)).toBe(3);
-// });
-
-// test('partial match', () => {
-//     const rating = (animal: Animal) => match(animal, {
-//         cat: () => 1,
-//         default: () => 4,
-//     });
-
-//     expect(rating(cerberus)).toBe(4);
-//     expect(rating(Animal.cat({name: 'Loki', furnitureDamaged: 8}))).toBe(1);
-// });
-
-// test('match else', () => {
-//     const rating = (animal: Animal) => matchElse(animal, {
-//         cat: _ => 1,
-//     }, animal => match(animal, {
-//         dog: _ => 2,
-//         snake: _ => 3,
-//     }));
-
-//     expect(rating(cerberus)).toBe(2);
-// })
 
 // test('match else default', () => {
 //     const rating = (animal: Animal) => match(animal, {

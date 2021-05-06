@@ -1,13 +1,13 @@
 import {fields, match, TypeNames, variant, VariantOf, variation} from '.';
-import {augmented} from './augmented';
+import {augment} from './augment';
 import {Animal, CapsAnimal} from './__test__/animal';
 
-test('augmented (inline)', () => {
-    const BetterAnimal = variant(augmented(() => ({better: 4}),{
+test('augment (inline)', () => {
+    const BetterAnimal = variant(augment({
         dog: fields<{name: string, favoriteBall?: string}>(),
         cat: fields<{name: string, furnitureDamaged: number}>(),
         snake: (name: string, pattern = 'striped') => ({name, pattern}),
-    }));
+    }, () => ({better: 4})));
     type BetterAnimal<T extends TypeNames<typeof BetterAnimal> = undefined> = VariantOf<typeof BetterAnimal, T>;
 
 
@@ -17,8 +17,8 @@ test('augmented (inline)', () => {
     expect(snek.better).toBe(4);
 })
 
-test('augmented (referencing pre-existing module)', () => {
-    const BetterAnimal = variant(augmented(() => ({better: true}), Animal));
+test('augment (referencing pre-existing module)', () => {
+    const BetterAnimal = variant(augment(Animal, () => ({better: true})));
     type BetterAnimal<T extends TypeNames<typeof BetterAnimal> = undefined> = VariantOf<typeof BetterAnimal, T>;
 
     const snek = BetterAnimal.snake('steve');
@@ -27,8 +27,8 @@ test('augmented (referencing pre-existing module)', () => {
     expect(snek.better).toBe(true);
 })
 
-test('augmented (referencing mismatched module)', () => {
-    const BetterCapsAnimal = variant(augmented(() => ({better: true}), CapsAnimal));
+test('augment (referencing mismatched module)', () => {
+    const BetterCapsAnimal = variant(augment(CapsAnimal, () => ({better: true})));
     const test = BetterCapsAnimal.cat({name: 'Test', furnitureDamaged: 0});
     
     const snek = BetterCapsAnimal.snake('steve');
@@ -37,11 +37,8 @@ test('augmented (referencing mismatched module)', () => {
     expect(snek.type).toBe('SNAKE');
 })
 
-test('augmented (variable augment)', () => {
-    const BetterAnimal = variant(augmented(
-        animal => ({nameLength: animal.name.length}),
-        Animal
-    ));
+test('augment (variable augment)', () => {
+    const BetterAnimal = variant(augment(Animal, ({name}) => ({nameLength: name.length})));
     
     const snek = BetterAnimal.snake('steve');
     expect(snek.name).toBe('steve');
@@ -49,8 +46,9 @@ test('augmented (variable augment)', () => {
     expect(snek.nameLength).toBe(5);
 })
 
-test('augmented (conditional augment)', () => {
-    const BetterAnimal = variant(augmented(
+test('augment (conditional augment)', () => {
+    const BetterAnimal = variant(augment(
+        Animal,
         animal => ({
             epithet: match(animal, {
                 cat: ({furnitureDamaged}) => furnitureDamaged > 5 ? 'dangerous' : 'safe',
@@ -58,7 +56,6 @@ test('augmented (conditional augment)', () => {
                 snake: ({pattern}) => pattern,
             })
         }),
-        Animal,
     ));
     
     const snek = BetterAnimal.snake('steve');

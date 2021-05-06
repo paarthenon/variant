@@ -12,6 +12,8 @@ test('Simple module', () => {
         }),
     })
     type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
+
+    expect(Animal.cat.type).toBe('cat');
 })
 
 test('Renamed module', () => {

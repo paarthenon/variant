@@ -1,7 +1,7 @@
 import {SumType, VariantModule} from './precepts';
 
 export interface IsOfVariantFunc<K extends string> {
-    isOfVariant<T extends VariantModule<K>>(instance: {} | null | undefined, variant: T): boolean;
+    isOfVariant<T extends VariantModule<K>>(instance: {} | null | undefined, variant: T): instance is SumType<T>;
 }
 
 export function isOfVariantImpl<K extends string>(key: K): IsOfVariantFunc<K> {

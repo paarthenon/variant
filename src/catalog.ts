@@ -26,19 +26,19 @@ export type IsLiteral<T extends LiteralBase> = LiteralBase extends T ? true : fa
  * This is equivalent to strEnum.
  * @param strings 
  */
-export function literalist<T extends string>(strings: T[]): {[P in T]: P};
+export function catalog<T extends string>(strings: T[]): {[P in T]: P};
 /**
  * strEnum with a factory function.
  * @param strings 
  * @param factory 
  */
-export function literalist<T extends string, F extends LiteralFactory<T>>(strings: T[], factory: F): {[P in T]: ReturnType<F>};
+export function catalog<T extends string, F extends LiteralFactory<T>>(strings: T[], factory: F): {[P in T]: ReturnType<F>};
 /**
  * Define the object yourself, but enforce that every value is the same kind of literal.
  * @param catalog 
  */
-export function literalist<T extends LiteralCatalog>(catalog: T): T;
-export function literalist<T extends string[] | LiteralCatalog, F extends LiteralFactory>(catalog: T, factory?: F) {
+export function catalog<T extends LiteralCatalog>(catalog: T): T;
+export function catalog<T extends string[] | LiteralCatalog, F extends LiteralFactory>(catalog: T, factory?: F) {
     if (Array.isArray(catalog)) {
         return catalog.reduce((result, current: string, index) => {
             return {
@@ -51,5 +51,8 @@ export function literalist<T extends string[] | LiteralCatalog, F extends Litera
     }
 }
 
-// alias for people who don't like fun.
-export const literalList = literalist;
+/**
+ * Alias for compatibility
+ * @deprecated - use `catalog`
+ */
+export const literalist = catalog;
