@@ -39,13 +39,14 @@ type ScopedVariant<T extends RawVariant, Scope extends string> = {
  * TS 4.1-compatible scoped type.
  */
 type ScopedType<Scope extends string, Type extends string> = `${Scope}/${Type}`;
+
 /**
  * Internal function to consistently generate a scoped type.
  * @param scope 
  * @param type 
  * @returns 
  */
-const scopeType = <Scope extends string, Type extends string>(scope: Scope, type: Type) => `${scope}/${type}` as ScopedType<Scope, Type>
+export const scopeType = <Scope extends string, Type extends string>(scope: Scope, type: Type) => `${scope}/${type}` as ScopedType<Scope, Type>
 
 function descopeType<S extends string, T extends string>(s: ScopedType<S, T>): T {
     return (s.split('/')[1] ?? s) as T;
