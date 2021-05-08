@@ -17,7 +17,7 @@ type PatchedTemplate<T extends ConstrainedTemplate<F>, F extends Func> = {
  * Constrained variant. A variant where each form abides by a given constraint - handles these
  * inputs and provides these outputs. 
  * 
- * This can be used to provide optional values to the union type.
+ * This can be used to ensure optional properties exist on the union type.
  * @param _constraint_ 
  * @param v 
  * @returns 

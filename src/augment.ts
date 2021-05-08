@@ -1,30 +1,31 @@
-import {variant, variation} from '.';
+import {variation} from './index.onType';
 import {Func, PatchObjectOrPromise, RawVariant, VariantCreator, VariantOf} from './precepts';
 import {Identity} from './util';
-
 import {isVariantCreator, VariantRecord} from './variant';
 
 /**
  * Expand the functionality of a variant as a whole by tacking on 
  * computed properties. These are configured through a function parameter.
  * 
- * Used in conjunction with `variantModule` or `variant`.
+ * @param variantDefinition a template for the variant, extends `RawVariant`
+ * @param f the augment function. This receives the object that is is augmenting, enabling calculated properties.
+ * @tutorial
+ * Use in conjunction with `variant` (or `variantModule`).
  * 
  * ```typescript
+ * // Add a timestamp to every action.
  * export const Action = variant(augment(
- *     () => ({created: Date.now()}), 
  *     {
  *         AddTodo: fields<{text: string, due?: number}>(),
  *         UpdateTodo: fields<{todoId: number, text?: string, due?: number, complete?: boolean}>(),
  *     },
+ *     () => ({timestamp: Date.now()}), 
  * ));
  * ```
- * @param variantDef 
- * @param f
  */
-export function augment<T extends RawVariant, F extends (x: VariantOf<VariantRecord<T, string>>) => any>(variantDef: T, f: F) {
-    return Object.keys(variantDef).reduce((acc, key: keyof T) => {
-        let inputFunc = variantDef[key] as Func
+export function augment<T extends RawVariant, F extends (x: VariantOf<VariantRecord<T, string>>) => any>(variantDefinition: T, f: F) {
+    return Object.keys(variantDefinition).reduce((acc, key: keyof T) => {
+        let inputFunc = variantDefinition[key] as Func
 
         let returnFunc = isVariantCreator(inputFunc)
             ? variation(inputFunc.type, (...args: any[]) => {
@@ -35,7 +36,7 @@ export function augment<T extends RawVariant, F extends (x: VariantOf<VariantRec
                 }
             })
             : (...args: T[typeof key] extends (...args: infer TArgs) => any ? TArgs : []) => {
-                const branch = variantDef[key];
+                const branch = variantDefinition[key];
                 let item = typeof branch === 'function' ? branch(...args) : {};
                 return {
                     ...f(item),
@@ -60,7 +61,7 @@ type FullyFuncRawVariant<V extends RawVariant> = {
 type PatchFunc<F, O extends object> = F extends (...args: infer TArgs) => infer TReturn ? (...args: TArgs) => PatchObjectOrPromise<TReturn, O> : never;
 
 /**
- * Augment a variant with some value. 
+ * A variant patched with an extra property.
  */
 export type AugmentedRawVariant<V extends RawVariant, F extends Func> = {
     [P in keyof V]: V[P] extends VariantCreator<infer VT, infer VCF, infer VK> 

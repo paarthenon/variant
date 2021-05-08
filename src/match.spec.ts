@@ -1,6 +1,7 @@
-import {fields, match, matcher, scopedVariant, TypeNames, VariantOf, variation} from '.';
-import {keymap} from './keynum';
-import {just} from './match.tools';
+import {fields, match, payload, scopedVariant, TypeNames, VariantOf, variation} from '.';
+import {variant} from './index.onType';
+import {typeMap} from './typeCatalog';
+import {just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';
 
 test('match (basic)', () => {
@@ -38,7 +39,7 @@ test('caps animal', () => {
 test('caps animal, keymap (destructured)', () => {
     const catInstance = CapsAnimal.cat({name: 'Steve', furnitureDamaged: 0}) as CapsAnimal;
     
-    const _ = keymap(CapsAnimal);
+    const _ = typeMap(CapsAnimal);
     
     const result = match(catInstance, {
         [_.cat]: just(5),
@@ -52,7 +53,7 @@ test('caps animal, keymap (destructured)', () => {
 test('caps animal, keymap (destructured)', () => {
     const catInstance = CapsAnimal.cat({name: 'Steve', furnitureDamaged: 0}) as CapsAnimal;
     
-    const {cat, dog, snake} = keymap(CapsAnimal);
+    const {cat, dog, snake} = typeMap(CapsAnimal);
     
     const result = match(catInstance, {
         [cat]: just(5),
@@ -78,4 +79,67 @@ test('scoped match', () => {
     })
 
     expect(rating(Animal2.Cat({name: 'steve'}))).toBe('steve');
+})
+
+
+test('unpack', () => {
+    const thing = Test1.Alpha('yolo') as Test1;
+    
+    expect(test1Result(thing)).toBe('yolo');
+})
+
+test('unpack (solo)', () => {
+    const thing = Test1.Alpha('yolo');
+
+    const ret = match(thing, {
+        Alpha: unpack,
+    })
+
+    expect(ret).toBe('yolo');
+})
+
+
+const Test1 = variant({
+    Alpha: payload<string>(),
+    Beta: fields<{prop: string}>(),
+    Gamma: {},
+});
+type Test1<T extends TypeNames<typeof Test1> = undefined> = VariantOf<typeof Test1, T>;
+
+const test1Result = (thing: Test1) => match(thing, {
+    Alpha: unpack,
+    Beta: ({prop}) => prop,
+    Gamma: just('gamma'),
+});
+
+test('just (solo)', () => {
+    const thing = Test1.Alpha('yolo');
+
+    const ret = match(thing, {
+        Alpha: just(5),
+    })
+
+    expect(ret).toBe(5);
+})
+
+test('just (complex)', () => {
+    const result = test1Result(Test1.Gamma());
+
+    expect(result).toBe('gamma');
+})
+
+test('just (object)', () => {
+    const result = (animal: Animal) => match(animal, {
+        snake: just({
+            hello: 'world',
+            complex: 4,
+        }),
+        default: just(2),
+    })
+
+    expect(result(sample.cerberus)).toBe(2);
+    expect(result(Animal.snake('Test'))).toEqual({
+        hello: 'world',
+        complex: 4,
+    })
 })

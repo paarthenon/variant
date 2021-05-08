@@ -26,7 +26,10 @@ type FuncsOnly<T> = {
 }
 
 
-export type LiteralToUnion<T extends string | number | symbol, K extends string> = {[P in T]: Record<K, P>}[T];
+export type LiteralToUnion<
+    T extends string | number | symbol,
+    K extends string
+> = {[P in T]: Record<K, P>}[T];
 
 
 export type MatchFuncs<K extends string> = {

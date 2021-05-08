@@ -1,7 +1,9 @@
 
 /**
- * Describe the shape of the variant.
- * @param defaults set some default values for the object. Note this does not adjust the return type.
+ * Describe the fields of the variation.
+ * 
+ * When used creates a function of type `(input: T) => T & {type: 'literal'}`
+ * @param defaults set some default values for the object. Note this does *not* adjust the return type.
  */
 export function fields<T extends {}>(defaults: Partial<T> = {}) {
     return (input: {} extends T ? void : T) => ({
@@ -19,6 +21,6 @@ export function payload<T>(_example?: T) {
 
 
 /**
- * Used in conjunction with variantModule to have empty tags.
+ * Template to create an empty variation (`{type: 'literal'}`).
  */
 export const nil = () => ({});

@@ -1,7 +1,6 @@
-import {variantCosmos} from './cosmos';
 import {isTypeImpl} from './isType';
-import {Handler, MatchFuncs, matchImpl} from './match';
-import {Func, KeysOf, VariantCreator, VariantModule, VariantOf} from './precepts';
+import {MatchFuncs, matchImpl} from './match';
+import {Func, TypesOf, VariantCreator, VariantModule, VariantOf} from './precepts';
 import {variantImpl, VMFromVC} from './variant';
 
 
@@ -10,10 +9,26 @@ type IsFunctions<T extends VariantModule<K>, K extends string = 'type'> = {
 }
 
 
+/**
+ * A wrapper around a variant to allow more aesthetically pleasing interfaces
+ * and variant-specific functionality.
+ */
 export interface Remote<T extends VariantModule<K>, K extends string = 'type'> {
+    /**
+     * The key of the discriminant (`type`, `tag`, `kind`, `__typename`).
+     */
     readonly key: K;
+    /**
+     * A collection of user-defined type guards to enable syntax like `Animal.is.dog(_)`.
+     */
     readonly is: IsFunctions<T, K>;
+    /**
+     * The variant definition, a collection of tag constructors.
+     */
     readonly new: T;
+    /**
+     * The match function.
+     */
     match: MatchFuncs<K>['match'];
 }
 
@@ -28,7 +43,13 @@ type CreativeSequenceInput<K extends string, Type extends string = string> =
     | VariantCreator<Type, Func, K>
 ;
 
-export type CreatorFromSeqInput<T extends CreativeSequenceInput<K>, K extends string> = T extends VariantCreator<string, Func, string> ? T : T extends string ? VariantCreator<T, () => {}, K> : never;
+export type CreatorFromSeqInput<T extends CreativeSequenceInput<K>, K extends string> =
+    T extends VariantCreator<string, Func, string>
+        ? T
+        : T extends string
+            ? VariantCreator<T, () => {}, K>
+            : never
+;
 
 /**
  * A valid input to a sequence element.
@@ -51,31 +72,61 @@ type SequenceInputType<T extends SequenceInput<K>, K extends string> =
                 : never
 ;
 
+/**
+ * Give a variant an order or **sequence**, like a numerical enum.
+ */
 export interface Sequence<
     T extends VariantModule<K>,
-    O extends SequenceInput<K, KeysOf<T>>,
+    O extends SequenceInput<K, TypesOf<T>>,
     K extends string,
     RT extends Pick<T, SequenceInputType<O, K>> = Pick<T, SequenceInputType<O, K>>,
 > extends Remote<RT, K> {
+    /**
+     * Compare two elements to discover whether `a` is greater, equal,
+     * or lesser than `b`.
+     */
     compare: (
-        a: SequenceInput<K, KeysOf<RT>>, 
-        b: SequenceInput<K, KeysOf<RT>>,
+        a: SequenceInput<K, TypesOf<RT>>, 
+        b: SequenceInput<K, TypesOf<RT>>,
     ) => CompareResult;
     /**
      * Get the index of some type in the sequence.
      */
-    index: (a: SequenceInput<K, KeysOf<RT>>) => number;
+    index: (a: SequenceInput<K, TypesOf<RT>>) => number;
+    /**
+     * Get some element by index.
+     * @returns a tag constructor.
+     */
     get: (index: number) => T[keyof T];
+    /**
+     * The number of elements.
+     */
     readonly length: number;
-    readonly types: KeysOf<T>[];
+    /**
+     * A list of types ordered as the sequence.
+     */
+    readonly types: TypesOf<T>[];
 }
 
 export interface RemoteFuncs<K extends string> {
-    remote<T extends VariantModule<K>>(vmod: T): Remote<T, K>;
+    /**
+     * Create a "remote control" for a variant.
+     * @param variant 
+     */
+    remote<T extends VariantModule<K>>(variant: T): Remote<T, K>;
+    /**
+     * Create a sequence based on a variant.
+     * @param module the variant definition.
+     * @param order the list of string literal types or variation creators.
+     */
     sequence<
         T extends VariantModule<K>,
         O extends SequenceInput<K>,
     > (module: T, order: O[]): Sequence<Pick<T, SequenceInputType<O, K>>, O, K>;
+    /**
+     * Create a sequenced variant.
+     * @param order the list of literal types or variation creators. Also the variant definition a la `variantList`.
+     */
     sequence<
         O extends CreativeSequenceInput<K>,
     > (order: O[]): Sequence<VMFromVC<CreatorFromSeqInput<O, K>>, O, K>;

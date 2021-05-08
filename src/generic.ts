@@ -1,5 +1,5 @@
 import {flagsImpl, Matrix} from './flags';
-import {Func, KeysOf, Outputs, PatchObjectOrPromise, RawVariant, Stringable, SumType, TypeNames, VariantModule, VariantOf} from './precepts';
+import {Func, TypesOf, Outputs, PatchObjectOrPromise, RawVariant, Stringable, SumType, TypeNames, VariantModule, VariantOf} from './precepts';
 import {variantImpl, VariantRecord} from './variant';
 
 type primitive = number | string | symbol | boolean | bigint;
@@ -115,7 +115,7 @@ export const Alpha = flags(Object.values(GP).map(f => f()));
  * Type with placeholders for generic terms. 
  */
 export type Alpha = {
-    [P in KeysOf<typeof GP>]: GenericTerm<P>;
+    [P in TypesOf<typeof GP>]: GenericTerm<P>;
 };
 
 interface TermMap {

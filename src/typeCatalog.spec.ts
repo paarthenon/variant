@@ -1,8 +1,8 @@
-import {keymap, keynum} from './keynum';
+import {typeMap, typeCatalog} from './typeCatalog';
 import {CapsAnimal} from './__test__/animal';
 
-test('keymap match', () => {
-    const km = keynum(CapsAnimal);
+test('typeCatalog', () => {
+    const km = typeCatalog(CapsAnimal);
 
     expect(km.CAT).toBe('CAT');
     expect(km.DOG).toBe('DOG');
@@ -10,7 +10,7 @@ test('keymap match', () => {
 })
 
 test('keymap match', () => {
-    const km = keymap(CapsAnimal);
+    const km = typeMap(CapsAnimal);
 
     expect(km.cat).toBe('CAT');
     expect(km.dog).toBe('DOG');
@@ -19,7 +19,7 @@ test('keymap match', () => {
 
 test('keymap object instance', () => {
     const cat = CapsAnimal.cat({name: 'Steve', furnitureDamaged: 0}) as CapsAnimal;
-    const km = keymap(CapsAnimal);
+    const km = typeMap(CapsAnimal);
     
     expect(cat.type).toBe(km.cat);
 })

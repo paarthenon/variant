@@ -113,3 +113,38 @@ test('cyclical variation', () => {
     const first = one();
     const second = two();
 })
+
+test('async variant', async () => {
+    // from issue #3 on github
+    const bla = () => 'hello';
+
+    const TaskExtractMetadata = variation('extract_metadata', async function() {
+        // do async stuff
+        const stuff1 = await bla();
+        return {
+            stuff1
+        }
+    });
+
+    const thing = await TaskExtractMetadata();
+
+    expect(thing.type).toBe('extract_metadata');
+    expect(thing.stuff1).toBe('hello');
+});
+
+test('async variation output types', async () => {
+    const nonce = Promise.resolve(5);
+
+    const AsyncTask = variation('A_TASK', async () => ({
+        nonce: await nonce,
+        four: 4,
+    }))
+
+    const result = AsyncTask();
+
+    expect(AsyncTask.type).toBe('A_TASK');
+    expect(AsyncTask.key).toBe('type');
+
+    expect((result as any).four).toBeUndefined();
+    expect((await result).four).toBe(4);
+})

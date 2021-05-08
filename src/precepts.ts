@@ -95,45 +95,82 @@ export type Func = (...args: any[]) => any;
     [name: string]: VariantCreator<string, Func, K>
 }
 
-export type KeyMap<T extends VariantModule<string>> = {
+/**
+ * Most `VariantModule`s will have labels (Animal.dog) that match the
+ * underlying type of the object the function will create. Some will not.
+ * This type creates a mapping from the name/label to the type.
+ */
+export type TypeMap<T extends VariantModule<string>> = {
     [P in keyof T]: T[P]['type'];
 }
 
 /**
- * For a 
+ * Reverse lookup - get the label from the literal type. 
  */
-export type GetTypeLabel<T extends VariantModule<string>, Key extends KeysOf<T>> = {[P in keyof T]: T[P]['type'] extends Key ? P : never}[keyof T];
+export type GetTypeLabel<
+    T extends VariantModule<string>,
+    Key extends TypesOf<T>
+> = {
+    [P in keyof T]: T[P]['type'] extends Key ? P : never
+}[keyof T];
 
 /**
  * Warning: may be expensive.
  */
-export type KeyLookup<T extends VariantModule<string>> = {
-    [P in KeysOf<T>]: GetTypeLabel<T, P>;
+export type TypeNameLookup<T extends VariantModule<string>> = {
+    [P in TypesOf<T>]: GetTypeLabel<T, P>;
 }
 
-export type KeysOf<T extends VariantModule<string>> = KeyMap<T>[keyof T];
+/**
+ * Get the valid options for a variant's type property.
+ */
+export type TypesOf<T extends VariantModule<string>> = TypeMap<T>[keyof T];
+
 /**
  * Get the valid options for a variant type's names, plus `undefined`.
  */
- export type TypeNames<T extends VariantModule<string>> = KeysOf<T> | undefined;
+export type TypeNames<T extends VariantModule<string>> = TypesOf<T> | undefined;
 
-export type VariantTypeSpread<T extends VariantModule<string>> = {
+/**
+ * Simple internal helper to extract the variation types for each key of a `VariantModule`
+ */
+type VariantTypeSpread<T extends VariantModule<string>> = {
     [P in keyof T]: CreatorOutput<T[P]>
 }
 
+/**
+ * Create a union of variation types from any arbitrary `VariantModule`
+ */
 export type SumType<T extends VariantModule<string>> = Identity<VariantTypeSpread<T>[keyof T]>;
 
+
+/**
+ * **Create a variant type**. Use as
+ * 
+ * ```ts
+ * export type SomeVariant<T extends TypeNames<typeof SomeVariant> = undefined> = VariantOf<typeof SomeVariant, T>;
+ * ```
+ * 
+ * This allows the type `SomeVariant` to represent the union and the type `SomeVariant<'SomeType'>` to capture
+ * one specific variation.
+ * 
+ * ### Minimal form
+ * ```ts
+ * export type SomeVariant = VariantOf<typeof SomeVariant>;
+ * ```
+ * Some users who prioritize brevity and do not mind using `Extract<SomeVariant, Record<'type', 'SomeType'>>` to
+ * express a specific variation may prefer this simplified format.
+ */
 export type VariantOf<
     T extends VariantModule<string>,
     TType = undefined,
-> = TType extends undefined ? SumType<T> : TType extends KeysOf<T> ? Extract<SumType<T>, Record<T[keyof T]['key'], TType>> : SumType<T>;
+> = TType extends undefined ? SumType<T> : TType extends TypesOf<T> ? Extract<SumType<T>, Record<T[keyof T]['key'], TType>> : SumType<T>;
 
 /**
- * Input type for VariantModule
+ * The input type for `variant`/`variantModule`. 
+ * 
  */
 export type RawVariant = {[type: string]: Func | {}};
-
-export type LessRawVariant = {[type: string]: Func};
 
 /**
  * Catch-all type to express type errors.
@@ -141,10 +178,9 @@ export type LessRawVariant = {[type: string]: Func};
 export interface VariantError<T> { __error: never, __message: T };
 
 /**
- * A message.
+ * A type to express some arbitrary information.
  */
 export interface Message<T> { __: never, message: T };
-
 
 /**
  * Prevents 'overflow' in a literal.
@@ -158,4 +194,7 @@ export type Limited<T, U> = Exclude<keyof T, U> extends never
  * The key used to indicate the default handler.
  */
 export const DEFAULT_KEY = 'default';
+/**
+ * The string literal used to indicate the default handler.
+ */
 export type DEFAULT_KEY = typeof DEFAULT_KEY;

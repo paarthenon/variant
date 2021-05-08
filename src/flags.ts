@@ -1,8 +1,7 @@
-import {variantCosmos} from './cosmos';
-import {CreatorOutput, GetTypeLabel, KeysOf, TypeNames, VariantModule, VariantOf, VariantTypeSpread} from './precepts';
+import {CreatorOutput, GetTypeLabel, TypesOf, VariantModule} from './precepts';
 
 export type Matrix<T extends VariantModule<string>> = {
-    [P in KeysOf<T>]: CreatorOutput<T[GetTypeLabel<T, P>]>;
+    [P in TypesOf<T>]: CreatorOutput<T[GetTypeLabel<T, P>]>;
 }
 
 /**

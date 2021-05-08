@@ -1,4 +1,5 @@
-import {fields, scopedVariant, TypeNames, variant, VariantOf, variation} from '.';
+import {fields, just, match, payload, scopedVariant, TypeNames, Variant, variant, VariantOf, variation} from '.';
+import {GVariantOf, onTerms} from './generic';
 import {Identity} from './util';
 import {isVariantCreator} from './variant';
 

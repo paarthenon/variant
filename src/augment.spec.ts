@@ -1,4 +1,4 @@
-import {fields, match, TypeNames, variant, VariantOf, variation} from '.';
+import {fields, match, TypeNames, variant, VariantOf} from '.';
 import {augment} from './augment';
 import {Animal, CapsAnimal} from './__test__/animal';
 

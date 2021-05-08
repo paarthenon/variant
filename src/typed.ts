@@ -1,11 +1,3 @@
-// /**
-//  * strip the type field from some object type.
-//  */
-// export type VariantWithoutDiscriminant<T, K extends string> = Omit<T, K>;
-
-import {Func} from './precepts';
-import {TypesFunc} from './types';
-
 /**
  * Helper to retrieve the fields of a variation.
  */
@@ -34,16 +26,48 @@ export const pass = <T>(x: T) => x;
 
 export interface TypedFunc<K extends string> {
     /**
-     * Helper function to enforce the structure (i.e. grant autocomplete) of
-     * a type-first variant.
-     * @param variant
+     * Enforce a variant following a pre-defined type.
+     * 
+     * @param variant implementation of the underlying functions.
+     * @returns the implementation passed in.
+     * 
+     * @tutorial
+     * ```ts
+     * type Option =
+     *     | Variant<'Some', {payload: any}>
+     *     | Variant<'None'>
+     * ;
+     * const Option = variant(typed<Option>({
+     *     Some: pass,
+     *     None: pass,
+     * }));
+     * ```
+     * 
+     * `pass` is just the identity function. Any function `(input: T) => T` is valid.
      */
     typed<
         T extends Record<K, string>,
     >(variant: ExactDefinition<T, K>): VoidEmpty<ExactDefinition<T, K>>;
     /**
-     * Helper that takes pass as a '_' parameter.
-     * @param defHelper 
+     * Enforce a variant following a pre-defined type.
+     *
+     * Receive the `pass` function as a parameter.
+     * @param factory factory function implementation of the underlying functions. Receives `pass` as the only parameter.
+     * @returns the implementation passed in.
+     * 
+     * @tutorial
+     * ```ts
+     * type Option =
+     *     | Variant<'Some', {payload: any}>
+     *     | Variant<'None'>
+     * ;
+     * const Option = variant(typed<Option>(_ => ({
+     *     Some: _,
+     *     None: _,
+     * })));
+     * ```
+     * 
+     * `_` is just the identity function. Any function `(input: T) => T` is valid.
      */
     typed<
         T extends Record<K, string>,

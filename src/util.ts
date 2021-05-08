@@ -3,7 +3,11 @@ import {Func, VariantCreator} from './precepts';
 /**
  * Useful in generating friendly types. Intersections are rendered as the type of the intersection, not as A & B.
  */
- export type Identity<T> = T extends object ? {} & {
+
+/**
+ * Collapse a complex type into a more easily read object.
+ */
+export type Identity<T> = T extends object ? {} & {
     [P in keyof T]: T[P]
 } : T;
 
@@ -16,7 +20,7 @@ export const identityFunc = <T>(x = {} as T) => x as T extends unknown ? {} : T 
 
 /**
  * Determine whether or not a variable is a promise.
- * @param x 
+ * @param x potential promise.
  */
  export function isPromise<T>(x: T | PromiseLike<T>): x is PromiseLike<T> {
     return x != undefined && typeof x === 'object' && 'then' in x && typeof x.then === 'function';
