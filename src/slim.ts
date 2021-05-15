@@ -6,6 +6,7 @@ export {onTerms, GVariantOf} from './generic';
 export {TypeCatalog, typeMap, typeCatalog} from './typeCatalog';
 export {catalog, literalist} from './catalog';
 export {constant, just, unpack} from './match.tools';
+export {matcher} from './matcher';
 export {patterned} from './patterned';
 export {TypesOf, TypeMap, TypeNames, Variant, VariantOf, VariantModule} from './precepts';
 export {pass} from './typed';
