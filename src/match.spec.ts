@@ -1,8 +1,9 @@
 import {fields, match, payload, scopedVariant, TypeNames, VariantOf, variation} from '.';
-import {variant} from './index.onType';
+import {prematch, variant} from './index.onType';
 import {typeMap} from './typeCatalog';
 import {just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';
+
 
 test('match (basic)', () => {
     const rate = (animal: Animal) => match(animal, {
@@ -14,6 +15,37 @@ test('match (basic)', () => {
     expect(rate(sample.cerberus)).toBe(4);
     expect(rate(Animal.cat({name: 'Yellow', furnitureDamaged: 2}))).toBe(2);
     expect(rate(Animal.snake('Paleos'))).toBe(5);
+})
+
+test('prematch on type', () => {
+
+    const test = prematch<Animal>()({
+        cat: _ => 5,
+        dog: _ => 6,
+        snake: _ => 9,
+    });
+
+    prematch<Animal>()({
+        default: _ => 5,
+    })
+    const result = test(sample.cerberus);
+
+    expect(result).toBe(6)
+    expect(test(Animal.snake('Kailash'))).toBe(9);
+})
+
+test('prematch on module', () => {
+
+    const test = prematch(Animal)({
+        cat: _ => 5,
+        dog: _ => 6,
+        default: _ => 8,
+    });
+
+    const result = test(sample.cerberus);
+
+    expect(result).toBe(6)
+    expect(test(Animal.snake('Kailash'))).toBe(8);
 })
 
 test('match (partial)', () => {

@@ -1,4 +1,4 @@
-import {DEFAULT_KEY, Limited, Message, Func} from './precepts'
+import {DEFAULT_KEY, Limited, Message, Func, VariantModule, VariantOf} from './precepts'
 
 /**
  * A set of functions meant to handle the variations of an object.
@@ -6,6 +6,7 @@ import {DEFAULT_KEY, Limited, Message, Func} from './precepts'
 export type Handler<T extends Record<K, string>, K extends string> = {
     [P in T[K]]: (instance: Extract<T, Record<K, P>>) => any;
 }
+
 type AdvertiseDefault<T> = T & {
     /**
      * Adding a `default` value will make make this a partial match,
@@ -25,12 +26,10 @@ type FuncsOnly<T> = {
     [P in keyof T]: T[P] extends Func ? T[P] : never;
 }
 
-
 export type LiteralToUnion<
     T extends string | number | symbol,
     K extends string
 > = {[P in T]: Record<K, P>}[T];
-
 
 export type MatchFuncs<K extends string> = {
     /**
@@ -63,10 +62,49 @@ export type MatchFuncs<K extends string> = {
         EF extends (instance: Exclude<T, Record<K, keyof H>>) => any
     > (object: T, handler: Limited<H, T[K]>, elseFunc: EF): ReturnType<FuncsOnly<H>[keyof H]> | ReturnType<EF>;
 
+    /**
+     * Elevate a literal `A | B | C` to a type union `{type: A} | {type: B} | {type: C}`
+     * @param instance 
+     */
     onLiteral<T extends string | number | symbol>(instance: T): LiteralToUnion<T, K>;
+
+    /**
+     * Match against a function ahead of time.
+     */
+    prematch: PrematchFunc<K>;
+    
+}
+
+export interface PrematchFunc<K extends string> {
+    /**
+     * Placeholder - prematch on variant module instance
+     */
+    <T extends VariantModule<K>>(animal: T): CurriedMatchFunc<VariantOf<T>, K>;
+    /**
+     * Placeholder docs - prematch on variant union type.
+     */
+    <T extends Record<K, string>>(): CurriedMatchFunc<T, K>;
+}
+
+export interface CurriedMatchFunc<T extends Record<K, string>, K extends string> {
+    /**
+     * Placeholder documentation - match against full list.
+     */
+    <H extends AdvertiseDefault<Handler<T, K>>>(handler: H): (instance: T) => ReturnType<H[keyof H]>;
+    /**
+     * Placeholder documentation - 
+     */
+    <H extends WithDefault<Handler<T, K>>>(handler: H): (instance: T) => ReturnType<FuncsOnly<H>[keyof H]>;
 }
 
 export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
+    // curryable wrapper around match.
+    const prematch: Func = (_?: {}) =>
+        (handler: Handler<Record<K, string>, K>) =>
+            (instance: Record<K, string>) =>
+                match(instance, handler);
+
+    // 
     function match<
         T extends Record<K, string>,
         H extends Handler<T, K>,
@@ -91,6 +129,5 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
         } as LiteralToUnion<T, K>;
     }
 
-    return {match, onLiteral};
+    return {match, onLiteral, prematch};
 }
-

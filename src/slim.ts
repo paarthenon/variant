@@ -10,4 +10,5 @@ export {matcher} from './matcher';
 export {patterned} from './patterned';
 export {TypesOf, TypeMap, TypeNames, Variant, VariantOf, VariantModule} from './precepts';
 export {pass} from './typed';
+export {HOI} from './util';
 export {fields, nil, payload} from './variant.tools';

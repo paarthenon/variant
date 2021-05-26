@@ -14,7 +14,7 @@ import {variant, TypeNames, VariantOf, fields, variation} from '..';
 export const Animal = variant({
     cat: fields<{name: string, furnitureDamaged: number}>(),
     dog: fields<{name: string, favoriteBall?: string}>(),
-    snake: (name: string, pattern = 'striped') => ({name, pattern}),
+    snake: (name: string, pattern: string = 'striped') => ({name, pattern}),
 });
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 

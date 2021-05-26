@@ -31,3 +31,30 @@ export const identityFunc = <T>(x = {} as T) => x as T extends unknown ? {} : T 
  */
 export type TypeStr<T extends (string | VariantCreator<string, Func, K>), K extends string = 'type'> =
     T extends VariantCreator<infer R, Func, K> ? R : T extends string ? T : never;
+
+
+/**
+ * **H**igher-**O**rder **I**dentity.
+ * 
+ * A higher order factory for this very useful wrapper function.
+ * 
+ * ```ts
+ * // Enforce the type constraint *and* narrow the return type.
+ * function defineThing<T extends Template>(definition: T): T {
+ *     return definition;
+ * }
+ * ```
+ * 
+ * The above `defineThing` can now be generated through
+ * 
+ * ```ts
+ * const defineThing = HOI<Template>();
+ * ```
+ * 
+ * Or in more advanced to define something like a catalog:
+ * 
+ * ```ts
+ * const defineThings = HOI<Record<string, Template>>();
+ * ```
+ */
+export const HOI = <Constraint> () => <T extends Constraint> (definition: T) => definition;

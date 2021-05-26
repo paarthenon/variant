@@ -7,6 +7,7 @@ export const {
     isType,
     match,
     onLiteral,
+    prematch,
     remote,
     scopedVariant,
     sequence,
