@@ -3,6 +3,7 @@ import {prematch, variant} from './index.onType';
 import {typeMap} from './typeCatalog';
 import {just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';
+import {Handler} from './match';
 
 
 test('match (basic)', () => {
@@ -17,8 +18,30 @@ test('match (basic)', () => {
     expect(rate(Animal.snake('Paleos'))).toBe(5);
 })
 
-test('prematch on type', () => {
+test(`match (inline)`, () => {
+    const test = (animal: Animal) => match(animal, {
+        default: just(null),
+    });
 
+    const animalList: Animal[] = [
+        sample.cerberus,
+        Animal.cat({name: 'Perseus', furnitureDamaged: 0}),
+        Animal.dog({name: 'Twix'}),
+    ];
+
+    const renamed = animalList.map(match({
+        cat: _ => ({..._, name: `${_.name}-paw`}),
+        dog: _ => ({..._, name: `${_.name}-floof`}),
+        snake: _ => ({..._, name: `${_.name}-noodle`}),
+    }));
+
+
+    expect(renamed[0]).toBe(6);
+    expect(renamed[1]).toBe(5);
+    expect(renamed[2]).toBe(6);
+})
+
+test('prematch on type', () => {
     const test = prematch<Animal>()({
         cat: _ => 5,
         dog: _ => 6,
@@ -35,7 +58,6 @@ test('prematch on type', () => {
 })
 
 test('prematch on module', () => {
-
     const test = prematch(Animal)({
         cat: _ => 5,
         dog: _ => 6,

@@ -42,16 +42,13 @@ export function variantCosmos<
 >({key}: VariantCosmosConfig<K>): VariantCosmos<K> {
     const {isType} = isTypeImpl(key);
     const {flags} = flagsImpl(key);
-    const {match, onLiteral, prematch} = matchImpl(key);
 
     return {
         key,
         isType,
         flags,
-        match,
-        onLiteral,
-        prematch,
         ...isOfVariantImpl(key),
+        ...matchImpl(key),
         ...remoteImpl(key),
         ...typedImpl(key),
         ...typesImpl(key),

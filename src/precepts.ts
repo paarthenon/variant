@@ -22,21 +22,20 @@ export type Variant<
  * 
  * This is mostly used to merge the `{type: ______}` property into
  * the body definition of a variant.
+ * 
+ * Note: Places items at the top of the resulting object - this helps clearly
+ * identify the discriminant in a union.
  */
 export type PatchObjectOrPromise<
     T extends {} | PromiseLike<{}>,
     U extends {}
 > = T extends PromiseLike<infer R> 
-    ? PromiseLike<Identity<R & U>> 
-    : Identity<T & U>
+    ? PromiseLike<Identity<U & R>> 
+    : Identity<U & T>
 ;
 
 /**
  * The type marking metadata. It's useful to know the type of the items the function will generate.
- * 
- * It doesn't *really* matter if it's creator.outputType vs. creator.type, but
- * the latter has the advantage of being tolerable to the group of people who will
- * prefer to use [Animal.dog.type]: rather than dog: . 
  */
 export type Outputs<K, T> = {
     /**
