@@ -1,4 +1,4 @@
-import {types} from '.';
+import {inferTypes, types} from '.';
 import {Animal, sample} from './__test__/animal';
 
 test('types (on variant)', () => {
@@ -35,4 +35,12 @@ test('types func (on instance list)', () => {
     expect(animalTypes.includes('cat')).toBeTruthy();
     expect(animalTypes.includes('dog')).toBeTruthy();
     expect(animalTypes.length).toBe(2);
+})
+
+test('inferTypes', () => {
+    const result = inferTypes(sample.cerberus as Animal);
+
+    expect(result.cat).toBe('cat');
+    expect(result.dog).toBe('dog');
+    expect(result.snake).toBe('snake');
 })

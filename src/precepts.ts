@@ -197,3 +197,13 @@ export const DEFAULT_KEY = 'default';
  * The string literal used to indicate the default handler.
  */
 export type DEFAULT_KEY = typeof DEFAULT_KEY;
+
+
+/**
+ * One step better than Partial<T>.
+ * 
+ * But only one.
+ */
+export type Splay<T> = {
+    [P in keyof T]: Identity<Partial<T> & Record<P, T[P]>>;
+}[keyof T];

@@ -1,175 +1,286 @@
 import {Handler} from './match';
-import {Func, VariantCreator, VariantError} from './precepts';
+import {just} from './match.tools';
+import {Func, Splay, VariantCreator, VariantError} from './precepts';
 import {Identity, TypeStr} from './util';
+import {isVariantCreator} from './variant';
 
 /**
- * A stateful "match" clause represented by an object.
- * 
- * Create the matcher on some instance of a variant.
- * Express handlers for clauses through `.when()`. 
- * Finish handling with a terminal: `.complete()`, `.execute()`, or `.else()`.
+ * From a lookup table to a handler record.
  */
-export type Matcher<
-    T extends Record<K, string>,
-    H extends {[P in T[K]]?: (instance: Extract<T, Record<K, P>>) => any},
-    K extends string,
-> = {
-    /**
-     * The in-progress handler.
-     */
-    readonly handler: H;
-     /**
-      * The target object being matched.
-      */
-    readonly target: T;
-     /**
-      * The key used as the discriminant.
-      */
-    readonly key: K;
+export type TableToHandler<T extends {}> = {
+    [P in keyof T]: () => T[P];
+}
 
-    /**
-     * Handle one or more cases using a `match`-like handler object.
-     */
-    when<HPrime extends SplayPartial<Exclude<T, Record<K, keyof H>>, K>>(hp: HPrime): Matcher<T, H & HPrime, K>;
-    /**
-     * Handle one or more cases by specifying the relevant types in an array
-     * then providing a function to process a variant of one of those types.
-     */
-    when<
-        KPrime extends (Exclude<T[K], keyof H> | VariantCreator<Exclude<T[K], keyof H>, Func, K>),
-        HFunc extends (x: Extract<T, Record<K, TypeStr<KPrime, K>>>) => any,
-    >(
-        keys: KPrime[] | KPrime,
-        handler: HFunc,
-    ): Matcher<T, H & Record<TypeStr<KPrime, K>, HFunc>, K>;
-
-    /**
-     * Execute the match immediately. Exhaustiveness is not guaranteed, but if the matcher
-     * has missing cases this function may return `undefined`. In that scenario the `undefined` 
-     * type will be added to this function's possible return types.
-     */
-    execute(): Exclude<T[K], keyof H> extends never 
-        ? ReturnType<EnsureFunc<H[keyof H]>> 
-        : (ReturnType<EnsureFunc<H[keyof H]>> | undefined)
-    ;
-    /**
-     * Take any remaining cases and handle them in a single function. This is a terminal and
-     * will execute the match immediately. If a previous `when()` statement 
-     */
-    else<F extends (variant: Exclude<T, Record<K, keyof H>>) => any>(f: F): ReturnType<EnsureFunc<H[keyof H]> | F>;
-
-} & (Exclude<T[K], keyof H> extends never ? {
-    /**
-     * Only exists if all cases are handled.
-     */
-    complete: () => ReturnType<EnsureFunc<H[keyof H]>>
-} : {
-    /**
-     * The **incomplete** complete function. This is *not* executable, it purely reports the error.
-     */
-    complete: (_: VariantError<['The handler has not been fully completed. Keys', Exclude<T[K], keyof H>, 'expected']>) => ReturnType<EnsureFunc<H[keyof H]>>
-});
-
-type Coalesce<T, U> = T extends undefined ? U : T;
+/**
+ * Strip all non-function options.
+ */
 type EnsureFunc<T> = T extends Func ? T : never;
 
 /**
- * *Extremely* beta, do not use unless you've spoken to me.
- * @deprecated - rewrite w/ 3.0 in mind (in closure).
- * @param target 
- * @param handler 
- * @param _typeKey 
+ * Utility func to create a handler from a lookup table.
+ * @param table 
+ * @returns 
  */
-export function matcher<
+export function tableToHandler<
     T extends Record<K, string>,
-    H extends {},
-    K extends string = 'type',
->(target: T, handler = {} as H, _typeKey = 'type' as K): Matcher<T, {}, K> {
-    return {
-        target,
-        handler,
-        key: _typeKey ?? 'type',
-        when: function<HPrime extends SplayPartial<Exclude<T, Record<K, keyof H>>, K>>(
-            this: Matcher<T, H, K>, 
-            hp: HPrime | Array<T[K] | VariantCreator<T[K]>> | T[K],
-            hfunc?: Func
-        ) {
-            if (typeof hp === 'string') {
-                if (hfunc) {
-                    return {
-                        ...this,
-                        handler: {
-                            ...this.handler,
-                            [hp]: hfunc,
-                        }
-                    }
-                } else {
-                    return this;
-                }
-            } else {
-                // The case where an array is passed in.
-                if (Array.isArray(hp)) {
-                    const keys = hp.map(keyOrVC => {
-                        if (typeof keyOrVC === 'string') {
-                            return keyOrVC;
-                        } else {
-                            return keyOrVC.type;
-                        }
-                    });
-                    if (hfunc) {
-                        const obj = keys.reduce((acc, key) => {
-                            return {...acc, [key]: hfunc};
-                        }, {});
-                        return {
-                            ...this,
-                            handler: {
-                                ...this.handler,
-                                ...obj,
-                            }
-                        }
-                    } else {
-                        // ERROR
-                        return this;
-                    }
-                } else {
-                    return {
-                        ...this,
-                        handler: {
-                            ...this.handler,
-                            ...hp,
-                        } as H & HPrime,
-                    }
-                }
-            }
-        } as Func,
-        execute: function(this: Matcher<T, H, K>) {
-            const result: (x: T) => unknown = (this.handler as any)[this.target[this.key]]
-            return result(this.target);
-        } as Func,
-        complete: function(this: Matcher<T, H, K>) {
-            return this.execute();
-        } as Func,
-        else: function(this: Matcher<T, H, K>, func: (x: T) => unknown) {
-            if (this.target[this.key] in (this.handler ?? {})) {
-                return this.execute();
-            } else {
-                return func(this.target);
-            }
+    K extends string,
+    Table extends Record<T[K], unknown>
+>(table: Table) {
+    return Object.keys(table).reduce((acc, cur) => {
+        const key = cur as keyof Table;
+        return {
+            ...acc,
+            [key]: just(table[key]),
         }
-    } as any;
+    }, {} as Handler<T, K>);
 }
 
-
-type SplayPartial<T extends Record<K, string>, K extends string = 'type'> =
-    Identity<SplayCase<T, K>[T[K]]>;
-
-type SplayCase<T extends Record<K, string>,K extends string = 'type'> = {
-    [P in T[K]]: KeyCase<T, T[K], P, (x: Extract<T, Record<K, P>>) => any, K>;
+type CompleteFunc<RemainingKeys, Return> = {
+    /**
+     * Execute the matcher with all cases and retrieve the result.
+     */
+    complete(): Return;
+    /**
+     * The **incomplete** complete function.
+     * 
+     * > This is not callable. 
+     */
+    incomplete: VariantError<['The handler has not been fully completed. Keys', RemainingKeys, 'expected']>
 }
 
 /**
- * 
+ * Determine the complenetary handler.
  */
-type KeyCase<T extends Record<K, string>, Types extends string, Type extends Types, F extends (...args: any[]) => any, K extends string = 'type'> 
-    = Partial<Handler<T, K>> & Record<Type, F>;
+type RestOfHandler<
+    T extends Record<K, string>,
+    H extends Partial<Handler<T, K>>,
+    K extends string,
+> = keyof H extends never 
+    ? Handler<T, K> // the extract will fail if asked to retrieve Record<K, never>
+    : Handler<Extract<T, Record<K, keyof H>>, K>;
 
+/**
+ * Retrieve keys not yet handled.
+ */
+type RemainingKeys<
+    T extends Record<K, string>,
+    K extends string,
+    H extends Partial<Handler<T, K>>,
+> = keyof H extends never ? T[K] : Exclude<T[K], keyof H>;
+
+/**
+ * The matcher, a builder-pattern form of `match()`
+ * 
+ * * Create a matcher `matcher(animal)`
+ * * Define cases
+ * ** `.when('cat', _ => _.name)`
+ * ** `.when(Animal.cat, c => c.name)`
+ * ** `.when(['cat', Animal.dog], cd => cd.name)`,
+ * ** `.when({cat: c => c.name, dog: d => d.name})`
+ * ** `.register({cat: 'purr', dog: 'woof'})` for constants.
+ * 
+ * * Execute the matcher
+ * ** `.complete()` brings exhaustiveness checking
+ * ** `.execute()` immediately runs the matcher, whether or not all cases are handled.
+ * ** `.else(_ => {...})` immediately runs the matcher, resolving unhandled cases with a function.
+ */
+export class Matcher<
+    T extends Record<K, string>,
+    K extends string,
+    H extends Partial<Handler<T, K>>,
+> {
+    /**
+     * Create a new matcher from the target
+     * @param target the 
+     * @param handler the initial handler. Use `{}` for standard functionality.
+     * @param key the discriminant. Use `'type'` for standard functionality.
+     */
+    constructor(
+        /**
+         * The match target. 
+         */
+        readonly target: T,
+        /**
+         * The discrimant used for the union `T`
+         */
+        readonly key: K,
+        /**
+         * The in-progress handler object.
+         */
+        readonly handler: H,
+    ) { }
+
+    /**
+     * Immediately execute the matcher. Exhaustiveness is not guaranteed.
+     * 
+     * This is a **terminal** and resolves the matcher.
+     */
+    execute() {
+        const chosenHandler: (target: T) => unknown
+            = this.handler[this.target[this.key]] as Func;
+
+        return chosenHandler?.(this.target) as RemainingKeys<T, K, H> extends never 
+            ? ReturnType<EnsureFunc<H[keyof H]>> 
+            : (ReturnType<EnsureFunc<H[keyof H]>> | undefined) 
+    }
+
+    /**
+     * Handle all unhandled cases and immediately execute. 
+     * 
+     * This is a **terminal** and resolves the matcher.
+     * @param remainingCases 
+     * @returns 
+     */
+    exhaust<R extends RestOfHandler<T, H, K>>(remainingCases: R): ReturnType<(H & R)[T[K]]> {
+        const combinedHandler = {
+            ...this.handler,
+            ...remainingCases,
+        };
+        return combinedHandler[this.target[this.key]]?.(this.target as any);
+    }
+
+    complete = this.execute as
+        RemainingKeys<T, K, H> extends never
+            ? CompleteFunc<RemainingKeys<T, K, H>, ReturnType<EnsureFunc<H[keyof H]>>>['complete']
+            : CompleteFunc<RemainingKeys<T, K, H>, ReturnType<EnsureFunc<H[keyof H]>>>['incomplete']
+    ;
+
+    /**
+     * Execute the match. If the target type has been explicitly handled, use that logic.
+     * Otherwise use the function passed here.
+     * 
+     * This is a **terminal** and resolves the matcher.
+     * @param func 
+     * @returns 
+     */
+    else<
+        ElseFunc extends (variant: Exclude<T, Record<K, keyof H>>) => any
+    >(func: ElseFunc): ReturnType<EnsureFunc<H[keyof H]> | ElseFunc> {
+        if (this.target[this.key] in this.handler) {
+            return this.handler[this.target[this.key]]?.(this.target as Extract<T, Record<K, string>>);
+        } else {
+            return func(this.target as Exclude<T, Record<K, keyof H>>);
+        }
+    }
+
+    /**
+     * Register a series of options as a lookup table.
+     * 
+     * ```ts
+     * const getSound = (a: Animal) => matcher(a)
+     *     .register({
+     *         cat: 'purr',
+     *         dog: 'woof',
+     *         snake: 'hiss',
+     *     })
+     *     .complete()
+     * ```
+     * @param table 
+     * @returns 
+     */
+    register<Table extends Splay<Record<T[K], any>>>(table: Table): Matcher<T, K, H & TableToHandler<Table>> {
+        const newHandler = {
+            ...this.handler,
+            ...tableToHandler(table),
+        } as H & TableToHandler<Table>
+        return new Matcher(this.target, this.key, newHandler);
+    }
+
+    /**
+     * Provide an exhaustive table of the unhandled options and look up which value
+     * to use based on the instance.
+     * 
+     * This is a **terminal** and resolves the matcher.
+     * 
+     * ```ts
+     * const getSound = (a: Animal) => matcher(a)
+     *     .lookup({
+     *         cat: 'purr',
+     *         dog: 'woof',
+     *         snake: 'hiss',
+     *     })
+     * ```
+     * @param table 
+     * @returns 
+     */
+    lookup<Table extends Record<T[K], any>>(table: Table): ReturnType<(H & TableToHandler<Table>)[T[K]]> {
+        const combinedHandler = {
+            ...this.handler,
+            ...tableToHandler(table),
+        } as H & TableToHandler<Table>
+
+        return combinedHandler[this.target[this.key]]?.(this.target as any);
+    }
+
+    /**
+     * Handle one or more cases, object-style.
+     * @param variations
+     */
+    when<
+        Variations extends Splay<Handler<T, K>>,
+    >(variations: Variations): Matcher<T, K, H & Variations>;
+
+    /**
+     * Handle one or more cases with a set of types and a handler.
+     * @param variations 
+     * @param handler 
+     */
+    when<
+        Variation extends T[K] | VariantCreator<T[K], Func, K>,
+        Handler extends (x: Extract<T, Record<K, TypeStr<Variation, K>>>) => any
+    >(variations:Variation | Variation[], handler: Handler): Matcher<T, K, H & Record<TypeStr<Variation, K>, Handler>>;
+    /**
+     * Actual impl.
+     * @param variations 
+     * @param handler 
+     * @returns 
+     */
+    when<
+        Variation1 extends T[K],
+        Variation2 extends VariantCreator<T[K], Func, K>,
+        Variation3 extends Variation1[],
+        Variation4 extends Splay<Handler<T, K>>,
+        HandlerFunc extends (x: Extract<T, Record<K, TypeStr<Variation1, K>>>) => any
+    >(variations: Variation1 | Variation2 | Variation3 | Variation4, handler?: HandlerFunc) {
+        if (handler != undefined) {
+            // 2 param case
+            const list = Array.isArray(variations) ? variations : [variations];
+            const newCases = list.reduce((acc, cur) => {
+                const type = typeof cur === 'string' ? cur : isVariantCreator(cur) ? cur.type : undefined;
+    
+                return type != undefined ? (
+                    {...acc, [type]: handler}
+                ) : (
+                    acc
+                );
+            }, {} as Record<TypeStr<Variation1, K>, HandlerFunc>);
+
+            return new Matcher(this.target, this.key, {
+                ...this.handler,
+                ...newCases
+            });
+        } else {
+            //1 param case
+            return new Matcher(this.target, this.key, {
+                ...this.handler,
+                ...(variations as Variation4)
+            });
+        }
+    }
+}
+
+export interface MatcherFunc<K extends string> {
+    /**
+     * Create a matcher on some target variant instance.
+     * @param target 
+     */
+    matcher<T extends Record<K, string>>(target: T): Matcher<T, K, {}>
+}
+
+export function matcherImpl<K extends string>(key: K): MatcherFunc<K> {
+    function matcher<T extends Record<K, string>>(target: T) {
+        return new Matcher(target, key, {})
+    }
+
+    return {matcher};
+}

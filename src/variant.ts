@@ -58,7 +58,7 @@ export interface CreatorBranded {
     [VARIANT_CREATOR_BRAND]: typeof VARIANT_CREATOR_BRAND;
 }
 
-export function isVariantCreator(func: Function): func is VariantCreator<string> {
+export function isVariantCreator(func: Function | object): func is VariantCreator<string> {
     return VARIANT_CREATOR_BRAND in func;
 }
 

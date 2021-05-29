@@ -36,9 +36,9 @@ test(`match (inline)`, () => {
     }));
 
 
-    expect(renamed[0]).toBe(6);
-    expect(renamed[1]).toBe(5);
-    expect(renamed[2]).toBe(6);
+    expect(renamed[0].name).toBe('Cerberus-floof');
+    expect(renamed[1].name).toBe('Perseus-paw');
+    expect(renamed[2].name).toBe('Twix-floof');
 })
 
 test('prematch on type', () => {

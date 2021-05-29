@@ -12,6 +12,15 @@ export interface TypesFunc<K extends string> {
      * @param content list of instances.
      */
     types<T extends Record<K, string>>(content: T[]): T[K][];
+
+    /**
+     * Create a type catalog from an *instance* of a variant.
+     * 
+     * Note this leverages proxies and is based on the perceived
+     * type union for `instance`
+     * @param instance 
+     */
+    inferTypes<T extends Record<K, string>>(instance: T): {[P in T[K]]: P}
 }
 
 export function typesImpl<K extends string>(key: K): TypesFunc<K> {
@@ -22,7 +31,14 @@ export function typesImpl<K extends string>(key: K): TypesFunc<K> {
             return Object.values(content).map(c => c.type);
         }
     }
+    function inferTypes<T extends Record<K, string>>(_: T) {
+        return new Proxy({} as {[P in T[K]]: P}, {
+            get: (_, property) => {
+                return property;
+            }
+        })
+    }
 
-    return {types};
+    return {types, inferTypes};
 }
 
