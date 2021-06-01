@@ -25,10 +25,13 @@
 }
 
 [data-theme=""] .hero.hero--primary {
-  background-image: linear-gradient(#444, #111);
+  background-image: linear-gradient(#444,#111111);
 }
 [data-theme="dark"] .hero.hero--primary {
   background-image: linear-gradient(#FFF, #C8C0C0) ;
+}
+[data-theme="light"] .hero.hero--primary {
+  background-image: linear-gradient(#444,#111111);
 }
 
 .docusaurus-highlight-code-line {

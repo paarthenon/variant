@@ -1,5 +1,6 @@
-import {match, matcher, types} from './index.onType';
+import {match, matcher, onLiteral, types} from './index.onType';
 import {just} from './match.tools';
+import {typeCatalog} from './typeCatalog';
 import {Animal, sample} from './__test__/animal';
 
 test('matcher creation', () => {
@@ -125,4 +126,16 @@ test('matcher (when-complete)', () => {
     expect(getFeature(sample.cerberus)).toBeUndefined();
     expect(getFeature(sample.perseus)).toBe(0);
     expect(getFeature(Animal.snake('Tanya', 'spotted'))).toBe('spotted');
+})
+
+test('matcher (onLiteral)', () => {
+    const rate = (type: Animal['type']) => matcher(onLiteral(type))
+        .lookup({
+            cat: 1,
+            dog: 2,
+            snake: 3,
+        });
+
+    expect(rate(Animal.cat.type)).toBe(1);
+    expect(rate(Animal.dog.type)).toBe(2);
 })

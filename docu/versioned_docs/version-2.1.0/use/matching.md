@@ -98,7 +98,7 @@ const coolAnimals = animals.filter(a => match(a, {
 }));
 ```
 
-**Last minute color selections.** Conveniently switch based on type for various properties. Since literals are retained, this even works for fields like the react library [@blueprintjs/core]()'s `icon` property which is required to be a valid literal from a selection. 
+**Last minute color selections.** Conveniently switch based on type for various properties. Since literals are retained, this even works for fields like the react library [@blueprintjs/core](https://blueprintjs.com/)'s `icon` property which is required to be a valid literal from a selection. 
 ```typescript
 <Icon
     icon='upload'

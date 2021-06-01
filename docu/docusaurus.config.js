@@ -19,7 +19,7 @@ module.exports = {
         alt: 'Variant Logo',
         src: 'img/variant_logo.png',
       },
-      links: [
+      items: [
         {
           to: 'docs/intro',
           activeBasePath: 'docs',
@@ -31,6 +31,10 @@ module.exports = {
           activeBasePath: 'about',
           label: 'About', 
           position: 'left'
+        },
+        {
+          type: 'docsVersionDropdown',
+          position: 'right',
         },
         {
           to: 'docs/api',
@@ -100,6 +104,11 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          versions: {
+            current: {
+              label: '3.0.0-dev.__',
+            }
+          }
         },
         about: {
           sidebarPath: require.resolve('./sidebars.js'),

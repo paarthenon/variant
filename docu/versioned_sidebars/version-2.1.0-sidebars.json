@@ -1,0 +1,95 @@
+{
+  "version-2.1.0/someSidebar": [
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "Getting Started",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.1.0/intro"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/motivation"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "User Guide",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.1.0/use/variant"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/use/grouping"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/use/matching"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/use/filter"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/use/advanced-creation"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/use/redux"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/cheat"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
+      "label": "Articles",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-2.1.0/articles/that-type"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/articles/type-name"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/articles/augment"
+        },
+        {
+          "type": "doc",
+          "id": "version-2.1.0/changelog"
+        }
+      ]
+    },
+    {
+      "type": "doc",
+      "id": "version-2.1.0/api"
+    }
+  ],
+  "version-2.1.0/secondSidebar": [
+    {
+      "type": "doc",
+      "id": "version-2.1.0/about"
+    },
+    {
+      "type": "doc",
+      "id": "version-2.1.0/changelog"
+    },
+    {
+      "type": "doc",
+      "id": "version-2.1.0/credits"
+    }
+  ]
+}

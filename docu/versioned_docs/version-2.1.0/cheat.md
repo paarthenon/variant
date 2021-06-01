@@ -21,10 +21,6 @@ type AllAnimalsType = Animal;
 
 ### Boilerplate 
 
-:::warning
-TODO: Update to 3.0. These are the 2.X snippets.
-:::
-
 Here are some [VS Code snippets](https://code.visualstudio.com/docs/editor/userdefinedsnippets) to make following the groupings pattern very easy.
 ```json
 {

@@ -3,10 +3,6 @@ title: Changelog
 ---
 Summary of the changes in each patch.
 
-# 3.0.0
-
-Variant 3.0 has a separate article to discuss changes, [What's new in Variant 3.0](new-in-3.0).
-
 ## 2.0.3
  - added `remote()` and `sequence()`.
  - Improved handling of primitives in conditional types
