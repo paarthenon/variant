@@ -51,4 +51,23 @@ Highlight that there are multiple companies that use variant in production.
 
 Variant is built on standard language features. This means that you can use as much or as little of the library as you wish. It is entirely possible to use variant for the advanced creation utilities and then return to a traditional switch statement to process these items or good old `if (animal.type === 'cat') {` which will narrow correctly.
 
-It is also entirely possible to ignore the creation utilities entirely. I know of at least a couple users who use graphQL codegen to create their discriminated unions but use variant's matching utilities to process them.
+It is also entirely possible to ignore the creation utilities completely. I know of at least a couple users who use graphQL codegen to create their discriminated unions but use variant's matching utilities to process them.
+
+### Describe unopinionated.
+
+Variant, against the fashion of the time, is *unopinionated*. Variant does not proselytize, it is intended to be foundational library and operate *on your terms* while doing its utter best to stay out of your way.
+
+ - use whatever naming or capitalization
+ - use raw styles 
+
+### Naming conventions
+
+Should `Animal` be singular or pluralized? Should case names be `camelCase`, `PascalCase`, or `snake_case`? It does not matter to the library. I personally recommand that variants be singular, cases be `PascalCase`, and the flags version be plural. i.e. `Attribute`, `Attribute.VideoCodec`, and `Attributes` referring to the potential object on some model.
+
+### `augment()` for immutability
+
+You can create truly immutable variants by calling `augment()` and passing the function `Object.freeze` (test this).
+
+### Autocomplete
+
+Emphasize the focus on a good autocomplete experience. This can be part of the UX conversation along with documentation. This isn't just a laziness thing, having autocompletion implies that the types involved are constrained in useful ways.

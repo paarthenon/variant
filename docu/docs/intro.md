@@ -4,6 +4,10 @@ title: Introduction
 ---
 > _**Variant** is a language feature disguised as a library._
 
+
+...intended to fit cleanly into any project structure.
+
+
 ****
 
 ### TODO

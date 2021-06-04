@@ -3,6 +3,14 @@ slug: glossary
 title: 📑 Glossary of Terms
 ---
 
+## Domain
+
+TODO: Steal this from the intro of the previous version.
+
+## Exhaustive
+
+The term "exhaustive" refers to some control flow statement where every branch is handled. Variant's match functions are exhaustive until instructed otherwise.
+
 ## Match
  - [`match()`](api#match) - match a variant as an expression.
  - [`matcher()`](api#matcher) - match a variant in a builder pattern.
@@ -10,6 +18,9 @@ title: 📑 Glossary of Terms
 
 An operation resembling a [switch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/switch) statement that can be performed on some instance of a [variant](#variant). Matching in general refers to processing an instance of a variant by providing instructions on how to respond to each potential [variation](#variation). There are several match functions available depending on your needs and aesthetic preferences.
 
+## Model
+
+Model is a bit of an overloaded term, but generally speaking refers to the abstract representation of your [domain](#domain) concerns. In code, it generally refers to the interfaces and types you use in your core logic.
 
 ## TypeScript
 

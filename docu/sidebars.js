@@ -8,16 +8,38 @@ module.exports = {
     {
       type: 'category',
       label: 'User Guide',
-      items: ['cheat'],
+      items: [
+        {
+          type: 'category',
+          label: 'Creation',
+          items: [
+            'book/creation',
+            'book/augment',
+          ]
+        },
+        'book/organization',
+        {
+          type: 'category',
+          label: 'Matching',
+          items: ['book/match', 'book/matcher'],
+        },
+        'book/flags',
+        'cheat',
+      ],
     },
     {
       type: 'category',
       label: 'Articles',
-      items: ['flags', 'changelog'],
+      items: ['articles/naming', 'changelog'],
     },
+    {
+      type: 'category',
+      label: 'Libraries',
+      items: ['libraries/rxjs', 'libraries/redux-toolkit'],
+    },
+    'todo',
     'api',
     'glossary',
-    'todo',
   ],
   secondSidebar: [
     'about',
