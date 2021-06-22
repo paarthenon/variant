@@ -8,7 +8,7 @@ the template to the final variant. Please document your models to create the exp
 
 
 ```ts
-export const Animal {
+const Animal = {
     /**
      * A four-legged furry animal that ranges in size and activity level.
      **/

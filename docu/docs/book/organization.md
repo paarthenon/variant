@@ -32,7 +32,7 @@ const Reptiles = variant([
 
 ```
 
-### Compose
+### Composition
 
 Make variants *members* of other variants. This is especially useful in different types of settings. 
 

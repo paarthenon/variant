@@ -15,6 +15,8 @@ module.exports = {
           items: [
             'book/creation',
             'book/augment',
+            'book/generic',
+            'book/procedural-generation',
           ]
         },
         'book/organization',
@@ -30,7 +32,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Articles',
-      items: ['articles/naming', 'changelog'],
+      items: ['articles/naming', 'articles/semantics', 'changelog'],
     },
     {
       type: 'category',

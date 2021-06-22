@@ -106,7 +106,7 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           versions: {
             current: {
-              label: '3.0.0-dev.__',
+              label: '3.0.0-dev 🔨',
             }
           }
         },

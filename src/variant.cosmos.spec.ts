@@ -1,7 +1,6 @@
 import {variantCosmos} from './cosmos';
 import {Matrix} from './flags';
 import {constant, just} from './match.tools';
-import {matcher} from './matcher';
 import {GetTypeLabel, TypeNames, VariantOf} from './precepts';
 import {fields, payload} from './variant.tools';
 
