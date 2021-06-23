@@ -73,16 +73,16 @@ type RemainingKeys<
  * 
  * * Create a matcher `matcher(animal)`
  * * Define cases
- * ** `.when('cat', _ => _.name)`
- * ** `.when(Animal.cat, c => c.name)`
- * ** `.when(['cat', Animal.dog], cd => cd.name)`,
- * ** `.when({cat: c => c.name, dog: d => d.name})`
- * ** `.register({cat: 'purr', dog: 'woof'})` for constants.
+ *     * `.when('cat', _ => _.name)`
+ *     * `.when(Animal.cat, c => c.name)`
+ *     * `.when(['cat', Animal.dog], cd => cd.name)`,
+ *     * `.when({cat: c => c.name, dog: d => d.name})`
+ *     * `.register({cat: 'purr', dog: 'woof'})` for constants.
  * 
  * * Execute the matcher
- * ** `.complete()` brings exhaustiveness checking
- * ** `.execute()` immediately runs the matcher, whether or not all cases are handled.
- * ** `.else(_ => {...})` immediately runs the matcher, resolving unhandled cases with a function.
+ *     * `.complete()` brings exhaustiveness checking
+ *     * `.execute()` immediately runs the matcher, whether or not all cases are handled.
+ *     * `.else(_ => {...})` immediately runs the matcher, resolving unhandled cases with a function.
  */
 export class Matcher<
     T extends Record<K, string>,

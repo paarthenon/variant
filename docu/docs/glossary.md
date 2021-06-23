@@ -3,6 +3,14 @@ slug: glossary
 title: 📑 Glossary of Terms
 ---
 
+:::note
+
+## Notation
+
+To distinguish between concepts and concrete functions, I will use a monospaced name `match()` when referring to the concrete types and values. When speaking generally, I will refer to *matching* or *the match functions*, when describing `match()`/`matcher()`/`prematch()`.
+
+:::
+
 ## Domain
 
 TODO: Steal this from the intro of the previous version.

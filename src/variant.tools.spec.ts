@@ -10,6 +10,7 @@ test('fields empty', () => {
 
     expect(emptyUse).toEqual({type: 'test'});
     expect(emptyObjectUse).toEqual({type: 'test'});
+    console.log(validUse);
     expect(validUse).toEqual({type: 'test', test: 5});
 })
 

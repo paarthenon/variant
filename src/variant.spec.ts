@@ -124,44 +124,12 @@ test('scoped', () => {
 });
 
 
-test('variant w/ classes', () => {
-    // Defined ahead of time to have in scope for instanceOf check.
-    const Dog = class {
-        constructor(private barkVolume: number) { }
+test('variation w/ override', () => {
+    const resultF = variation('one', () => ({type: 'two'}));
 
-        public bark() {
-            // can access class members.
-            const msg = this.barkVolume > 5 ? 'BARK' : 'bark';
-            console.log(msg);
-        }
-    }
+    const result = resultF();
 
-    // I'm honestly not sure if this will work.
-    const ClassyAnimal = variant({
-        dog: construct(Dog),
-        cat: construct(class {
-            public furnitureDamaged = 0;
-        }),
-        snake: construct(class {
-            constructor (
-                private color: string,
-                private isStriped: boolean = false,
-            ) { }
-
-            get skin() {
-                return `${this.isStriped && 'striped '}${this.color}`;
-            }
-        })
-    });
-    type ClassyAnimal = VariantOf<typeof ClassyAnimal>;
-
-    const thing2 = variant([
-        variation('Dog', construct(class {
-
-        })),
-    ])
-    
-    const dog = ClassyAnimal.dog(4);
-    
-    expect(dog instanceof Dog).toBe(true);
+    // TODO: This is intentional, but the type is wrong. Either change the intention
+    // of the design or change the type to consider the function passed in.
+    expect(result.type).toBe('two');
 })

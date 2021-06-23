@@ -4,8 +4,19 @@ title: Introduction
 ---
 > _**Variant** is a language feature disguised as a library._
 
+Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://basarat.gitbook.io/typescript/type-system/discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domain models and tiny DSLs. However, because [*"TypeScript instead builds on JavaScript patterns as they exist today"*](http://web.archive.org/web/20191018040436/https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
 
-...intended to fit cleanly into any project structure.
+[🧠 Click here to jump straight to the API Reference](api.md)
+
+## Quick start
+
+Variant has zero dependencies and doesn't need any setup.
+
+```bash
+yarn add variant
+# or
+npm install --save variant
+```
 
 :::note
 There are two good options for the type definition. Both will give a type `Animal` that captures the union of types.
@@ -47,7 +58,7 @@ The simplified type does not feature this. To get at this snake type, the develo
 
 ## Superhero
 
-The demonstration is going to be about superhero powers. They have excellent and evocative factors to include as fields and are universally understood. There will be a Hero type and they will have powers: Flags<typeof Power> ;
+The demonstration could be about superhero powers. They have excellent and evocative factors to include as fields and are universally understood. There will be a Hero type and they will have powers: `Flags<typeof Power>` ;
 
 Superpowers:
    - flight

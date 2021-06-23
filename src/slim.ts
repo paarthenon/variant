@@ -1,5 +1,6 @@
 export {augment} from './augment';
 export {constrained} from './constrained';
+export {construct} from './construct';
 export {variantCosmos} from './cosmos';
 export {Flags, Matrix} from './flags';
 export {onTerms, GVariantOf} from './generic';

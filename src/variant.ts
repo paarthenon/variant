@@ -292,14 +292,14 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
             const returned = (creator ?? identityFunc)(...args);
             if (isPromise(returned)) {
                 return returned.then(result => {
-                    if (type in (result ?? {})) {
+                    if (key in (result ?? {})) {
                         return result;
                     } else {
                         return Object.assign(result ?? {}, {[key]: type})
                     }
                 })
             } else {
-                if (type in (returned ?? {})) {
+                if (key in (returned ?? {})) {
                     return returned;
                 } else {
                     return Object.assign(returned ?? {}, {[key]: type});
