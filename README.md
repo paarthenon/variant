@@ -10,7 +10,10 @@ Variant aims to bring the experience of [variant types](https://dev.realworldoca
 
 # [![Variant Logo](docs/img/variant_logo_96_inline.png "Variant Logo") **Documentation**](https://paarthenon.github.io/variant/)
 
+> ✨ Variant 3.0 is in active development. Documentation featuring 3.0 features will be available shortly. In the meantime, the [changes are available here](https://github.com/paarthenon/variant/issues/17).
+
 *everything below this line is project documentation for developers. Please use the website linked just above.*
+
 ****
 Initial setup
 ```bash
