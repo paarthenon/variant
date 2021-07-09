@@ -28,4 +28,4 @@ It's also possible to check whether or not a function is a variant creator by lo
 
 ## Variant Record
 
-The internal construction of a variant is as an object.
+The internal construction of a variant is as an object. Each value is the result of a call to `variation`. *There are no requirements regarding the keys.* By convention the keys will match the string literal registered to the `type` field (or other discriminant)

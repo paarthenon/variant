@@ -139,3 +139,13 @@ test('matcher (onLiteral)', () => {
     expect(rate(Animal.cat.type)).toBe(1);
     expect(rate(Animal.dog.type)).toBe(2);
 })
+declare var animal: Animal;
+
+test('matcher failure', () => {
+    
+    const greetAnimal = (animal: Animal) => matcher(animal)
+        .when('snake', ({name}) => `Hello ${name}`)
+        .complete()
+    ;
+
+})

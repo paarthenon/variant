@@ -1,11 +1,23 @@
 ---
 id: that-type
-title: That type tho...
+title: That type annotation
 ---
 
-I admit this type I ask you to include is... *a bit much.*
+I admit the full version of the type annotation I ask you to include is... *a bit much.*
 
-```typescript
+```twoslash include animal
+import {variant, fields, VariantOf} from 'variant';
+
+export const Animal = variant({
+    cat: fields<{name: string, furnitureDamaged: number}>(),
+    dog: fields<{name: string, favoriteBall?: string}>(),
+    snake: (name: string, pattern: string = 'striped') => ({name, pattern}),
+});
+```
+```ts twoslash
+// @include: animal
+import {TypeNames} from 'variant';
+// ---cut---
 export type Animal<T extends TypeNames<typeof Animal> = undefined>
      = VariantOf<typeof Animal, T>;
 ```

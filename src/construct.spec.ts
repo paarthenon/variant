@@ -41,9 +41,12 @@ test('variant w/ classes', () => {
 
 
 test('variant list w/ classes', () => {
-    const thing2 = variant([
+    const ListedDog = variant([
         variation('Dog', construct(class {
-
+            public doesBark = true;
         })),
-    ])
+    ]);
+    const dog = ListedDog.Dog();
+
+    expect(dog.doesBark).toBe(true);
 })

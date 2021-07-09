@@ -12,7 +12,13 @@ module.exports = {
       theme: require('prism-react-renderer/themes/vsDark'),
       darkTheme: require('prism-react-renderer/themes/ultramin'),
     },
-    sidebarCollapsible: false,
+    colorMode: {
+      switchConfig: {
+        lightIcon: '🌔',
+        darkIcon: '🌒',
+      }
+    },
+    sidebarCollapsible: true,
     navbar: {
       title: 'Variant',
       logo: {
@@ -121,5 +127,11 @@ module.exports = {
         },
       },
     ],
+    [
+      'docusaurus-preset-shiki-twoslash',
+      {
+        themes: ["comrade-contrast", "horizon-bright"],
+      }
+    ]
   ],
 };

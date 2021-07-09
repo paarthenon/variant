@@ -3,15 +3,29 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['intro', 'documentation', 'new-in-3.0'],
+      items: [
+        'intro',
+        {
+          type: 'category',
+          label: 'Tutorial',
+          collapsed: false,
+          items: [
+            'tutorial/part-one',
+          ]
+        },
+        'documentation',
+        'new-in-3.0',
+      ],
     },
     {
       type: 'category',
-      label: 'User Guide',
+      label: 'The Book',
+      collapsed: false,
       items: [
         {
           type: 'category',
           label: 'Creation',
+          collapsed: true,
           items: [
             'book/creation',
             'book/augment',
@@ -32,7 +46,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Articles',
-      items: ['articles/naming', 'articles/semantics', 'changelog'],
+      items: ['articles/naming', 'articles/semantics', 'articles/that-type', 'changelog'],
     },
     {
       type: 'category',

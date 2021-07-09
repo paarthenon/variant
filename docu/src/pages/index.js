@@ -79,9 +79,28 @@ function Home() {
                     styles.getStarted,
                   )}
                   to={useBaseUrl('docs/intro')}
-                  style={{color: 'white'}}
+                  style={{
+                    color: 'white',
+                    backgroundColor: 'var(--ifm-color-primary-darkest)',
+                    border: '1px solid var(--ifm-color-gray-900)',
+                  }}
                 >
                   Get Started
+                </Link>
+                <Link
+                  className={classnames(
+                    'button  button--primary button--lg',
+                    styles.getStarted,
+                  )}
+                  to={useBaseUrl('docs/next/intro')}
+                  style={{
+                    color: 'white',
+                    backgroundColor: '#5e2424',
+                    border: '1px solid var(--ifm-color-gray-900)',
+                    marginLeft: '1rem',
+                  }}
+                >
+                  Try 3.0
                 </Link>
               </div>
               </div>

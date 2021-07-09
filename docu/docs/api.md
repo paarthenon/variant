@@ -4,17 +4,7 @@ sidebar_label: ☕ API
 ---
 ## Functions
 
-Tools to help describe and process domains.
-
-### cast
-Set a variable's type to a new case of the same variant.
-
- - **obj** `O extends TypeExt<K, string>` object of concern.
- - **type** `T extends O[K]`*(string)* new type tag. Restricted to possible types of the variant.
- - **typeKey** `K extends string` discriminant key.
-```typescript
-const snake = cast(animal, 'snake'); // typeof snake === Animal<'snake'>;
-```
+### flags
 
 ### isOfVariant
 

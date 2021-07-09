@@ -2,7 +2,7 @@
 title: 'About'
 ---
 
-Variant is a project I wished existed. I love TypeScript, but I find it's discriminated unions implementation elegant in some ways and clunky in others. See the [motivation page](motivation) for some of the problems this library addresses.
+Variant is a project I wished existed. I love TypeScript, but I find it's discriminated unions implementation elegant in some ways and clunky in others. See the [motivation page] for some of the problems this library addresses.
 
 ## 📜 The Author 
 

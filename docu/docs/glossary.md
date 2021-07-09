@@ -3,13 +3,18 @@ slug: glossary
 title: 📑 Glossary of Terms
 ---
 
-:::note
 
-## Notation
+:::note Notation
 
-To distinguish between concepts and concrete functions, I will use a monospaced name `match()` when referring to the concrete types and values. When speaking generally, I will refer to *matching* or *the match functions*, when describing `match()`/`matcher()`/`prematch()`.
+I will use a monospaced name `match()` when referring to the concrete types and values.
+
+When speaking generally, I will refer to *matching* or *the match functions*, when describing `match()`/`matcher()`/`prematch()`.
 
 :::
+
+## Discriminant
+
+TypeScript discriminated unions require at least one property to be shared among all forms with a unique string literal type registered to each form. This property (and more specifically it's key) is the discriminant—the value used to discriminate between the options.
 
 ## Domain
 
@@ -18,6 +23,10 @@ TODO: Steal this from the intro of the previous version.
 ## Exhaustive
 
 The term "exhaustive" refers to some control flow statement where every branch is handled. Variant's match functions are exhaustive until instructed otherwise.
+
+## Expression
+
+An **expression**, in contrast to a **statement** is a section of code that returns a value and so can be used inline within other expressions or statements. 
 
 ## Match
  - [`match()`](api#match) - match a variant as an expression.
@@ -29,6 +38,10 @@ An operation resembling a [switch](https://developer.mozilla.org/en-US/docs/Web/
 ## Model
 
 Model is a bit of an overloaded term, but generally speaking refers to the abstract representation of your [domain](#domain) concerns. In code, it generally refers to the interfaces and types you use in your core logic.
+
+## Tag
+
+Discriminated unions are also called "Tagged Unions" referring to each of the shapes being labeled or tagged distinctly. The "tag" of the dog form of Animal would be "dog". 
 
 ## TypeScript
 

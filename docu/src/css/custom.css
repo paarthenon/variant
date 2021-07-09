@@ -50,3 +50,54 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
   display: flex;
   flex-direction: column;
 }
+
+
+/** SHIKI **/
+[data-theme="light"] .horizon-bright {
+  display: none;
+}
+
+[data-theme="dark"] .shiki.comrade-contrast {
+  display: none;
+}
+
+/**
+TODO: FIX this is just light-mode, get it working in dark-mode
+**/
+[data-theme="light"] .code-container span.popover {
+  /* background-color: black; */
+  color: black;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: 3px 5px 10px black;
+}
+
+[data-theme="light"] .shiki.twoslash div.code-title {
+  color: white;
+}
+
+[data-theme="light"] .code-container span.popover div.arrow {
+  /* background-color: black; */
+}
+
+[data-theme="dark"] .code-container span.popover {
+  background-color: var(--ifm-color-gray-900);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: 3px 5px 10px black;
+  color: rgb(224, 192, 192);
+}
+
+[data-theme="dark"] .code-container span.popover div.arrow {
+  background-color: var(--ifm-color-gray-900);
+}
+[data-theme="dark"] .shiki.twoslash div.code-title {
+  color: black;
+}
+
+
+
+/**
+ALERT FIX
+**/
+div.alert.alert--warning {
+  background-color: var(--ifm-color-warning-dark);
+}

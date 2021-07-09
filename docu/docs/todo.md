@@ -71,3 +71,17 @@ You can create truly immutable variants by calling `augment()` and passing the f
 ### Autocomplete
 
 Emphasize the focus on a good autocomplete experience. This can be part of the UX conversation along with documentation. This isn't just a laziness thing, having autocompletion implies that the types involved are constrained in useful ways.
+
+
+### Catalog
+
+WHile variants have flags, catalog serves as its own set of flags.
+
+```ts
+const subCatalog = catalog([
+    bigCatalog.one,
+    bigCatalog.two,
+]);
+```
+
+That is essentially the same.
