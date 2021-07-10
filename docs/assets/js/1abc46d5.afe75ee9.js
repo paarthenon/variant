@@ -1,0 +1,1 @@
+(self.webpackChunkvariant_site=self.webpackChunkvariant_site||[]).push([[1403],{1845:function(a){"use strict";a.exports=JSON.parse('{"allTagsPath":"/variant/blog/tags","slug":"intro","name":"intro","count":1,"permalink":"/variant/blog/tags/intro"}')}}]);

@@ -197,3 +197,21 @@ test('just (object)', () => {
         complex: 4,
     })
 })
+
+
+// const Animal = variant({
+//     cat: fields<{name: string, furnitureDamaged: number}>(),
+//     dog: fields<{name: string, favoriteBall?: string}>(),
+//     snake: (name: string, pattern: string = 'striped') => ({name, pattern}),
+//     bird: fields<{name: string, canFly: boolean}>(),
+// });
+// type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>
+
+// function rivalWantsAnimal(animal: Animal) {
+//     return match(animal, {
+//         dog: _ => false,
+//         cat: ({furnitureDamaged}) => furnitureDamaged < 3,
+//         snake: _ => true,
+        
+//     })
+// }

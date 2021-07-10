@@ -1,0 +1,1 @@
+(self.webpackChunkvariant_site=self.webpackChunkvariant_site||[]).push([[2535],{6353:function(t){"use strict";t.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Intro","permalink":"/variant/blog/intro"}]}')}}]);

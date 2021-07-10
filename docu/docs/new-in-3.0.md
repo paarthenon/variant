@@ -42,7 +42,7 @@ export const {isType, match, variant, variation} = variantCosmos({key: '__typena
 
 Comments left on variants will now propogate to the resulting functions and objects. 
 
-See [the full article](documentation.md) for more info.
+See [the full article](articles/documentation) for more info.
 
 # Matching
 

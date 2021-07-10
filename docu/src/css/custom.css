@@ -53,7 +53,7 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 
 /** SHIKI **/
-[data-theme="light"] .horizon-bright {
+[data-theme="light"] .Monotone-red-color-theme {
   display: none;
 }
 
@@ -83,14 +83,14 @@ TODO: FIX this is just light-mode, get it working in dark-mode
   background-color: var(--ifm-color-gray-900);
   border: 1px solid var(--ifm-color-emphasis-200);
   box-shadow: 3px 5px 10px black;
-  color: rgb(224, 192, 192);
+  color: rgb(228, 221, 221);
 }
 
 [data-theme="dark"] .code-container span.popover div.arrow {
   background-color: var(--ifm-color-gray-900);
 }
 [data-theme="dark"] .shiki.twoslash div.code-title {
-  color: black;
+  /* color: black; */
 }
 
 

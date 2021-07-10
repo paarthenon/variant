@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://paarthenon.github.io/variant/blog</id>
+    <title>Variant Blog</title>
+    <updated>2020-05-11T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://paarthenon.github.io/variant/blog"/>
+    <subtitle>Variant Blog</subtitle>
+    <icon>https://paarthenon.github.io/variant/img/variant.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Intro]]></title>
+        <id>intro</id>
+        <link href="https://paarthenon.github.io/variant/blog/intro"/>
+        <updated>2020-05-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[This is version one of the variant docs. I'll add more content over time.]]></summary>
+    </entry>
+</feed>

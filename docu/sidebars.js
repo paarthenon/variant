@@ -1,21 +1,13 @@
 module.exports = {
   someSidebar: [
+    'intro',
     {
       type: 'category',
-      label: 'Getting Started',
+      label: 'Tutorial',
+      collapsed: false,
       items: [
-        'intro',
-        {
-          type: 'category',
-          label: 'Tutorial',
-          collapsed: false,
-          items: [
-            'tutorial/part-one',
-          ]
-        },
-        'documentation',
-        'new-in-3.0',
-      ],
+        'tutorial/part-one',
+      ]
     },
     {
       type: 'category',
@@ -40,13 +32,15 @@ module.exports = {
           items: ['book/match', 'book/matcher'],
         },
         'book/flags',
+        'new-in-3.0',
         'cheat',
       ],
+
     },
     {
       type: 'category',
       label: 'Articles',
-      items: ['articles/naming', 'articles/semantics', 'articles/that-type', 'changelog'],
+      items: ['articles/naming', 'articles/semantics', 'articles/that-type', 'articles/documentation', 'changelog'],
     },
     {
       type: 'category',

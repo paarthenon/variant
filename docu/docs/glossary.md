@@ -11,6 +11,17 @@ I will use a monospaced name `match()` when referring to the concrete types and 
 When speaking generally, I will refer to *matching* or *the match functions*, when describing `match()`/`matcher()`/`prematch()`.
 
 :::
+## ADT
+
+An [Algebraic Data Type](#algebraic-data-type).
+
+## Algebraic Data Type
+
+Another name for a variant type.
+
+## Composability
+
+Long story short, two things are composable if they can interact and perform their intended functionality without needing to be aware of each other or performing special handling.
 
 ## Discriminant
 

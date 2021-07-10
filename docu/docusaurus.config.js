@@ -130,7 +130,7 @@ module.exports = {
     [
       'docusaurus-preset-shiki-twoslash',
       {
-        themes: ["comrade-contrast", "horizon-bright"],
+        themes: ["comrade-contrast", "Monotone-red-color-theme"],
       }
     ]
   ],
