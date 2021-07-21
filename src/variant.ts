@@ -8,7 +8,7 @@ import {Identity, identityFunc, isPromise} from './util';
 export type VariantRecord<T extends RawVariant, K extends string> = {
     [P in keyof T]: T[P] extends VariantCreator<string, Func, string> 
         ? T[P]
-        : VariantCreator<(P & string), T[P] extends Func ? T[P] : () => {}, K>
+        : VariantCreator<`${Exclude<P, symbol>}`, T[P] extends Func ? T[P] : () => {}, K>
 }
 
 type ValidListType = string | VariantCreator<string, Func, string>;
