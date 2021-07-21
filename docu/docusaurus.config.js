@@ -131,6 +131,7 @@ module.exports = {
       'docusaurus-preset-shiki-twoslash',
       {
         themes: ["comrade-contrast", "Monotone-red-color-theme"],
+        includeJSDocInHover: true,
       }
     ]
   ],

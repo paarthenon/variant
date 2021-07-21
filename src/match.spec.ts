@@ -1,7 +1,7 @@
 import {fields, match, payload, scopedVariant, TypeNames, VariantOf, variation} from '.';
-import {prematch, variant} from './index.onType';
+import {onLiteral, prematch, variant} from './index.onType';
 import {typeMap} from './typeCatalog';
-import {just, unpack} from './match.tools';
+import {constant, just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';
 import {Handler} from './match';
 
@@ -215,3 +215,55 @@ test('just (object)', () => {
         
 //     })
 // }
+
+const wrapEnum = <T extends string | number>(a: T) => onLiteral(a);
+
+test('onEnum basic', () => {
+    enum Alpha {
+        A = 'A',
+        B = 'B',
+    }
+
+    expect(wrapEnum(Alpha.A).type).toBe(Alpha.A);
+    expect(wrapEnum(Alpha.B).type).toBe(Alpha.B);
+})
+
+
+test('onEnum numeric', () => {
+    enum Numba {
+        A = 1,
+        B = 2,
+    }
+    expect(wrapEnum(Numba.A).type).toBe(Numba.A);
+    expect(wrapEnum(Numba.B).type).toBe(Numba.B);
+})
+
+test('match enum', () => {
+    enum Alpha {
+        A = 'A',
+        B = 'B',
+    }
+
+    const rate = (a: Alpha) => match(onLiteral(a), {
+        [Alpha.A]: constant(0),
+        [Alpha.B]: constant(1),
+    })
+
+    expect(rate(Alpha.A)).toBe(0);
+    expect(rate(Alpha.B)).toBe(1);
+})
+
+test('match enum (numeric)', () => {
+    enum Alpha {
+        A = 'A',
+        B = 'B',
+    }
+
+    const rate = (a: Alpha) => match(onLiteral(a), {
+        [Alpha.A]: constant(0),
+        [Alpha.B]: constant(1),
+    })
+
+    expect(rate(Alpha.A)).toBe(0);
+    expect(rate(Alpha.B)).toBe(1);
+})

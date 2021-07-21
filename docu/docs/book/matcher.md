@@ -15,7 +15,7 @@ The `.complete()` function will not be callable unless every case has been appro
 
 For example, let's say we dropped a line from the previous code sample:
 
-```ts {3}
+```ts {2}
 const describePetting = (animal: Animal) => matcher(animal)
     .when('snake', ({name}) => `You let ${name} wrap your hand.`),
     .complete() // Error: This expression is not callable.
@@ -39,7 +39,7 @@ A **terminal** is some matcher method that executes the handler immediately. The
 
 ## Matching Literals
 
-Just like match, matcher can be used on *any* valid string literal union. These can be generated simply with `catalog()` or may come from other libraries. For example, **Chakra-UI** provides a hook `useColorMode` hook.
+Just like match, matcher can be used on *any* valid string literal union. These can be generated simply with `catalog()` or may come from other libraries. For example, **Chakra-UI** provides a hook `useColorMode`.
 
 ```ts
 const {colorMode} = useColorMode();

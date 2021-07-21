@@ -1,5 +1,5 @@
 import {match, matcher, onLiteral, types} from './index.onType';
-import {just} from './match.tools';
+import {constant, just} from './match.tools';
 import {typeCatalog} from './typeCatalog';
 import {Animal, sample} from './__test__/animal';
 
@@ -145,7 +145,23 @@ test('matcher failure', () => {
     
     const greetAnimal = (animal: Animal) => matcher(animal)
         .when('snake', ({name}) => `Hello ${name}`)
+        // @ts-expect-error
         .complete()
     ;
 
+})
+
+test('match enum', () => {
+    enum Alpha {
+        A = 'A',
+        B = 'B',
+    }
+
+    const rate = (a: Alpha) => match(onLiteral(a), {
+        [Alpha.A]: _ => 0,
+        [Alpha.B]: constant(1),
+    })
+
+    expect(rate(Alpha.A)).toBe(0);
+    expect(rate(Alpha.B)).toBe(1);
 })

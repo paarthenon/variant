@@ -2,29 +2,56 @@
 title: Documentation
 ---
 
-Variant makes every effort to preserve documentation and user comments as it transforms
+Variant makes efforts to preserve documentation and user comments as it transforms
 the template to the final variant. Please document your models to create the experience
 *you* would desire as a developer. 
 
 
 ```ts twoslash
-const Animal = {
+import {variant, fields} from 'variant';
+
+/**
+ * Some sort of pet.
+ **/
+const Animal = variant({
     /**
-     * A four-legged furry animal that ranges in size and activity level.
+     * A personal companion that comes in a variety of shapes and sizes
      **/
-    dog: {},
-}
+    dog: fields<{
+        /**
+         * What to call them.
+         **/
+        name: string;
+        /**
+         * The color of the dog's favorite ball
+         **/
+        favoriteBall?: string;
+    }>(),
+    /**
+     * A friend and pet that has taken the internet by storm.
+     **/
+    cat: {},
+})
 
-const things: Record<string, boolean> = {
-    yes: true,
-    no: false,
-}
+// hover-text of `Animal.dog` is
+// "A personal companion that comes in a variety of shapes and sizes"
+const dog = Animal.dog({ 
+    name: 'Cerberus',
+});
+// hover-text of dog.favoriteBall is
+// "The color of the dog's favorite ball"
+console.log(dog.favoriteBall); 
 
-const thing2 = things;
+//hover-text: Animal
+// "Some sort of pet."
+console.log(Animal);
 ```
+These doc-comments are valid on:
 
-****
+- The overall variant (`Animal`)
+- Variant creators (`Animal.dog()`)
+- Parameter types (`dog.favoriteBall`, `Animal.dog({name: 'Cerberus', favoriteBall: 'red'})`)
 
-### TODO
+### How does it work?
 
- - show how it renders in intellisense on action creators and on fields.
+TypeScript has special handling for documentation passthrough [iff](../glossary#iff) there's a `P in keyof T` index type. The variant types have been written to preserve this structure when possible, allowing the documentation to flow.

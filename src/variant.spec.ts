@@ -1,6 +1,8 @@
+import {EnumType} from 'typescript';
 import {fields, just, match, payload, scopedVariant, TypeNames, Variant, variant, VariantOf, variation} from '.';
 import {construct} from './construct';
 import {GVariantOf, onTerms} from './generic';
+import {onLiteral} from './index.onType';
 import {Identity} from './util';
 import {isVariantCreator} from './variant';
 
@@ -133,3 +135,20 @@ test('variation w/ override', () => {
     // of the design or change the type to consider the function passed in.
     expect(result.type).toBe('two');
 })
+
+
+test('variant from enum', () => {
+    enum AniType {
+        d = 'dog',
+        c = 'cat',
+        s = 'snake',
+    }
+
+    const Animal = variant({
+        [AniType.d]: payload<'woof'>(),
+        [AniType.c]: payload<'meow'>(),
+        [AniType.s]: payload<'hiss'>(),
+    })
+    type Animal = VariantOf<typeof Animal>;
+})
+

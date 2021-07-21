@@ -15,7 +15,7 @@ const result = match(instance, {
 
 ## Matching Literals
 
-Match can be used on *any* valid string literal union. These can be generated simply with `catalog()` or may come from other libraries. For example, **Chakra-UI** provides a hook `useColorMode` hook.
+Match can be used on *any* valid string literal union. These can be generated simply with `catalog()` or may come from other libraries. For example, **Chakra-UI** provides a hook `useColorMode`.
 
 ```ts
 const {colorMode} = useColorMode();

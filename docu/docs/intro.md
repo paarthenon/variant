@@ -35,14 +35,13 @@ export const Animal = variant({
 import {TypeNames} from 'variant';
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 // - fullType
-
 ```
 
 ```ts twoslash title="animal.ts"
 // @include: animal-variantOnly
 export type Animal = VariantOf<typeof Animal>;
-
 ```
+
 Let's take a closer look at that last line.
 
 ```ts twoslash
@@ -221,7 +220,7 @@ console.log(describeAnimal(cerberus));
 
 Just like before, TypeScript understands the return type of `describeAnimal`. It has been correctly inferred as `string`. We'll see a more detailed example of conditional rendering when we enter the React portions of the tutorial. Rest assured, Variant isn't a react library and doesn't actually have any react dependencies. Despite that fact, the two work together seamlessly thanks to a shared focus on functional principles and [**composability**](glossary#composability).
 
-By that same token, because variants *are* discriminated unions and TypeScript understands them as such, `match()` doesn't actually *need* its target to have been created by `variant()`. Match can easily operate on the discriminated unions that are already within your code, and will work with models written by [codegen](glossary#codegen). Any valid discriminated union (or even literal unions with [`onLiteral()`](api#onLiteral)) will work.
+By that same token, because variants *are* discriminated unions and TypeScript understands them as such, `match()` doesn't actually need its target to have been created by `variant()`. Match can easily operate on the discriminated unions that are already within your code, and will work with models written by [codegen](glossary#codegen). Any valid discriminated union (or even literal unions with [`onLiteral()`](api#onLiteral)) will work.
 
 #### [Exhaustiveness](glossary#exhaustive) and Partial Matching
 
@@ -360,6 +359,16 @@ Thanks for sticking around to this point. In one sense that was a lot to cover. 
  - **API**: A full API reference for the library. Every function, every type, every meaning.
  - **Glosssary**: A consolidated dictionary of the esoteric terms I use.
 
-:::warning
-At time of writing, this is the only fully written page.
+:::note Under Construction
+This documentation is still under construction. The most fleshed out pages beyond this page are
+
+ - The *Creation* section of *The Book*.
+    - [Making Variants](book/creation)
+    - [Advanced Creation](book/advanced-creation)
+    - [Augmenting Variants](book/augment)
+    - [Generic Variants](book/generic)
+    - [Procedural Generation](book/procedural-generation)
+ - [`Articles/Documentation`](articles/documentation)
+ - [New in Variant 3.0](new-in-3.0)
+
 :::

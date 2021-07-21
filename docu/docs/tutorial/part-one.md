@@ -1,13 +1,12 @@
-# Tutorial (part 1) - definitions.
-
-For this next section, we're going to demonstrate how a typically complex task can be simplified through variant.
+# Part 1 - Definitions
 
 Over the course of this tutorial we will develop the logic for a small game. Our hero will have one or more superpowers that will enable them to complete different tasks. These powers may be things like **flight**, **elemental magic**, or **teleportation**. As you might imagine, these powers have very different features and constraints. Teleportation, for example, may have a maximum distance that the user can travel, along with a cooldown to limit the ability's use. The data model for elemental magic would of course need the specific element the user can control.
 
-
 ```ts
 export const Superpower = variant({
-    // Avatar-like powers
+    /**
+     * Avatar-like powers
+     **/
     ElementalMagic: fields<{
         element: 'fire' | 'air' | 'water' | 'earth',
     }>(),
@@ -39,3 +38,8 @@ export const Superpower = variant({
 export type Superpower<T extends TypeNames<typeof Superpower> = undefined>
  = VariantOf<typeof Superpower, T>
 ```
+
+:::note Documentation
+
+The JSDoc-style comments in the example above will actually carry over to the resulting constructors. Use this to provide helpful information about the relevant types and their intended use. See more in the article [Documentation](../articles/documentation)
+:::

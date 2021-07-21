@@ -1,5 +1,6 @@
 import {fields, match, TypeNames, variant, VariantOf} from '.';
 import {augment} from './augment';
+import {payload} from './variant.tools';
 import {Animal, CapsAnimal} from './__test__/animal';
 
 test('augment (inline)', () => {
@@ -15,6 +16,20 @@ test('augment (inline)', () => {
     expect(snek.name).toBe('steve');
     expect(snek.better).toBeDefined();
     expect(snek.better).toBe(4);
+})
+
+test('augment (timestamp)', () => {
+    const Action = variant(augment(
+        {
+            DoSomething: {},
+            LoadThing: fields<{thingId: number}>(),
+            RefreshPage: {},
+        },
+        () => ({timestamp: Date.now()}),
+    ));
+    type Action = VariantOf<typeof Action>;
+
+    const loadAction = Action.LoadThing({thingId: 12});
 })
 
 test('augment (referencing pre-existing module)', () => {
@@ -47,6 +62,27 @@ test('augment (variable augment)', () => {
 })
 
 test('augment (conditional augment)', () => {
+    const BetterAnimal = variant(augment(
+        Animal,
+        animal => ({
+            epithet: match(animal, {
+                cat: ({furnitureDamaged}) => furnitureDamaged > 5 ? 'dangerous' : 'safe',
+                dog: ({favoriteBall}) => favoriteBall === 'yellow' ? 'bad' : 'good',
+                snake: ({pattern}) => pattern,
+            })
+        }),
+    ));
+    
+    const snek = BetterAnimal.snake('steve');
+    const pup = BetterAnimal.dog({name: 'Spot', favoriteBall: 'red'});
+
+    expect(snek.name).toBe('steve');
+    expect(snek.epithet).toBe('striped');
+    expect(pup.name).toBe('Spot');
+    expect(pup.epithet).toBe('good');
+})
+
+test('augment (conditional augment, inline match)', () => {
     const BetterAnimal = variant(augment(
         Animal,
         animal => ({

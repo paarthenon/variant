@@ -39,6 +39,10 @@ The term "exhaustive" refers to some control flow statement where every branch i
 
 An **expression**, in contrast to a **statement** is a section of code that returns a value and so can be used inline within other expressions or statements. 
 
+## Iff
+
+[If-and-only-if.](https://en.wikipedia.org/wiki/If_and_only_if)
+
 ## Match
  - [`match()`](api#match) - match a variant as an expression.
  - [`matcher()`](api#matcher) - match a variant in a builder pattern.

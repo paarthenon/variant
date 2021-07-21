@@ -6,6 +6,7 @@ module.exports = {
       label: 'Tutorial',
       collapsed: false,
       items: [
+        'tutorial/part-zero',
         'tutorial/part-one',
       ]
     },
@@ -20,6 +21,7 @@ module.exports = {
           collapsed: true,
           items: [
             'book/creation',
+            'book/advanced-creation',
             'book/augment',
             'book/generic',
             'book/procedural-generation',
@@ -40,7 +42,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Articles',
-      items: ['articles/naming', 'articles/semantics', 'articles/that-type', 'articles/documentation', 'changelog'],
+      items: ['articles/naming', 'articles/semantics', 'articles/that-type', 'articles/documentation', 'articles/pitch', 'changelog'],
     },
     {
       type: 'category',

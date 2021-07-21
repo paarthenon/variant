@@ -85,3 +85,11 @@ const subCatalog = catalog([
 ```
 
 That is essentially the same.
+
+
+### Problems with computed properties
+
+There's a problem with using computed properties in the match handler - it can no longer evaluate missing cases in the autocomplete.
+
+Basically, if you were to define a matcher where instead of using the literals themselve you used a shared type, then you would not be able to benefit from autocomplete, and you would still need to confront the issues with missing keys. In this scenario, matcher is strictly better.
+

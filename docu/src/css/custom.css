@@ -17,12 +17,12 @@
   --ifm-code-font-size: 95%;
 }
 
-.docusaurus-highlight-code-line {
+/* .docusaurus-highlight-code-line {
   background-color: rgb(72, 77, 91);
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
-}
+} */
 
 [data-theme=""] .hero.hero--primary {
   background-image: linear-gradient(#444,#111111);
@@ -51,6 +51,10 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
   flex-direction: column;
 }
 
+/** Inline code being the same size as the regular text and having padding was too much **/
+p code {
+  font-size: smaller;
+}
 
 /** SHIKI **/
 [data-theme="light"] .Monotone-red-color-theme {
@@ -100,4 +104,26 @@ ALERT FIX
 **/
 div.alert.alert--warning {
   background-color: var(--ifm-color-warning-dark);
+}
+
+/** Shiki completion text **/
+[data-theme="light"] div.meta-line span.inline-completions li > span {
+  color: black;
+}
+[data-theme="dark"] div.meta-line span.inline-completions li > span {
+  color: white;
+}
+
+[data-theme="light"] pre.twoslash data-lsp:hover::before {
+  color: black;
+  background-color: whitesmoke;
+  border: 1px solid black;
+  border-radius: 5px;
+  
+}
+[data-theme="dark"] pre.twoslash data-lsp:hover::before {
+  color: whitesmoke;
+  background-color: black;
+  border: 1px solid whitesmoke;
+  border-radius: 5px;
 }
