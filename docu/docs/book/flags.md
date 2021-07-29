@@ -91,3 +91,9 @@ Rendering a project will involve displaying its overarching properties but then 
     - later on when we need to add a new field for the epic called "coordinator" then we can split these elements.
 
  - Some of you may be familiar with the classic flags enums that have been in use in the programming world for decades. This is exactly where the term **flags** comes from. However, with the expressivity of TS a simple set of flags can be typed as `Record<Animal['type']>`. Flags would be much more useful if each property corresponded to an instance of a variant. That way sub-variants and other complex types could express themselves as well.
+
+****
+
+Cool use for flags
+
+Have a variant that describes each faction (maybe `FactionOpinion`), then create a reputation object based on `Matrix<typeof Faction>`. Maybe one faction considers crimes that you commit to be stains against your personhood. Your crimes in their lands will be permanently recorded as part of your rep data model.

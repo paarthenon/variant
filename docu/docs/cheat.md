@@ -18,44 +18,31 @@ type SnakeType = Animal<'snake'>;
 type AllAnimalsType = Animal;
 ```
 
+### Snippets 
 
-### Boilerplate 
-
-:::warning
-TODO: Update to 3.0. These are the 2.X snippets.
-:::
-
-Here are some [VS Code snippets](https://code.visualstudio.com/docs/editor/userdefinedsnippets) to make following the groupings pattern very easy.
+Here are some [VS Code snippets](https://code.visualstudio.com/docs/editor/userdefinedsnippets) to make it easier to write the type annotations.
 ```json
 {
-	"VariantModule": {
-		"prefix": ["variant-module", "vm"],
-		"body": [
-			"export const $1 = variantModule({",
-			"    $2",
-			"});",
-			"export type $1<T extends TypeNames<typeof $1> = undefined> = VariantOf<typeof $1, T>;",
-			""
-		],
-		"description": "Initialize a module for variants"
-	},
-	"VariantList": {
-		"prefix": ["variant-list", "vl"],
-		"body": [
-			"export const $1 = variantList([",
-			"    $2",
-			"]);",
-			"export type $1<T extends TypeNames<typeof $1> = undefined> = VariantOf<typeof $1, T>;",
-			""
-		],
-		"description": "Initialize a module for variants as a list"
-	},
-	"VariantTypeAnnotation": {
-		"prefix": ["variant-type", "vt"],
-		"body": [
-			"export type $1<T extends TypeNames<typeof $1> = undefined> = VariantOf<typeof $1, T>;",
-		],
-		"description": "Type annotation for variants"
-	},
+  "VariantTypeAnnotation": {
+    "prefix": ["variant-type", "vt"],
+    "body": [
+      "export type $1<T extends TypeNames<typeof $1> = undefined> = VariantOf<typeof $1, T>;",
+    ],
+    "description": "Type annotation for variants"
+  },
+  "VariantSimpleTypeAnnotation": {
+    "prefix": ["variant-simple-type", "vst"],
+    "body": [
+      "export type $1 = VariantOf<typeof $1>;",
+    ],
+    "description": "Type annotation for generic variants"
+  },
+  "VariantGenericTypeAnnotation": {
+    "prefix": ["variant-generic-type", "vgt"],
+    "body": [
+      "export type $1<T, TType extends TypeNames<typeof $1> = undefined> = GVariantOf<typeof $1, TType, {T: T}>;",
+    ],
+    "description": "Type annotation for generic variants"
+  },
 }
 ```

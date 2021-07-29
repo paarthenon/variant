@@ -8,6 +8,9 @@ module.exports = {
       items: [
         'tutorial/part-zero',
         'tutorial/part-one',
+        'tutorial/part-two',
+        'tutorial/part-three',
+        'tutorial/part-four',
       ]
     },
     {
@@ -27,6 +30,7 @@ module.exports = {
             'book/procedural-generation',
           ]
         },
+        'book/inspection',
         'book/organization',
         {
           type: 'category',

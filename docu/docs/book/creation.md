@@ -198,11 +198,19 @@ const garfield = cat({name: 'Garfield', furnitureDamaged: 12});
 const echidna = snake('Echidna', 'speckled');
 ```
 
-The instance type for `cat` can be retrieved as `ReturnType<typeof cat>`. However. there's nothing wrong with exporing the constructors at the top level and also exporting the Animal type. Doing so means consumers still have the ability to type something as `Animal<'cat'>`, which will save you some typing and duplication of effort..
+The instance type for `cat` can be retrieved as `ReturnType<typeof cat>`. However. there's nothing wrong with exporing the constructors at the top level and also exporting the Animal type. Doing so means consumers still have the ability to type something as `Animal<'cat'>`, which will save you some typing and duplication of effort.
 
+Under the hood, `variant()` creates variant constructors by calling the function `variation()`. This function can be used directly to create variant constructors at the top level.
+
+```ts twoslash
+import {variation} from 'variant';
+
+const snake = variation('snake',  (name: string, pattern: string = 'striped') => ({name, pattern}));
+const echidna = snake('Echidna',  'speckled');
+```
 ## Catalog
 
-When you don't need state.
+Use a catalog when you don't need state and just want a group of literals types. These objects are essentially maps of constants. The most common case takes an array of strings. In this scenario, it is essentially the same as the common [`strEnum`](https://github.com/basarat/typescript-book/blob/master/docs/types/literal-types.md) function.
 
 ```ts twoslash
 import {catalog} from 'variant';
@@ -226,4 +234,18 @@ const logLevels = catalog({
 })
 ```
 
-The catalog function will enforce that all values are of the same type, ensuring that a stray `'600'` will raise an error.
+The advantage being the catalog function will enforce that all values are of the same type, ensuring that a stray `'600'` will raise an error.
+
+### Programmatic values
+
+The `logLevels` values follow a strict formula—the index times `100`. Catalog allows us to express this programmatically.
+
+```ts twoslash
+import {catalog} from 'variant';
+// ---cut---
+const logLevels = catalog(
+   ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
+   (_, i) => i * 100
+);
+```
+This version of the code can be shorter and is often more resilient against refactoring. 

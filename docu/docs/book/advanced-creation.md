@@ -8,26 +8,29 @@ title: Advanced Creation
 
 In many cases, the label used when referring to a variant is exactly what is used in the underlying `type` field. However, this is not always desirable.
 
- - Sometimes coding conventions will dictate camelCase or PascalCase names while database/network conventions will demand ALL_CAPS.
+ - Sometimes coding conventions will dictate `camelCase` or `PascalCase` names while database/network conventions will demand `ALL_CAPS`.
  - The `UPPER_SNAKE_CASE` format has historically been the most common naming scheme for constant values. Perhaps you'll need to support them to support existing code or data models.
- - In larger codebases, it may be necessary to start introducing scopes to avoid name collisions. These might look something like `@player/update` or `AUDIT::END_RECORDING`. These strings contain special characters and so are not valid property names, but may be required by your code.
+ - In larger codebases, it may be necessary to start introducing scopes to avoid name collisions. These might look something like `@player/update` or `AUDIT::END_RECORDING`. These strings contain special characters and so are not valid property names, but may be required by your code. Ideally, the variant creators would manage that complexity.
 
-Using `variation()` resolves these concerns. 
+Using `variation()` resolves these concerns. The first parameter, the string, will be the *actual* underlying type (both at runtime and compile time). The second parameter is the function that will handle the rest of the body.
 
-```ts
+```ts twoslash
+import {variant, variation, fields} from 'variant';
+
 const Action = variant({
     DoSomething: variation('DO_SOMETHING'),
     LoadThing: variation('LOAD_THING', fields<{thingId: number}>()),
     RefreshPage: variation('REFRESH_PAGE'),
 })
-```
 
-There are some minor consequences to breaking this assumption. 
-
-```ts
 const doAction = Action.DoSomething();
-console.log()
+doAction.type
+//        ^?
 ```
+
+
+`variation()` can also be used individually, similarly to `createAction`. 
+
 
 ## Variants are templates
 
@@ -36,6 +39,10 @@ The `variant()` function accepts a template as an object. In this object each va
 ```ts
 const OtherAnimal = variant(Animal);
 ```
+
+> ⏲️ coming soon.
+
+## Scoped Variants
 
 > ⏲️ coming soon.
 

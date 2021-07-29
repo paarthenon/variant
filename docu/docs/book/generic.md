@@ -18,7 +18,7 @@ export type Option<T, TType extends TypeNames<typeof Option> = undefined>
 ```ts twoslash
 // @include: optionDef
 ```
-Here's the type In action.
+Here's the type in action.
 
 ```ts twoslash
 // @filename: option.ts

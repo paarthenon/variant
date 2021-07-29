@@ -1,4 +1,4 @@
-# Part 1 - Definitions
+# Part 1 - Defining a Hero
 
 Over the course of this tutorial we will develop the logic for a small game. Our hero will have one or more superpowers that will enable them to complete different tasks. These powers may be things like **flight**, **elemental magic**, or **teleportation**. As you might imagine, these powers have very different features and constraints. Teleportation, for example, may have a maximum distance that the user can travel, along with a cooldown to limit the ability's use. The data model for elemental magic would of course need the specific element the user can control.
 

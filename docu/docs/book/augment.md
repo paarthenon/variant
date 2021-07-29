@@ -28,7 +28,7 @@ console.log(loadAction.t     );
 ```
 Working with an existing variant is similarly direct.
 
-```ts twoslash
+```ts twoslash {6}
 import {variant, augment, fields, VariantOf} from 'variant';
 // ---cut---
 const Action = variant({
@@ -36,7 +36,6 @@ const Action = variant({
     LoadThing: fields<{thingId: number}>(),
     RefreshPage: {},
 });
-type Action = VariantOf<typeof Action>;
 
 const LoggedAction = variant(augment(Action, () => ({timestamp: Date.now()})));
 ```
