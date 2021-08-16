@@ -1,4 +1,4 @@
-import {variation} from './index.onType';
+import {variation} from './type';
 import {fields} from './variant.tools';
 
 test('fields empty', () => {
@@ -10,7 +10,6 @@ test('fields empty', () => {
 
     expect(emptyUse).toEqual({type: 'test'});
     expect(emptyObjectUse).toEqual({type: 'test'});
-    console.log(validUse);
     expect(validUse).toEqual({type: 'test', test: 5});
 })
 

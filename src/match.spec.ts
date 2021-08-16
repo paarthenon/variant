@@ -1,5 +1,5 @@
 import {fields, match, payload, scopedVariant, TypeNames, VariantOf, variation} from '.';
-import {onLiteral, prematch, variant} from './index.onType';
+import {onLiteral, prematch, variant} from './type';
 import {typeMap} from './typeCatalog';
 import {constant, just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';

@@ -1,4 +1,4 @@
-import {variantCosmos} from './cosmos';
+import {variantCosmos} from '../cosmos';
 
 export const {
     descope,
@@ -8,6 +8,7 @@ export const {
     isType,
     match,
     matcher,
+    ofLiteral,
     onLiteral,
     prematch,
     remote,

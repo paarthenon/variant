@@ -1,2 +1,2 @@
 export * from './slim';
-export * from './index.onType';
+export * from './type';

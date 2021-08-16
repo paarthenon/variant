@@ -1,4 +1,4 @@
-import {isType} from './index.onType';
+import {isType} from './type';
 import {Animal, sample} from './__test__/animal';
 
 

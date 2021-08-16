@@ -1,4 +1,4 @@
-import {variation} from './index.onType';
+import {variation} from './type';
 import {Func, PatchObjectOrPromise, RawVariant, VariantCreator, VariantOf} from './precepts';
 import {Identity} from './util';
 import {isVariantCreator, VariantRecord} from './variant';

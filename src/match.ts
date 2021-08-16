@@ -36,8 +36,17 @@ export type MatchFuncs<K extends string> = {
      * Match function.
      */
     match: MatchOverloads<K>;
+
+    /**
+     * Create a variant from a catalog or enum. In other words, 
+     * elevate a literal `A | B | C` to a type union `{type: A} | {type: B} | {type: C}`
+     * @param instance 
+     */
+    ofLiteral<T extends string | number | symbol>(instance: T): LiteralToUnion<T, K>;
+
     /**
      * Elevate a literal `A | B | C` to a type union `{type: A} | {type: B} | {type: C}`
+     * @deprecated use `ofLiteral`
      * @param instance 
      */
     onLiteral<T extends string | number | symbol>(instance: T): LiteralToUnion<T, K>;
@@ -161,11 +170,12 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
         }
     }
 
-    function onLiteral<T extends string | number | symbol>(instance: T) {
+    const onLiteral = ofLiteral;
+
+    function ofLiteral<T extends string | number | symbol>(instance: T) {
         return {
             [key]: instance,
         } as LiteralToUnion<T, K>;
     }
-
-    return {match, onLiteral, prematch};
+    return {match, ofLiteral, onLiteral, prematch};
 }

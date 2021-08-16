@@ -1,4 +1,4 @@
-import {remote, sequence} from './index.onType';
+import {remote, sequence} from './type';
 import {just} from './match.tools';
 import {CompareResult} from './remote';
 import {Animal, sample} from './__test__/animal';

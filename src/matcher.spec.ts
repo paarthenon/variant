@@ -1,4 +1,4 @@
-import {match, matcher, onLiteral, types} from './index.onType';
+import {match, matcher, ofLiteral, types} from './type';
 import {constant, just} from './match.tools';
 import {typeCatalog} from './typeCatalog';
 import {Animal, sample} from './__test__/animal';
@@ -129,7 +129,7 @@ test('matcher (when-complete)', () => {
 })
 
 test('matcher (onLiteral)', () => {
-    const rate = (type: Animal['type']) => matcher(onLiteral(type))
+    const rate = (type: Animal['type']) => matcher(ofLiteral(type))
         .lookup({
             cat: 1,
             dog: 2,
@@ -157,7 +157,7 @@ test('match enum', () => {
         B = 'B',
     }
 
-    const rate = (a: Alpha) => match(onLiteral(a), {
+    const rate = (a: Alpha) => match(ofLiteral(a), {
         [Alpha.A]: _ => 0,
         [Alpha.B]: constant(1),
     })

@@ -1,5 +1,5 @@
 import {catalog} from './catalog';
-import {flags, onLiteral} from './index.onType'
+import {flags, onLiteral} from './type'
 import {Animal, sample} from './__test__/animal'
 
 test('flags (basic)', () => {

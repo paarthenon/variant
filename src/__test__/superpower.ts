@@ -1,6 +1,6 @@
 import {TypeNames, VariantOf} from '..';
 import {catalog} from '../catalog';
-import {variant} from '../index.onType';
+import {variant} from '../type';
 import {Identity} from '../util';
 import {fields} from '../variant.tools';
 import {Animal} from './animal';
