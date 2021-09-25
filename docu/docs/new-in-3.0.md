@@ -54,15 +54,15 @@ A `prematch()` function was introduced.
 
 ## Literals
 
-The `matchLiteral()` function has been removed. Instead, an `onLiteral` helper function has been provided that lifts a literal union to a discriminated union. Every match function can simply proceed from there.
+The `matchLiteral()` function has been removed. Instead, an `ofLiteral` helper function has been provided that lifts a literal union to a discriminated union. Every match function can simply proceed from there.
 
 ```ts
-return match(onLiteral(colorMode), {
+return match(ofLiteral(colorMode), {
     'light': _ => <FaSun />
     'dark': _ => <FaMoon />
 })
 // or
-return matcher(onLiteral(colorMode)).lookup({
+return matcher(ofLiteral(colorMode)).lookup({
     'light': <FaSun />,
     'dark': <FaMoon />,
 })

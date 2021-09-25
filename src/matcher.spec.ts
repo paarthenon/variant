@@ -128,7 +128,7 @@ test('matcher (when-complete)', () => {
     expect(getFeature(Animal.snake('Tanya', 'spotted'))).toBe('spotted');
 })
 
-test('matcher (onLiteral)', () => {
+test('matcher (ofLiteral)', () => {
     const rate = (type: Animal['type']) => matcher(ofLiteral(type))
         .lookup({
             cat: 1,

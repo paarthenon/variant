@@ -48,7 +48,7 @@ const {colorMode} = useColorMode();
 The `colorMode` variable is a string `'dark' | 'light'`. As such, it can be processed with matcher.
 
 ```ts
-const result = matcher(onLiteral(colorMode)).lookup({
+const result = matcher(ofLiteral(colorMode)).lookup({
     dark: ...,
     light: ...,
 });

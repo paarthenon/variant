@@ -1,9 +1,8 @@
 import {fields, match, payload, scopedVariant, TypeNames, VariantOf, variation} from '.';
-import {onLiteral, prematch, variant} from './type';
+import {lookup, ofLiteral, otherwise, partial, prematch, variant} from './type';
 import {typeMap} from './typeCatalog';
 import {constant, just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';
-import {Handler} from './match';
 
 
 test('match (basic)', () => {
@@ -19,10 +18,6 @@ test('match (basic)', () => {
 })
 
 test(`match (inline)`, () => {
-    const test = (animal: Animal) => match(animal, {
-        default: just(null),
-    });
-
     const animalList: Animal[] = [
         sample.cerberus,
         Animal.cat({name: 'Perseus', furnitureDamaged: 0}),
@@ -39,6 +34,35 @@ test(`match (inline)`, () => {
     expect(renamed[0].name).toBe('Cerberus-floof');
     expect(renamed[1].name).toBe('Perseus-paw');
     expect(renamed[2].name).toBe('Twix-floof');
+})
+test(`match (inline partial)`, () => {
+    const animalList: Animal[] = [
+        sample.cerberus,
+        Animal.cat({name: 'Perseus', furnitureDamaged: 0}),
+        Animal.dog({name: 'Twix'}),
+        Animal.snake('Terra'),
+    ];
+
+    const renamed = animalList.map(match(partial({
+        cat: _ => ({..._, name: `${_.name}-paw`}),
+        dog: _ => ({..._, name: `${_.name}-floof`}),
+        default: _ => ({..._, name: `${_.name}-animal`}),
+    })));
+
+
+    expect(renamed[0].name).toBe('Cerberus-floof');
+    expect(renamed[1].name).toBe('Perseus-paw');
+    expect(renamed[2].name).toBe('Twix-floof');
+    expect(renamed[3].name).toBe('Terra-animal');
+})
+
+test('(m2 otherwise', () => {
+    
+    const rate = (a: Animal) => match(a, otherwise({
+        dog: d => d.type,
+    }, _ => {
+        return 6;
+    }))
 })
 
 test('prematch on type', () => {
@@ -71,10 +95,10 @@ test('prematch on module', () => {
 })
 
 test('match (partial)', () => {
-    const rate = (animal: Animal) => match(animal, {
+    const rate = (animal: Animal) => match(animal, partial({
         cat: _ => _.furnitureDamaged,
         default: _ => 5,
-    });
+    }));
 
     expect(rate(Animal.cat({name: 'Yellow', furnitureDamaged: 2}))).toBe(2);
     expect(rate(sample.cerberus)).toBe(5);
@@ -127,10 +151,10 @@ test('scoped match', () => {
 
     const cat = Animal2.Cat({name: 'Perseus'});
 
-    const rating = (animal: Animal2) => match(animal, {
+    const rating = (animal: Animal2) => match(animal, partial({
         [Animal2.Cat.type]: c => c.name,
         default: just('yo'),
-    })
+    }))
 
     expect(rating(Animal2.Cat({name: 'steve'}))).toBe('steve');
 })
@@ -183,13 +207,13 @@ test('just (complex)', () => {
 })
 
 test('just (object)', () => {
-    const result = (animal: Animal) => match(animal, {
+    const result = (animal: Animal) => match(animal, partial({
         snake: just({
             hello: 'world',
             complex: 4,
         }),
         default: just(2),
-    })
+    }))
 
     expect(result(sample.cerberus)).toBe(2);
     expect(result(Animal.snake('Test'))).toEqual({
@@ -198,25 +222,7 @@ test('just (object)', () => {
     })
 })
 
-
-// const Animal = variant({
-//     cat: fields<{name: string, furnitureDamaged: number}>(),
-//     dog: fields<{name: string, favoriteBall?: string}>(),
-//     snake: (name: string, pattern: string = 'striped') => ({name, pattern}),
-//     bird: fields<{name: string, canFly: boolean}>(),
-// });
-// type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>
-
-// function rivalWantsAnimal(animal: Animal) {
-//     return match(animal, {
-//         dog: _ => false,
-//         cat: ({furnitureDamaged}) => furnitureDamaged < 3,
-//         snake: _ => true,
-        
-//     })
-// }
-
-const wrapEnum = <T extends string | number>(a: T) => onLiteral(a);
+const wrapEnum = <T extends string | number>(a: T) => ofLiteral(a);
 
 test('onEnum basic', () => {
     enum Alpha {
@@ -244,7 +250,7 @@ test('match enum', () => {
         B = 'B',
     }
 
-    const rate = (a: Alpha) => match(onLiteral(a), {
+    const rate = (a: Alpha) => match(ofLiteral(a), {
         [Alpha.A]: constant(0),
         [Alpha.B]: constant(1),
     })
@@ -259,11 +265,22 @@ test('match enum (numeric)', () => {
         B = 'B',
     }
 
-    const rate = (a: Alpha) => match(onLiteral(a), {
+    const rate = (a: Alpha) => match(ofLiteral(a), {
         [Alpha.A]: constant(0),
         [Alpha.B]: constant(1),
     })
 
     expect(rate(Alpha.A)).toBe(0);
     expect(rate(Alpha.B)).toBe(1);
+})
+
+
+test('lookup rate', () => {
+    const rate = (a: Animal) => match(a, lookup({
+        cat: 1,
+        dog: 2,
+        snake: 3,
+    }))
+
+    expect(rate(sample.cerberus)).toBe(2);
 })

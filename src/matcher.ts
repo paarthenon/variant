@@ -7,7 +7,7 @@ import {isVariantCreator} from './variant';
 /**
  * From a lookup table to a handler record.
  */
-export type TableToHandler<T extends {}> = {
+export type LookupTableToHandler<T extends {}> = {
     [P in keyof T]: () => T[P];
 }
 
@@ -178,11 +178,11 @@ export class Matcher<
      * @param table 
      * @returns 
      */
-    register<Table extends Splay<Record<T[K], any>>>(table: Table): Matcher<T, K, H & TableToHandler<Table>> {
+    register<Table extends Splay<Record<T[K], any>>>(table: Table): Matcher<T, K, H & LookupTableToHandler<Table>> {
         const newHandler = {
             ...this.handler,
             ...tableToHandler(table),
-        } as H & TableToHandler<Table>
+        } as H & LookupTableToHandler<Table>
         return new Matcher(this.target, this.key, newHandler);
     }
 
@@ -203,11 +203,11 @@ export class Matcher<
      * @param table 
      * @returns 
      */
-    lookup<Table extends Record<T[K], any>>(table: Table): ReturnType<(H & TableToHandler<Table>)[T[K]]> {
+    lookup<Table extends Record<T[K], any>>(table: Table): ReturnType<(H & LookupTableToHandler<Table>)[T[K]]> {
         const combinedHandler = {
             ...this.handler,
             ...tableToHandler(table),
-        } as H & TableToHandler<Table>
+        } as H & LookupTableToHandler<Table>
 
         return combinedHandler[this.target[this.key]]?.(this.target as any);
     }

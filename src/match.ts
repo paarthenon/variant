@@ -1,3 +1,4 @@
+import {LookupTableToHandler} from './matcher'
 import {DEFAULT_KEY, Limited, Message, Func, VariantModule, VariantOf, VariantError} from './precepts'
 
 /**
@@ -31,6 +32,7 @@ export type LiteralToUnion<
     K extends string
 > = {[P in T]: Record<K, P>}[T];
 
+
 export type MatchFuncs<K extends string> = {
     /**
      * Match function.
@@ -52,10 +54,56 @@ export type MatchFuncs<K extends string> = {
     onLiteral<T extends string | number | symbol>(instance: T): LiteralToUnion<T, K>;
 
     /**
+     * Evaluate 
+     * @param branches 
+     * @param elseFunc 
+     */
+    otherwise<
+        P extends Partial<Handler<T, K>>,
+        T extends Record<K, string>,
+        Else extends (remainder: Exclude<T, Record<K, keyof P>>) => any,
+    >(branches: P, elseFunc: Else): (input: T) =>  HandlerFromPartial<P & {default: Else}, T[K]>
+
+    /**
+     * Partial functions
+     */
+    partial: PartialOverloads<K>;
+
+    /**
      * Match against a function ahead of time.
      */
     prematch: PrematchFunc<K>;
     
+    lookup<H extends Record<T[K], any>, T extends Record<K, string>>(handler: H): (instance: T) => LookupTableToHandler<H>;
+}
+
+type asf = HandlerFromPartial<{default: () => 5}, 'Key1'>;
+
+type HandlerFromPartial<H extends Record<'default', unknown>, Keys extends string> = {
+    [K in Keys]: H extends Record<K, any> ? H[K] : H['default'];
+}
+
+export interface PartialOverloads<K extends string> {
+    <H extends AdvertiseDefault<Handler<T, K>>, T extends Record<K, string>>(handler: H): (input: T) => H;
+    <H extends WithDefault<Handler<T, K>, T>, T extends Record<K, string>>(handler: H): (input: T) => HandlerFromPartial<H, T[K]>;
+}
+
+export interface MatchOverloads<K extends string> {
+    /**
+     * Curried overload - handler.
+     */
+    <
+        T extends Record<K, string>,
+        H extends Handler<T, K>
+    >(handler: EnforceHandler<H> | ((t: T) => H)): (instance: T) => ReturnType<H[keyof H]>;
+
+    /**
+     * Main match overload
+     */
+    <
+        T extends Record<K, string>,
+        H extends Handler<T, K>,
+    >(target: T, handler: H | ((t: T) => H)): ReturnType<H[T[K]]>;
 }
 
 /**
@@ -63,55 +111,6 @@ export type MatchFuncs<K extends string> = {
  */
 export type EnforceHandler<T> = {} extends T ? VariantError<['Handler cannot be empty', 'Are you sure you are using this inline?']> : T;
 
-export interface CurriedMatchOverloads<K extends string> {
-    /**
-     * Curried overload - handler.
-     */
-    <
-        T extends Record<K, string>,
-        H extends AdvertiseDefault<Handler<T, K>>
-    >(handler: EnforceHandler<H>): (instance: T) => ReturnType<H[keyof H]>;
-    /**
-     * Curried overload - **partial** handler.
-     */
-    <
-        T extends Record<K, string>,
-        H extends WithDefault<Handler<T, K>, T>,
-    >(handler: EnforceHandler<H>): (instance: T) => ReturnType<FuncsOnly<H>[keyof H]>;
-}
-
-export type MatchOverloads<K extends string> = CurriedMatchOverloads<K> & {
-    /**
-     * Matchmaker, matchmaker, find me a match.
-     * @param object 
-     * @param handler 
-     */
-    <
-        T extends Record<K, string>,
-        H extends AdvertiseDefault<Handler<T, K>>,
-    >(object: T, handler: H): ReturnType<H[T[K]]>;
-    /**
-     * Matchmaker I'm desperate find me a partial match.
-     * @param object 
-     * @param handler 
-     */
-    <
-        T extends Record<K, string>,
-        H extends WithDefault<Handler<T, K>, T>,
-    >(object: T, handler: Limited<H, T[K] | DEFAULT_KEY>): ReturnType<FuncsOnly<H>[keyof H]>;
-    /**
-     * Matchmaker I'm very specific and I want to enumerate my remaining options.
-     * @param object 
-     * @param handler 
-     * @param elseFunc 
-     */
-    <
-        T extends Record<K, string>,
-        H extends Partial<Handler<T, K>>,
-        EF extends (instance: Exclude<T, Record<K, keyof H>>) => any
-    > (object: T, handler: Limited<H, T[K]>, elseFunc: EF): ReturnType<FuncsOnly<H>[keyof H]> | ReturnType<EF>;
-
-}
 
 export interface PrematchFunc<K extends string> {
     /**
@@ -140,35 +139,38 @@ export interface TypedCurriedMatchFunc<T extends Record<K, string>, K extends st
 
 export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
     // curryable wrapper around match.
-    const prematch: Func = (_?: {}) =>
+    const prematch = (_?: {}) =>
         (handler: Handler<Record<K, string>, K>) =>
             (instance: Record<K, string>) =>
                 match(instance, handler);
 
     function match<
         T extends Record<K, string>,
-        H extends Handler<T, K>,
-        EF extends (instance: Exclude<T, Record<K, keyof H>>) => any,
+        H extends Handler<T, K> | ((t: T) => Handler<T, K>),
     >(...args: any[]) {
         if (args.length === 1) {
+            // inline match
             const [handler] = args as [H];
             return (instance: T) => match(instance, handler);
         } else if (args.length === 2) {
-            const [instance, handler] = args as [T, H];
+            // regular match
+            const [instance, handlerParam] = args as [T, H];
+
+            // unpack handler from function if necessary.
+            const handler: WithDefault<Handler<T, K>, T> = typeof handlerParam === 'function'
+                ? (handlerParam as Extract<H, Func>)(instance)
+                : handlerParam
+            ;
+
             if (instance[key] in handler) {
                 return handler[instance[key]]?.(instance as any);
             } else if (DEFAULT_KEY in handler) {
-                return handler[DEFAULT_KEY as keyof H]?.(instance as any);
-            }
-        } else if (args.length === 3) {
-            const [instance, handler, elseClause] = args as [T, H, EF];
-            if (instance[key] in handler) {
-                return handler[instance[key]]?.(instance as any)
-            } else {
-                elseClause(instance as any);
+                return handler[DEFAULT_KEY]?.(instance as any);
             }
         }
     }
+
+    const partial = <H> (h: H) => () => h;
 
     const onLiteral = ofLiteral;
 
@@ -177,5 +179,21 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
             [key]: instance,
         } as LiteralToUnion<T, K>;
     }
-    return {match, ofLiteral, onLiteral, prematch};
+
+    function lookup<H extends Record<T[K], any>, T extends Record<K, string>>(handler: H): (instance: T) => LookupTableToHandler<H> {
+        const handlerWithFuncs = Object.keys(handler).reduce((acc, cur) => {
+            return {...acc, [cur]: () => handler[cur as keyof H]}
+        }, {} as LookupTableToHandler<H>);
+        return (_instance: T) => handlerWithFuncs;
+    }
+
+    function otherwise<
+        P extends Partial<Handler<T, K>>,
+        T extends Record<K, string>,
+        Else extends (remainder: Exclude<T, Record<K, keyof P>>) => any,
+    >(branches: P, elseFunc: Else): (input: T) =>  HandlerFromPartial<P & {default: Else}, T[K]> {
+        return _ => ({...branches, default: elseFunc});
+    }
+
+    return {match, ofLiteral, onLiteral, otherwise, partial, prematch, lookup};
 }

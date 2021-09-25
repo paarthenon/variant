@@ -220,7 +220,7 @@ console.log(describeAnimal(cerberus));
 
 Just like before, TypeScript understands the return type of `describeAnimal`. It has been correctly inferred as `string`. We'll see a more detailed example of conditional rendering when we enter the React portions of the tutorial. Rest assured, Variant isn't a react library and doesn't actually have any react dependencies. Despite that fact, the two work together seamlessly thanks to a shared focus on functional principles and [**composability**](glossary#composability).
 
-By that same token, because variants *are* discriminated unions and TypeScript understands them as such, `match()` doesn't actually need its target to have been created by `variant()`. Match can easily operate on the discriminated unions that are already within your code, and will work with models written by [codegen](glossary#codegen). Any valid discriminated union (or even literal unions with [`onLiteral()`](api#onLiteral)) will work.
+By that same token, because variants *are* discriminated unions and TypeScript understands them as such, `match()` doesn't actually need its target to have been created by `variant()`. Match can easily operate on the discriminated unions that are already within your code, and will work with models written by [codegen](glossary#codegen). Any valid discriminated union (or even literal unions with [`ofLiteral()`](api#ofLiteral)) will work.
 
 #### [Exhaustiveness](glossary#exhaustive) and Partial Matching
 

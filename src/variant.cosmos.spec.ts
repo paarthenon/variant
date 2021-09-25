@@ -5,7 +5,7 @@ import {GetTypeLabel, TypeNames, VariantOf} from './precepts';
 import {fields, payload} from './variant.tools';
 
 const DISCRIMINANT = 'tag';
-const {isType, match, onLiteral, variantModule, variantList, variation, variant} = variantCosmos({key: 'tag'});
+const {isType, match, otherwise, ofLiteral, partial, variantModule, variantList, variation, variant} = variantCosmos({key: 'tag'});
 
 
 // tag('dog', fields<{name: string, favoriteBall?: string}>()),
@@ -14,6 +14,7 @@ const {isType, match, onLiteral, variantModule, variantList, variation, variant}
 //     name,
 //     pattern: patternName ?? 'striped',
 // })),
+
 const Animal = variantModule({
     cat: fields<{
         name: string;
@@ -101,7 +102,7 @@ test('match 2', () => {
 
     const kt = kerb.tag;
 
-    const thing = match(kerb, {
+    const thing = match(kerb, otherwise({
         cat: ({name, furnitureDamaged}) => {
             return name + furnitureDamaged;
         },
@@ -110,12 +111,12 @@ test('match 2', () => {
         }
     }, _ => {
         return 5;
-    })
+    }))
 
-    const otherTest = match(onLiteral(kerb.tag), {
+    const otherTest = match(ofLiteral(kerb.tag), partial({
         cat: ({tag}) => tag,
         default: constant(6),
-    })
+    }))
 
     // const thing = match({tag: kt}, {
 

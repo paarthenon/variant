@@ -1,10 +1,4 @@
-import {EnumType} from 'typescript';
-import {fields, just, match, payload, scopedVariant, TypeNames, Variant, variant, VariantOf, variation} from '.';
-import {construct} from './construct';
-import {GVariantOf, onTerms} from './generic';
-import {onLiteral} from './type';
-import {Identity} from './util';
-import {isVariantCreator} from './variant';
+import {fields, payload, scopedVariant, TypeNames, variant, VariantOf, variation} from '.';
 
 test('Simple module', () => {
     const Animal = variant({
