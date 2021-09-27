@@ -1,4 +1,6 @@
-import {fields, payload, scopedVariant, TypeNames, variant, VariantOf, variation} from '.';
+import {fields, payload, scoped, TypeNames, variant, VariantOf, variation} from '.';
+import {GVariantOf, onTerms} from './generic';
+import {match} from './type';
 
 test('Simple module', () => {
     const Animal = variant({
@@ -107,10 +109,10 @@ test('card variantList', () => {
 })
 
 test('scoped', () => {
-    const Animal2 = scopedVariant('Animal', {
+    const Animal2 = variant(scoped('Animal', {
         Cat: fields<{name: string}>(),
         Dog: fields<{name: string, toy?: string}>(),
-    });
+    }));
     type Animal2<T extends TypeNames<typeof Animal2> = undefined> = VariantOf<typeof Animal2, T>;
 
     const cat = Animal2.Cat({name: 'Perseus'});
@@ -146,3 +148,16 @@ test('variant from enum', () => {
     type Animal = VariantOf<typeof Animal>;
 })
 
+test('variant retains mismatched names', () => {
+    const Animal2 = scoped('Animal', {
+        Cat: fields<{name: string}>(),
+        Dog: fields<{name: string, toy?: string}>(),
+    });
+    type Animal2<T extends TypeNames<typeof Animal2> = undefined> = VariantOf<typeof Animal2, T>;
+
+    const Animal3 = variant(Animal2);
+
+    expect(Animal3.Cat).toBeDefined();
+    expect(Animal3.Cat.type).toBe('Animal/Cat');
+    expect(Animal3.Dog.type).toBe('Animal/Dog');
+})

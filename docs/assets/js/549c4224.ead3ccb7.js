@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkvariant_site=self.webpackChunkvariant_site||[]).push([[4286],{2258:function(e){e.exports=JSON.parse('{"permalink":"/variant/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"previousPage":null,"nextPage":null,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

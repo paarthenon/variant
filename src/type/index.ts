@@ -14,7 +14,7 @@ export const {
     partial,
     prematch,
     remote,
-    scopedVariant,
+    scoped,
     sequence,
     lookup,
     typed,

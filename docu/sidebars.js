@@ -7,10 +7,6 @@ module.exports = {
       collapsed: false,
       items: [
         'tutorial/part-zero',
-        'tutorial/part-one',
-        'tutorial/part-two',
-        'tutorial/part-three',
-        'tutorial/part-four',
       ]
     },
     {

@@ -28,7 +28,7 @@ console.log(loadAction.t     );
 ```
 Working with an existing variant is similarly direct.
 
-```ts twoslash {6}
+```ts twoslash {7}
 import {variant, augment, fields, VariantOf} from 'variant';
 // ---cut---
 const Action = variant({

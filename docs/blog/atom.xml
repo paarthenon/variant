@@ -13,5 +13,9 @@
         <link href="https://paarthenon.github.io/variant/blog/intro"/>
         <updated>2020-05-11T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[This is version one of the variant docs. I'll add more content over time.]]></summary>
+        <author>
+            <name>Paarth</name>
+            <uri>https://github.com/paarthenon</uri>
+        </author>
     </entry>
 </feed>

@@ -82,10 +82,10 @@ export interface VariantFuncs<K extends string> {
      * @param scope 
      * @param v 
      */
-    scopedVariant<
+    scoped<
         T extends RawVariant,
         Scope extends string,
-    >(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>>;
+    >(scope: Scope, v: T): ScopedVariant<T, Scope>;
 
     /**
      * Create a **variant** from a list of elements. Each element may be a `string`
@@ -263,7 +263,7 @@ export interface VariantFuncs<K extends string> {
 }
 
 export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
-    function scopedVariant<
+    function scope<
         T extends RawVariant,
         Scope extends string,
     >(scope: Scope, v: T): Identity<ScopedVariant<T, Scope>> {
@@ -359,5 +359,5 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
         }
     }
 
-    return {descope, scopedVariant, variant, variantList, variantModule, variation};
+    return {descope, scoped: scope, variant, variantList, variantModule, variation};
 }

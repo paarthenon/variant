@@ -84,8 +84,8 @@ type HandlerFromPartial<H extends Record<'default', unknown>, Keys extends strin
 }
 
 export interface PartialOverloads<K extends string> {
-    <H extends AdvertiseDefault<Handler<T, K>>, T extends Record<K, string>>(handler: H): (input: T) => H;
-    <H extends WithDefault<Handler<T, K>, T>, T extends Record<K, string>>(handler: H): (input: T) => HandlerFromPartial<H, T[K]>;
+    <H extends AdvertiseDefault<Handler<T, K>>, T extends Record<K, string>>(handler: H | ((t: T) => H)): (input: T) => H;
+    <H extends WithDefault<Handler<T, K>, T>, T extends Record<K, string>>(handler: H | ((t: T) => H)): (input: T) => HandlerFromPartial<H, T[K]>;
 }
 
 export interface MatchOverloads<K extends string> {
@@ -93,17 +93,19 @@ export interface MatchOverloads<K extends string> {
      * Curried overload - handler.
      */
     <
-        T extends Record<K, string>,
-        H extends Handler<T, K>
-    >(handler: EnforceHandler<H> | ((t: T) => H)): (instance: T) => ReturnType<H[keyof H]>;
+        T extends (TType extends TType ? Record<K, TType> : never),
+        H extends Handler<T, K>,
+        TType extends string,
+    >(handler: EnforceHandler<H> | ((t: T) => H)): (instance: T | TType) => ReturnType<H[keyof H]>;
 
     /**
      * Main match overload
      */
     <
-        T extends Record<K, string>,
+        T extends (TType extends TType ? Record<K, TType> : never),
         H extends Handler<T, K>,
-    >(target: T, handler: H | ((t: T) => H)): ReturnType<H[T[K]]>;
+        TType extends string,
+    >(target: T | TType, handler: H | ((t: T) => H)): ReturnType<H[T[K]]>;
 }
 
 /**
@@ -145,17 +147,22 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
                 match(instance, handler);
 
     function match<
-        T extends Record<K, string>,
+        T extends (TType extends TType ? Record<K, TType> : never),
         H extends Handler<T, K> | ((t: T) => Handler<T, K>),
+        TType extends string,
     >(...args: any[]) {
         if (args.length === 1) {
             // inline match
             const [handler] = args as [H];
-            return (instance: T) => match(instance, handler);
+            return (instance: T | TType) => match(instance, handler);
         } else if (args.length === 2) {
             // regular match
-            const [instance, handlerParam] = args as [T, H];
+            const [instanceOrType, handlerParam] = args as [T | TType, H];
 
+            const instance = typeof instanceOrType === 'string'
+                ? ofLiteral(instanceOrType) as T
+                : instanceOrType
+            ;
             // unpack handler from function if necessary.
             const handler: WithDefault<Handler<T, K>, T> = typeof handlerParam === 'function'
                 ? (handlerParam as Extract<H, Func>)(instance)

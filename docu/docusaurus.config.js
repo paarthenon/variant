@@ -18,7 +18,6 @@ module.exports = {
         darkIcon: '🌒',
       }
     },
-    sidebarCollapsible: true,
     navbar: {
       title: 'Variant',
       logo: {
@@ -109,6 +108,7 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
+          sidebarCollapsible: true,
           sidebarPath: require.resolve('./sidebars.js'),
           versions: {
             current: {

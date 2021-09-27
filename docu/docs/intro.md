@@ -4,7 +4,7 @@ title: Introduction
 ---
 > _**Variant** is a language feature disguised as a library._
 
-Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://basarat.gitbook.io/typescript/type-system/discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domain models and tiny DSLs. However, because [*"TypeScript instead builds on JavaScript patterns as they exist today"*](http://web.archive.org/web/20191018040436/https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
+Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://basarat.gitbook.io/typescript/type-system/discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domains and problem spaces. However, because [*"TypeScript instead builds on JavaScript patterns as they exist today"*](http://web.archive.org/web/20191018040436/https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
 
 [🧠 Click here to jump straight to the API Reference](api.md)
 
@@ -16,9 +16,9 @@ Variant has zero dependencies and doesn't need any setup.
 yarn add variant@dev # npm install --save variant@dev
 ```
 
-Let's use [**Variant**](book/creation) to describe a simple domain — **Animals**. Much like an enum, our `Animal` variant can be in one of several forms. Unlike an enum, our variant can carry *data* with each of its forms. 
+Let's use [`variant()`](book/creation) to describe a simple domain — **Animals**. Much like an enum, our `Animal` variant can be in one of several forms. Unlike an enum, our variant can carry *data* with each of its forms. 
 
-For this application, we care about dogs, cats, and snakes. These might be the various pets our player can have. We have different concerns for each animal, so we'll want to define them with distinct fields. We could write this ourselves as a function that takes certain properties, but the [`fields`](api#fields) function below is shorthand to help do this. We'll see more of how it works in the [first section of the User Guide](book/creation).
+For the game we're making, our player can have a pet cat, dog, or snake. We have different concerns for each animal, so we'll want to define them with distinct fields. The [`fields()`](api#fields) function is a useful shorthand here. We'll see more of how it works in the [first section of the User Guide](book/creation). For complete control over the creation process, including default inputs, side effects, or other complex logic, use a function. We'll do so for the snake constructor to give it a default pattern.
 
 <a id="animal-ts"></a>
 
@@ -59,11 +59,9 @@ Those familiar with TypeScript's discriminated unions will recognize this patter
 
 Well... to work with them, and *to build on them*. The tools Variant provides offer more convenience, safety, and utility than the vanilla approach. Traditionally, a developer would define each form of a discriminated union as its own type, write a factory function for each of those types, and then manually place these types in a union (`type Animal = Dog | Cat | Snake`).
 
-This process is error prone, tedious, and confusing to new developers. Each of these problems multiply with scale. Adding a new case requires modifications in multiple locations and duplication of effort. Variant is based on the idea that the subtype (`Animal<'dog'>`) can be inferred by adding a `type: 'dog'`[^1] property to whatever the `dog()` function returns, and that the larger type `Animal` can be calculated from a set of these constructor functions. By grouping these cases in one place, we define the bounds of our [**domain**](glossary/#domain), automate the relation of these types, and provide clarity of intent.
+This process is error prone, repetitive, and confusing to new developers. Each of these problems multiply with scale. Adding a new case requires modifications in multiple locations and duplication of effort. Variant is based on the idea that the subtype (`Animal<'dog'>`) can be inferred from the return type of the dog constructor, and that the larger type `Animal` can be calculated from a set of these constructor functions. By grouping our cases in one place, we define the bounds of our [**domain**](glossary/#domain), automate the relation of these types, and provide clarity of intent.
 
-[^1]: As mentioned later in the document, [it is possible to use `kind`, `__typename`, or anything](articles/type-name) instead of `type`.
-
-But it's not just in how we construct the variants. **The experience as a consumer is significantly improved.** For example, there's a lot that can be done with this single import. Because we used the name `Animal` for the value *and* the type, this statement imports them both.
+But it's not just in how we construct the variants. **The experience as a consumer is significantly improved.** There's a lot that can be done with this single import. Because we used the name `Animal` for the value *and* the type, this statement will import both.
 
 ```ts twoslash
 // @filename: animal.ts
@@ -75,7 +73,7 @@ import {Animal} from './animal';
 
 #### Create new instances
 
-With the const `Animal` (*a collection of tag constructors*) we can easily create new instances, even if custom logic is involved. Even though we never specified, steve has striped skin. This comes from [`animal.ts`](#animal-ts), where the function we wrote to create snakes had a default parameter __pattern__ set to `'striped'`.  
+With the object `Animal` (*a collection of tag constructors*) we can easily create new instances, even if custom logic is involved. Even though we never specified it, steve has striped skin. This comes from [`animal.ts`](#animal-ts), where the function we wrote to create snakes had a default parameter __pattern__ set to `'striped'`.  
 
 ```ts twoslash
 // @noErrors
@@ -91,7 +89,8 @@ const steve = Animal.snake('Steve');
 
 #### Type the Union
 
-With type `Animal`, we can describe the shape of the union. It's our way of saying _this is some animal, but we don't know which one_. Even when we aren't aware of the specific type, we can access properties shared among all animals.
+
+With the type `Animal`, we can describe the shape of the union. It's our way of saying _this is some animal, but we don't know which one_. We can still access properties shared among all animals, like the name.
 
 ```ts twoslash
 // @noErrors
@@ -103,12 +102,12 @@ import {Animal} from './animal';
 // ---cut---
 declare var animal: Animal;
 const type = animal.type;
-const nombre = animal.name;
+const name = animal.name;
 ```
 
 #### Type specific instances
 
-With the [full type](articles/that-type) for `Animal`, we can access specific members of the union.
+We can access specific members of the union _(with the [full type annotation](articles/that-type))_
 
 ```ts twoslash
 // @noErrors
@@ -187,7 +186,7 @@ const potentialPets = animals.filter(rivalWantsAnimal);
 ```
 Even though we never gave a return type for `rivalWantsAnimal`, `match()` has been written to work with [TypeScript's type inference](https://www.typescriptlang.org/docs/handbook/type-inference.html), allowing the language to infer `boolean` as the correct return type. 
 
-A simple form of [**conditional rendering**](glossary#conditional-rendering) would be describing how an animal is relaxing. Each description could be a simple line or something more complex involving information about the animal.
+A simple form of [**conditional rendering**](glossary#conditional-rendering) would be to describe how an animal is relaxing. Each description could be a simple line or something more complex, and it could involve information about the animal.
 
 ```ts twoslash
 // @filename: animal.ts
@@ -220,14 +219,14 @@ console.log(describeAnimal(cerberus));
 
 Just like before, TypeScript understands the return type of `describeAnimal`. It has been correctly inferred as `string`. We'll see a more detailed example of conditional rendering when we enter the React portions of the tutorial. Rest assured, Variant isn't a react library and doesn't actually have any react dependencies. Despite that fact, the two work together seamlessly thanks to a shared focus on functional principles and [**composability**](glossary#composability).
 
-By that same token, because variants *are* discriminated unions and TypeScript understands them as such, `match()` doesn't actually need its target to have been created by `variant()`. Match can easily operate on the discriminated unions that are already within your code, and will work with models written by [codegen](glossary#codegen). Any valid discriminated union (or even literal unions with [`ofLiteral()`](api#ofLiteral)) will work.
+By that same token, because variants *are* discriminated unions and TypeScript understands them as such, `match()` doesn't actually need its target to have been created by `variant()`. Match can easily operate on the discriminated unions that are already within your code, and will work with models written by [codegen](glossary#codegen). Any valid discriminated union will work.
 
 #### [Exhaustiveness](glossary#exhaustive) and Partial Matching
 
-Matching is **exhaustive** by default, meaning that a user must handle *every* possibility before the compiler will be satisfied. As our result, our code is much more resilient. If we were to add a new type of `Animal` to the game, say a bird, then every place in the code we match against `Animal` will raise a compiler error. Don't mistake them, these errors are a beautiful thing—they are step-by-step instructions on how to safely incorporate bird logic into your codebase.
+Matching is **exhaustive** by default, meaning that a user must handle *every* possibility before the compiler will be satisfied. As our result, our code is much more resilient. If we were to add a new type of `Animal` to the game, say a bird, then every place in the code we match against `Animal` will raise a compiler error. Don't mistake them, these errors are a beautiful thing—they are step-by-step instructions on how to safely incorporate bird logic into the codebase.
 
 
-```ts twoslash {6}
+```ts twoslash {7}
 // @include: animal-eov
     bird: fields<{name: string, canFly: boolean}>(),
 });
@@ -239,7 +238,7 @@ With the bird type in place, autocomplete can help guide us implement our handle
 
 With the new handler in place, the compiler is happy.
 
-```ts twoslash {5}
+```ts twoslash {6}
 // @include: animal-eov
     bird: fields<{name: string, canFly: boolean}>(),
 });
@@ -252,43 +251,67 @@ import {match, constant} from 'variant';
     })
 }
 ```
-However, there will be times when we don't want to handle each case individually, or may only be concerned with a subset of the cases. For those situations, we have **partial matching**. We activate it with the optional `default?` property in the autocomplete screenshot from earlier. Let's create a function to decide on animals for a person who is obsessed with snakes.
+However, there will be times when we don't want to handle each case individually, or may only be concerned with a subset of the cases. For those situations, we have **partial matching**. We activate it with the `partial` helper function. Let's create a function to decide on animals for a person who is obsessed with snakes.
 
 ```ts twoslash
 // @include: animal-eov
     bird: fields<{name: string, canFly: boolean}>(),
 });
 export type Animal = VariantOf<typeof Animal>;
-import {match, constant, just} from 'variant';
+import {match2 as match, constant, just, partial} from 'variant';
 // ---cut---
 
 const slytherinFanWantsAnimal = (hopefullyASnake: Animal) =>
-    match(hopefullyASnake, {
+    match(hopefullyASnake, partial({
         snake: constant(true), // same as () => true, but nicer to fingers.
         default: just(false), // same as 'constant(false)'. Your choice.
-    })
+    }))
 ```
 
-This functionality is also available via [`isType(hopefullyASnake, 'snake')`](api#isType).
+:::note A faster way
 
-### `matcher()`? I hardly know her
+In this special case where we are asking "is this a snake", match is overkill. We can use [`isType(hopefullyASnake, 'snake')`](api#isType).
+:::
 
-There's an important scenario that is not possible with a regular match statement, but *is* possible with the traditional `switch`. By taking advantage of fallthrough cases, a switch statement can implement [multi-matching](todo). To access this feature with the benefits of variant's pattern matching, use the [`matcher()`](book/matcher) function.
+### Harder Better Faster `matcher()` [(🎸)](https://www.youtube.com/watch?v=gAjR4_CbPpQ)
 
-This [builder-pattern](glossary#builder-pattern) alternative to match can construct the handler piece by piece. When done, finish it off with a `.complete()` statement (or other [terminal](book/matcher#terminal)) to execute the handler.
+
+There's an important scenario that is not possible with a regular match statement, but *is* possible with the traditional `switch`. By taking advantage of fallthrough cases, a switch statement can handle multiple cases at once, also known as **multi-matching**.
+
+```ts twoslash
+// @filename: animal.ts
+// @include: animal-fullType
+// @filename: index.ts
+import {Animal} from './animal';
+import {match} from 'variant';
+// ---cut---
+
+const hasFur = (animal: Animal) => {
+    switch(animal.type) {
+        case 'cat':
+        case 'dog':
+            return true;
+        case 'snake':
+            return false;
+    }
+}
+```
+
+To access this feature with the benefits of variant's pattern matching, use the [`matcher()`](book/matcher) function.
+
+This [builder-pattern](glossary#builder-pattern) alternative to match can construct the handler piece by piece. When all cases are handled, finish off with a `.complete()` statement (or other [terminal](book/matcher#terminal)) to execute the handler.
 
 ```ts twoslash
 // @include: animal-eov
-    bird: fields<{name: string, canFly: boolean}>(),
+    // bird: fields<{name: string, canFly: boolean}>(),
 });
 export type Animal = VariantOf<typeof Animal>;
 import {matcher, constant, just} from 'variant';
 // ---cut---
 
-const coatType = (animal: Animal) => matcher(animal)
-    .when(['cat', 'dog'], _ => 'fur')
-    .when('snake', _ => 'scales')
-    .when('bird', _ => 'feathers')
+const hasFur = (animal: Animal) => matcher(animal)
+    .when(['cat', 'dog'], _ => true)
+    .when('snake', _ => false)
     .complete();
 ```
 
@@ -299,25 +322,23 @@ The `matcher()` function has better error reporting than `match()`. When cases a
 ```ts twoslash
 // @errors: 2349
 // @include: animal-eov
-    bird: fields<{name: string, canFly: boolean}>(),
+    // bird: fields<{name: string, canFly: boolean}>(),
 });
 export type Animal = VariantOf<typeof Animal>;
 import {matcher} from 'variant';
 // ---cut---
-const coatType = (animal: Animal) => matcher(animal)
-    .when(['cat', 'dog'], _ => 'fur')
-    .when('snake', _ => 'scales')
+const hasFur = (animal: Animal) => matcher(animal)
+    .when('snake', _ => false)
     .complete();
 ```
 
-#### Lookup
+#### Built-in tools
 
 There are many options to the `matcher()`. For instance, it can act as a [lookup table](glossary#lookup-table), removing the need for `constant()`/`just()`.
 
 ```ts twoslash
 // @errors: 2349
 // @include: animal-eov
-    bird: fields<{name: string, canFly: boolean}>(),
 });
 export type Animal = VariantOf<typeof Animal>;
 import {matcher} from 'variant';
@@ -327,13 +348,29 @@ const animalEmoji = (animal: Animal) => matcher(animal)
         cat: '🐱',
         dog: '🐕',
         snake: '🐍',
-        bird: '🐦',
     })
 ```
 
-## Why Variant?
+#### Scaling up
 
-*Variant is a language feature disguised as a library*. As such it's relevant to any type of application, and at only `3kb` gzipped with further support for tree shaking it's become very easy to include. I find myself using variant in every project I write, to the point that I import it in my personal template alongside my logger of choice, [daslog](https://github.com/paarthenon/daslog) (*which also uses variant* 🙃).
+As the number of cases in a variant grows into the dozens, hundreds, or even thousands, it will become necessary to refactor these elements and handle them one subset at a time. The matcher is the ideal solution to delegate this handling based on these groups.
+
+Animals, when it comes to domain modeling, are a bit like the arithmetic of a coding tutorial. They demonstrate the structures,
+but more often your real-life programs will be more complex. In redux applications, for example, it's common to have a reducer, a function that takes a state and some descriptive action (_move to this tile, kill this enemy_) and returns a new state. As an application grows, it becomes necessary to separate reducer logic into smaller chunks. This is no problem. 
+
+```ts
+export const rootReducer = (state = initState, action: Action) => {
+   return matcher(action)
+      .when(types(DebugAction), _ => debugReducer(state, _))
+      .when(types(AppAction), _ => appReducer(state, _))
+      .when(types(GameAction), _ => ({...state, game: gameReducer(state, _))})
+      .else(just(state)); // ignore redux init actions
+}
+```
+
+## Variant Applications
+
+*Variant is a language feature disguised as a library*. As such it's relevant to any type of application, and at only `3kb` zipped it's become very easy to include. I find myself using variant in every project I write, to the point that I import it in my personal template.
 
 However there are certainly applications where variants *excel*.
 
@@ -342,19 +379,20 @@ However there are certainly applications where variants *excel*.
  - **Compilers and interpreters.** Variants closely mirror the recursive rule definitions of S-langs. Expressing grammars in TypeScript feels natural and is feasible with this project's support for recursive and generic types.
  - **Heterogeneous** (mixed) **lists**. These are the best way to express heterogeneous lists that can still be unzipped into separate, well-typed parts. Job or task systems tend to love having access to heterogeneous lists for the task queue, a list made up of different types of jobs.
 
-Thanks to a strong focus on type compatibility with raw discriminated unions, Variant is smoothly incorporated into existing codebases. Users may start refactoring from any part of their application while retaining a working build. Feel free to restructure your action creators and continue processing them with the same old `switch` statement in the reducer. Or take the opportunity to refresh your complex `switch` statements with the [cleaner organization of the `matcher()`](book/matcher) while preserving your current creation tools. Some users utilize the match functions but leave type creation entirely to codegen with GraphQL or protobuf.
+Variant is smoothly incorporated into existing codebases. Recall that variant types simply _are_ discriminated unions. There's very little magic in the product, just its construction. Users may start refactoring from any part of their application while retaining a working build. You may wish to refactor your action creators yet continue processing them with the same old `switch` statement in the reducer. Or take the opportunity to refresh your complex `switch` statements with the [cleaner organization of the `matcher()`](book/matcher) while leaving your current constructors in place. Some utilize the match functions but leave type creation entirely to codegen with GraphQL or protobuf.
 
-**Flexibility** has been coded into Variant 3.0 from the gound up. The variants we saw were created with `type` as the [discriminant](glossary#discriminant). This is simply the default. *Every* variant function can be keyed to a completely different common term, allowing the same level of functionality for unions that pivot on `kind`, `tag`, or GraphQL's `__typename`.
+**Flexibility** has been coded into Variant 3.0 from the gound up. The variants we saw were created with `type` as the [discriminant](glossary#discriminant), but this is simply the default. *Every* variant function can be keyed to a completely different common term, allowing the same level of functionality as `type` for unions that pivot on `kind`, `tag`, or GraphQL's `__typename`.
 
 The software is open-source, actively maintained, and matures with each update. Every function in the library has its own test suite and documentation. This package has been trusted by individuals, corporations, and government agencies for mission-critical applications.
 
 ## Next Steps
 
-Thanks for sticking around to this point. In one sense that was a lot to cover. In another, there's much more we can do with these tools. The remainder of the documentation is broken down into the following sections to help intuitively understand the library. I recommend the tutorial. [Click here](tutorial/part-one), or the **Next** button below.
+Thanks for sticking around to this point. The remainder of the documentation is broken down into the following sections to help intuitively understand the library. I recommend the tutorial. [Click here](tutorial/part-one), or the **Next** button below.
 
  - **The Tutorial**: An exploration into building **"Kind of Super"**, a text-based browser game that leverages variant to simplify a lot of the complexity in becoming a superhero and protecting a city from superpowered threats. Built on standard web technologies and eventually incorporating React + Redux, "Kind of Super" demonstrates *exactly* how to integrate variant into a codebase with real-world tooling.
  - **The Book**: A deep-dive into everything that's possible with these tools, and some things that aren't.
- - **Articles**: Assorted content. Things that are useful to know but don't fit well in a category. See [replacing 'type' with 'kind' or '__typename'](articles/type-name).
+ - **Articles**: Assorted content. Things that are useful to know but don't fit well in a category.
+    - See [replacing 'type' with 'kind' or '__typename'](articles/type-name).
  - **Libraries**: Comparisons to competitors, or How-To guides for compatible packages.
  - **API**: A full API reference for the library. Every function, every type, every meaning.
  - **Glosssary**: A consolidated dictionary of the esoteric terms I use.

@@ -21,19 +21,61 @@ Most of the time to do something useful with a discriminated union we'll need to
 ### `type` equality
 
 Classic. Supports type narrowing
+```ts twoslash
+// @include: animal
+declare var animal: Animal;
+// ---cut---
+if (animal.type === 'dog') {
+    const ballColor = animal.favoriteBall;
+//                      ^?
+}
+```
 
 ### `isType()`
+A _user-defined type guard_ that can answer whether or not an instance of a variant is of a given type. Takes the type as either a string literal or the variant creator.
+```ts twoslash
+// @include: animal
+declare var animal: Animal;
+import {isType} from 'variant';
+// ---cut---
+if (isType(animal, 'dog')) {
+    const ballColor = animal.favoriteBall;
+}
+```
+#### Variant creator
 
-- slightly better than if, it works with if or in other conditional contexts.
-- supports `Animal.dog()` syntax.
-- is a UDTG
+```ts twoslash
+// @include: animal
+declare var animal: Animal;
+import {isType} from 'variant';
+// ---cut---
+if (isType(animal, Animal.dog)) {
+    const ballColor = animal.favoriteBall;
+}
+```
+
+#### Point-free overload
+Note, this also works as a higher order function for filters.
+
+```ts twoslash
+// @include: animal
+declare var animal: Animal;
+import {isType} from 'variant';
+declare var animals: Animal[];
+// ---cut---
+const dogs = animals.filter(isType(Animal.dog));
+```
 
 ### `types()`
 
 Get a list of the types in a variant. For `Animal`, it would return `['cat', 'dog', 'snake']`. The order is... complicated. Expect it to be unspecified to be safe, but in some modern stacks it will match the order of the template. 
 
-```ts
-
+```ts twoslash
+// @include: animal
+declare var animal: Animal;
+import {types} from 'variant';
+// ---cut---
+const animalTypes = types(Animal);
 ```
 
 ### `typeCatalog()`
@@ -42,7 +84,7 @@ The `types()` function returns an array. This is often appropriate, but suffers 
 
 
 ```ts
-const animal = 
+const animalTypes = typeCatalog(Animal)
 ```
 
 ### `inferTypes()`

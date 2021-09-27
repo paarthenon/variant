@@ -12,9 +12,9 @@ export const Animal = variant({
 export type Animal = VariantOf<typeof Animal>;
 ```
 
-Variant aims to give the user complete control over how their objects are created.
+Variant aims to give the user complete control over how their objects are created. A variant's constructor may perform side effects, rely on asynchronous information, or generate objects of any kind.
 
-A call to Variant must be accompanied by a **template** that expresses the possibilities of the variant. This template may be expressed as an object or an array.
+A call to Variant must be accompanied by a **template** that expresses the possibilities of the variant. This template may be given as an object or an array.
 
 > #### Object Templates
 >
@@ -26,18 +26,25 @@ A call to Variant must be accompanied by a **template** that expresses the possi
 >
 > #### Array Templates
 >
-> ```ts
+> ```ts twoslash
+import {variant, VariantOf} from 'variant';
+// ---cut---
 const Suit = variant(['Spades', 'Hearts', 'Clubs', 'Diamonds']);
+type Suit = VariantOf<typeof Suit>;
 ```
 >
 > In the array template, each element must be a string literal (which will become the empty variant `{type: T extends string})`, or a call to `variation()`, like so:
 >
->```ts
+>```ts twoslash
+// @include: animal
+import {payload, variation} from 'variant';
+// ---cut---
 const Action = variant([
     'RefreshAnimals',
     'StartGame',
     variation('RescueAnimal', payload<Animal>()),
 ])
+type Action = VariantOf<typeof Action>;
 ```
 
 The object notation is recommended most of the time. The array notation is more convenient when most members of the variant are simple types with no data, but the object notation is a little clearer to read and will [forward documentation on the template down to the final constructors and interfaces](../articles/documentation).
@@ -47,21 +54,21 @@ The object notation is recommended most of the time. The array notation is more 
 
 The body of a variant—the shape of the data carried by some particular form—is defined by a function. More specifically, it is defined by that function's return value. In our snake example from earlier, we returned an object containing the properties `name` and `pattern`, which we sourced from our inputs. 
 
-When a variant is defined, it wraps the body of the function it receives into a new function. That new variant creator has the same inputs, and *almost* the same output (it merges in the `type` property).The beautiful thing about using a function as the definition of a variant is that it is both the simplest option *and* the nuclear option. Functions are capable of
+When a variant is defined, it wraps the body of the function it receives into a new function. That new variant creator has the same inputs, and *almost* the same output (it merges in the `type` property).The beautiful thing about using a function as the definition of a variant is that it is both the simplest option and the nuclear option. Functions are capable of
 
  - zero, one, multiple, [optional/default](https://www.typescriptlang.org/docs/handbook/2/functions.html#optional-parameters), and [variadic](https://en.wikipedia.org/wiki/Variadic_function) parameters. 
- - arbitrary processing logic.
+ - arbitrary processing logic like validation.
  - asynchronous calls.
- - side effects.
+ - side effects like logging.
  - referencing [closures](https://basarat.gitbook.io/typescript/recap/closure).
 
 Adding to that power, the objects they return may contain internal state, methods, and property accessors. In the few cases that isn't good enough variants can also be generated from full classes with `construct()`.
 
-Most of the time we will use helper functions like `payload()` or `fields()`, not because they increase our capabilities, but because they streamline how we think about and work with our domain.
+Most of the time we will use helper functions like `payload()` or `fields()`, not because they increase our capabilities, but because they streamline how we think about and manage our domain.
 
-### For no body
+### For empty bodies
 
-To express a case that has no data, use `nil`, or `{}`. Pick whichever speaks to you. In case it matters, `{}` may be interpreted as a block and depending on your syntax highlighting theme, that can change the color of the key. If this bothers you, use `nil`
+To express a case that has no data, use `nil`, or `{}`. Pick whichever speaks to you.
 
 ```ts twoslash
 // @include: animal
@@ -73,9 +80,11 @@ const Action = variant({
     RescueAnimal: payload<Animal>(),
 });
 ```
+Some syntax highlighters will interpret `{}` as a block and change the color of the key. If this bothers you, use `nil`
+
 ### For one piece of data
 
-Use `payload<T>()`, *or* use a simple function to wrap the name.
+Use `payload<T>()`, *or* use a simple function to retain the name.
 
 ```ts twoslash
 import {variant, VariantOf, payload} from 'variant';
@@ -92,7 +101,9 @@ type Something = VariantOf<typeof Something>;
 
 The `fields<T>()` function from earlier allows us to do this.
 
-> ⏲️ coming soon.
+```ts twoslash
+// @include: animal
+```
 
 
 ### For classes
@@ -116,7 +127,7 @@ class Dog {
 // @include: dogClass
 ```
 This class can be incorporated in our new version of `Animal`.
-```ts twoslash {1, 18-19}
+```ts twoslash {2, 19-20}
 // @include: dogClass
 import {variant, construct, VariantOf} from 'variant';
 // ---cut---

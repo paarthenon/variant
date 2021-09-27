@@ -64,7 +64,7 @@ export type GenericVariantTypeSpread<
  */
 export type GVariantOf<
     VM extends GenericVariantRecord<{}, string>,
-    TType extends (keyof VM | undefined),
+    TType extends TypeNames<VM>,
     Map extends {[gp: string]: any},
 > = TType extends keyof VM
     ? Generify<GenericVariantTypeSpread<VM>[TType], Map>

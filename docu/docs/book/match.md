@@ -38,7 +38,7 @@ const {colorMode} = useColorMode();
 The `colorMode` variable is a string `'dark' | 'light'`. As such, it can be processed with match.
 
 ```ts
-const result = match(ofLiteral(colorMode), {
+const result = match(colorMode, {
     dark: _ => ...,
     light: _ => ...,
 });
@@ -48,31 +48,25 @@ const result = match(ofLiteral(colorMode), {
 
 ## Partial matching
 
-Use the `default` keyword.
+Use the `partial()` helper function.
 
 ```ts twoslash
 // @include: animal
-import {match} from 'variant';
+import {match2 as match, partial} from 'variant';
 declare var animal: Animal;
 // ---cut---
 
-const hasFur = match(animal, {
+const hasFur = match(animal, partial({
     snake: _ => false,
     default: _ => true,
-});
+}));
 ```
 ### Better typed partial matching
 
-Use the overload `match(item, partialHandler, restHandler)`. In this version of match, the input to the default clause will be better typed. Specifically, it will exclude the items that the handler has already resolved. Notice that in this code sample, snake is absent from the input type.
+Use the `otherwise(partialHandler, restHandler)` helper function. In this utility, the input to the default clause will be better typed. Specifically, it will exclude the items that the handler has already resolved. Notice that in this code sample, snake is absent from the input type.
 
-```ts twoslash
-// @include: animal
-import {match} from 'variant';
-declare var animal: Animal;
-// ---cut---
-
-const hasFur = match(animal, {snake: _ => false}, _ => true);
-//                                                ^?
+```ts
+const hasFur = match(animal, otherwise({snake: _ => false}, _ => true));
 ```
 
 ## Inline matching
@@ -149,17 +143,3 @@ This can be accessed in two ways:
 const matchAnimal1 = prematch(Animal);
 const matchAnimal2 = prematch<Animal>();
 ```
-
-****
-
-- describe match
-- describe partial functionality
-- describe inline matcher
-- describe matching on literals
-- mention `unpack`
-- mention `constant`/`just`
-- bring up descoping a variant.
-
-Introduce the matcher
-
-Prematch

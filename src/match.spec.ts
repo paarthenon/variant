@@ -1,8 +1,9 @@
-import {fields, match, payload, scopedVariant, TypeNames, VariantOf, variation} from '.';
+import {fields, match, payload, scoped, TypeNames, VariantOf, variation} from '.';
 import {lookup, ofLiteral, otherwise, partial, prematch, variant} from './type';
 import {typeMap} from './typeCatalog';
 import {constant, just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';
+import {catalog} from './catalog';
 
 
 test('match (basic)', () => {
@@ -143,7 +144,7 @@ test('caps animal, keymap (destructured)', () => {
 })
 
 test('scoped match', () => {
-    const Animal2 = scopedVariant('Animal', {
+    const Animal2 = scoped('Animal', {
         Cat: fields<{name: string}>(),
         Dog: fields<{name: string, toy?: string}>(),
     });
@@ -276,11 +277,69 @@ test('match enum (numeric)', () => {
 
 
 test('lookup rate', () => {
-    const rate = (a: Animal) => match(a, lookup({
-        cat: 1,
-        dog: 2,
-        snake: 3,
-    }))
+    const rate = (a: Animal) => {
+        return match(a, lookup({
+            cat: 1,
+            dog: 2,
+            snake: 3,
+        }))
+    }
 
     expect(rate(sample.cerberus)).toBe(2);
+})
+
+
+test('match literal (quiet)', () => {
+    const rate = (a: Animal) => {
+        const aKey = a.type;
+        return match(aKey, {
+            cat: () => 1,
+            dog: () => 2,
+            snake: () => 3,
+        })
+    }
+    expect(rate(sample.cerberus)).toBe(2);
+})
+
+test('match literal (lookup)', () => {
+    const rate = (a: Animal) => {
+        const aKey = a.type;
+        return match(aKey, lookup({
+            cat: 1,
+            dog: 2,
+            snake: 3,
+        }))
+    }
+    expect(rate(sample.cerberus)).toBe(2);
+})
+
+
+test('inline match literal lookup', () => {
+    const greeks = [
+        'alpha',
+        'beta',
+        'gamma',
+    ] as const;
+
+    const greekLetters = greeks.map(match(lookup({
+        alpha: 'A',
+        beta: 'B',
+        gamma: 'Γ',
+    })))
+
+    expect(greekLetters[0]).toBe('A');
+    expect(greekLetters[1]).toBe('B');
+    expect(greekLetters[2]).toBe('Γ');
+})
+
+test('match promise inline', async () => {
+    const animal = Promise.resolve(sample.cerberus as Animal);
+
+    const result = await animal.then(match({
+        cat: c => c.type,
+        dog: d => d.name,
+        snake: s => s.pattern,
+    }));
+
+    expect(result).toBe('Cerberus');
 })
