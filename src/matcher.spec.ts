@@ -1,4 +1,4 @@
-import {match, matcher, ofLiteral, types} from './type';
+import {lookup, match, matcher, ofLiteral, types} from './type';
 import {constant, just} from './match.tools';
 import {typeCatalog} from './typeCatalog';
 import {Animal, sample} from './__test__/animal';
@@ -43,6 +43,7 @@ test('matcher lookupTable', () => {
     expect(rating(sample.cerberus)).toBe(2);
 })
 
+
 test('matcher (layered)', () => {
     const rating = (a: Animal) => {
         const matcherThunk = () => matcher(a)
@@ -62,7 +63,6 @@ test('matcher (layered)', () => {
     expect(rating(sample.perseus)).toBe(4);
     expect(rating(sample.cerberus)).toBeUndefined();
 })
-
 
 test('matcher (simple when)', () => {
     const getName = (a: Animal) => matcher(a)
@@ -116,9 +116,9 @@ test('matcher (simple single-entry when)', () => {
 
 test('matcher (when-complete)', () => {
     const getFeature = (a: Animal) => matcher(a)
-        .when({
+        .with({
             cat: c => c.furnitureDamaged,
-            dog: d => d.favoriteBall,
+            [Animal.dog.type]: d => d.favoriteBall,
             snake: s => s.pattern,
         })
         .complete();
@@ -148,7 +148,6 @@ test('matcher failure', () => {
         // @ts-expect-error
         .complete()
     ;
-
 })
 
 test('match enum', () => {
@@ -164,4 +163,72 @@ test('match enum', () => {
 
     expect(rate(Alpha.A)).toBe(0);
     expect(rate(Alpha.B)).toBe(1);
+})
+
+test('matcher (of literal directly)', () => {
+    const rate = (type: Animal['type']) => matcher(type)
+        .lookup({
+            cat: 1,
+            dog: 2,
+            snake: 3,
+        });
+
+    expect(rate(Animal.cat.type)).toBe(1);
+    expect(rate(Animal.dog.type)).toBe(2);
+})
+
+test('match enum directly', () => {
+    enum Alpha {
+        A = 'A',
+        B = 'B',
+    }
+
+    const rate = (a: Alpha) => matcher(a)
+        .when(Alpha.A, _ => 0)
+        .when(Alpha.B, _ => 1)
+        .complete();
+
+    expect(rate(Alpha.A)).toBe(0);
+    expect(rate(Alpha.B)).toBe(1);
+})
+
+
+test('matcher greeks', () => {
+    const greeks = [
+        'alpha',
+        'beta',
+        'gamma',
+    ] as const;
+
+    const greekLetters = greeks.map(letter => matcher(letter)
+        .register({
+            alpha: 'A',
+            beta: 'B',
+            gamma: 'Γ',
+        } as const)
+        .complete());
+
+    expect(greekLetters[0]).toBe('A');
+    expect(greekLetters[1]).toBe('B');
+    expect(greekLetters[2]).toBe('Γ');
+})
+
+test('matcher lookup', () => {
+    const greeks = [
+        'alpha',
+        'beta',
+        'gamma',
+    ] as const;
+
+    const greekLetters = greeks.map(letter => matcher(letter)
+        .with({
+            alpha: _ => 'A',
+            beta: _ => 'B',
+            gamma:_ => 'Γ',
+        })
+        .complete());
+
+    expect(greekLetters[0]).toBe('A');
+    expect(greekLetters[1]).toBe('B');
+    expect(greekLetters[2]).toBe('Γ');
 })

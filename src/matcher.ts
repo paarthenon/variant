@@ -1,6 +1,6 @@
 import {Handler} from './match';
 import {just} from './match.tools';
-import {Func, Splay, VariantCreator, VariantError} from './precepts';
+import {Func, Limited, Splay, VariantCreator, VariantError} from './precepts';
 import {Identity, TypeStr} from './util';
 import {isVariantCreator} from './variant';
 
@@ -45,7 +45,7 @@ type CompleteFunc<RemainingKeys, Return> = {
      * 
      * > This is not callable. 
      */
-    incomplete: VariantError<['The handler has not been fully completed. Keys', RemainingKeys, 'expected']>
+    incomplete: VariantError<['The handler has not been fully completed. Expected key(s)', RemainingKeys]>
 }
 
 /**
@@ -127,9 +127,11 @@ export class Matcher<
     /**
      * Handle all unhandled cases and immediately execute. 
      * 
+     * > **Exhaust** — to consume entirely, *Merriam-Webster*
+     * 
      * This is a **terminal** and resolves the matcher.
-     * @param remainingCases 
-     * @returns 
+     * @param remainingCases an object wiht a method to handle every remaining case.
+     * @returns the result of executing the handler, given these final additions.
      */
     exhaust<R extends RestOfHandler<T, H, K>>(remainingCases: R): ReturnType<(H & R)[T[K]]> {
         const combinedHandler = {
@@ -178,7 +180,7 @@ export class Matcher<
      * @param table 
      * @returns 
      */
-    register<Table extends Splay<Record<T[K], any>>>(table: Table): Matcher<T, K, H & LookupTableToHandler<Table>> {
+    register<Table extends Splay<Record<T[K], any>>>(table: Limited<Table, T[K]> & Table): Matcher<T, K, H & LookupTableToHandler<Table>> {
         const newHandler = {
             ...this.handler,
             ...tableToHandler(table),
@@ -216,10 +218,15 @@ export class Matcher<
      * Handle one or more cases, object-style.
      * @param variations
      */
-    when<
+    with<
         Variations extends Splay<Handler<T, K>>,
-    >(variations: Variations): Matcher<T, K, H & Variations>;
-
+    >(variations: Limited<Variations, T[K]> & Variations): Matcher<T, K, H & Variations> {
+        return new Matcher(this.target, this.key, {
+            ...this.handler,
+            ...(variations as Variations)
+        });
+    }
+ 
     /**
      * Handle one or more cases with a set of types and a handler.
      * @param variations 
@@ -228,7 +235,17 @@ export class Matcher<
     when<
         Variation extends T[K] | VariantCreator<T[K], Func, K>,
         Handler extends (x: Extract<T, Record<K, TypeStr<Variation, K>>>) => any
-    >(variations:Variation | Variation[], handler: Handler): Matcher<T, K, H & Record<TypeStr<Variation, K>, Handler>>;
+    >(variations: Variation | Variation[], handler: Handler): Matcher<T, K, H & Record<TypeStr<Variation, K>, Handler>>;
+
+    /**
+     * Handle one or more cases, object-style.
+     * @deprecated - use with
+     * @param variations
+     */
+    when<
+        Variations extends Splay<Handler<T, K>>,
+    >(variations: Limited<Variations, T[K]> & Variations): Matcher<T, K, H & Variations>;
+
     /**
      * Actual impl.
      * @param variations 
@@ -238,7 +255,7 @@ export class Matcher<
     when<
         Variation1 extends T[K],
         Variation2 extends VariantCreator<T[K], Func, K>,
-        Variation3 extends Variation1[],
+        Variation3 extends Array<Variation1 | Variation2>,
         Variation4 extends Splay<Handler<T, K>>,
         HandlerFunc extends (x: Extract<T, Record<K, TypeStr<Variation1, K>>>) => any
     >(variations: Variation1 | Variation2 | Variation3 | Variation4, handler?: HandlerFunc) {
@@ -274,12 +291,16 @@ export interface MatcherFunc<K extends string> {
      * Create a matcher on some target variant instance.
      * @param target 
      */
-    matcher<T extends Record<K, string>>(target: T): Matcher<T, K, {}>
+    matcher<T extends (TType extends TType ? Record<K, TType> : never), TType extends string>(target: T | TType): Matcher<T, K, {}>
 }
 
 export function matcherImpl<K extends string>(key: K): MatcherFunc<K> {
-    function matcher<T extends Record<K, string>>(target: T) {
-        return new Matcher(target, key, {})
+    function matcher<T extends (TType extends TType ? Record<K, TType> : never), TType extends string>(target: T | TType) {
+        const actualTarget = typeof target === 'string'
+            ? {[key]: target}
+            : target
+        ;
+        return new Matcher(actualTarget as any, key, {})
     }
 
     return {matcher};

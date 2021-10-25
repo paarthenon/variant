@@ -325,7 +325,7 @@ test('inline match literal lookup', () => {
         alpha: 'A',
         beta: 'B',
         gamma: 'Γ',
-    })))
+    } as const)))
 
     expect(greekLetters[0]).toBe('A');
     expect(greekLetters[1]).toBe('B');

@@ -44,9 +44,7 @@ This augmentation may not seem very impactful with only three actions, but for m
 
 ## Patching Instances
 
-The augmentation function can accept a parameter, the in-progress variant.
-
-This is an example ripped from a unit test. TODO: Include a tailored example.
+The augmentation function can accept a parameter, the in-progress variant. For a basic example, let's patch in a `nameLength` property to our `Animal`s from earlier.
 
 ```ts
 const BetterAnimal = variant(augment(Animal, animal => ({nameLength: animal.name.length})));
@@ -58,7 +56,7 @@ expect(snek.nameLength).toBe(5);
 
 ### Matching & Patching
 
-This is an example ripped from a unit test. TODO: Include a tailored example.
+In most instances, it won't be possible to augment a variant using the same logic for all cases. Here come the match functions to the rescue. In this next example we'll assign an [epithet](https://www.merriam-webster.com/dictionary/epithet) to each animal based on one of its properties.
 
 ```ts
 const BetterAnimal = variant(augment(

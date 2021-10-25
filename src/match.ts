@@ -77,8 +77,6 @@ export type MatchFuncs<K extends string> = {
     lookup<H extends Record<T[K], any>, T extends Record<K, string>>(handler: H): (instance: T) => LookupTableToHandler<H>;
 }
 
-type asf = HandlerFromPartial<{default: () => 5}, 'Key1'>;
-
 type HandlerFromPartial<H extends Record<'default', unknown>, Keys extends string> = {
     [K in Keys]: H extends Record<K, any> ? H[K] : H['default'];
 }
@@ -93,7 +91,7 @@ export interface MatchOverloads<K extends string> {
      * Curried overload - handler.
      */
     <
-        T extends (TType extends TType ? Record<K, TType> : never),
+        T extends Record<K, TType>,
         H extends Handler<T, K>,
         TType extends string,
     >(handler: EnforceHandler<H> | ((t: T) => H)): (instance: T | TType) => ReturnType<H[keyof H]>;
@@ -102,7 +100,7 @@ export interface MatchOverloads<K extends string> {
      * Main match overload
      */
     <
-        T extends (TType extends TType ? Record<K, TType> : never),
+        T extends Record<K, TType>,
         H extends Handler<T, K>,
         TType extends string,
     >(target: T | TType, handler: H | ((t: T) => H)): ReturnType<H[T[K]]>;
@@ -147,7 +145,7 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
                 match(instance, handler);
 
     function match<
-        T extends (TType extends TType ? Record<K, TType> : never),
+        T extends Record<K, TType>,
         H extends Handler<T, K> | ((t: T) => Handler<T, K>),
         TType extends string,
     >(...args: any[]) {
@@ -191,7 +189,7 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
         const handlerWithFuncs = Object.keys(handler).reduce((acc, cur) => {
             return {...acc, [cur]: () => handler[cur as keyof H]}
         }, {} as LookupTableToHandler<H>);
-        return (_instance: T) => handlerWithFuncs;
+        return _ => handlerWithFuncs;
     }
 
     function otherwise<

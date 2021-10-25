@@ -8528,9 +8528,9 @@ value-equal@^1.0.1:
   integrity sha512-NOJ6JZCAWr0zlxZt+xqCHNTEKOsrks2HQd4MqhP1qy4z1SkbEP467eNx6TgDKXMvUOb+OENfJCZwM+16n7fRfw==
 
 variant@^3.0.0-dev.19:
-  version "3.0.0-dev.21"
-  resolved "https://registry.yarnpkg.com/variant/-/variant-3.0.0-dev.21.tgz#d1c9405657f2a038359ebf849859d95289cde78b"
-  integrity sha512-kqC4c5zd+F3ZUntx5lSIEVW61ArOH9ujqCXyPVhwvLLOXooA6hpMQDzIeYwiSZWWAwX3o4106FDikqCV/G+vAg==
+  version "3.0.0-dev.22"
+  resolved "https://registry.yarnpkg.com/variant/-/variant-3.0.0-dev.22.tgz#2756132c9a594e5e18b12fcd2ab7b0ac286763fc"
+  integrity sha512-aKko0t2GnNEcZx51pw278hF9alCUiaKGN/lncjUYmleNoV3hZRqP7yrBzqN0vX/F9Zw2OwlByALUYV46T8sfkQ==
 
 vary@~1.1.2:
   version "1.1.2"

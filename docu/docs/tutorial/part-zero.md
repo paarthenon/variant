@@ -2,6 +2,10 @@
 title: Introducing "Kind of Super"
 ---
 
+:::danger
+I am dealing with a wrist injury and have limited typing. This tutorial is still coming, but will be posted in stages. This page is a placeholder for some of the content that is to come. For now, please [continue on to the book](../book/creation). 
+:::
+
 For this next section, we're going to demonstrate how a typically complex task can be simplified through variant by building a text-based browser game.
 
 The game **Kind of Super** will be a text-based game that has the player create a hero of their choosing and attempt to survive a
@@ -32,13 +36,10 @@ We're going to build a game in the most intuitive way and a lot of this book-kee
     - `matcher()` provides more utility than the redux-toolkit match builder.
 - No complex popovers or css tooltips. Just the `title` attribute.
 
-:::danger
-I am dealing with a wrist injury and have limited typing. This tutorial is still coming, but will be posted in stages. For now, please [continue on to the book.](../book/creation)
-:::
 
 ## Upcoming content
 
-When the tutorial does drop, my plan is to have it on several parts in order for it to be digestable.
+The tutorial will arrive in several parts in order to be digestable.
 
 ### Part 1 - Defining a Hero
 

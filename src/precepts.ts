@@ -174,12 +174,12 @@ export type RawVariant = {[type: string]: Func | {}};
 /**
  * Catch-all type to express type errors.
  */
-export interface VariantError<T> { __error: never, __message: T };
+export interface VariantError<T> {__error: never, __message: T};
 
 /**
  * A type to express some arbitrary information.
  */
-export interface Message<T> { __: never, message: T };
+export interface Message<T> {__: never, message: T};
 
 /**
  * Prevents 'overflow' in a literal.

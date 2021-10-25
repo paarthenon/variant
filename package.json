@@ -1,6 +1,6 @@
 {
   "name": "variant",
-  "version": "3.0.0-dev.22",
+  "version": "3.0.0-dev.23",
   "description": "Variant types (a.k.a. Discriminated Unions) in TypeScript",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

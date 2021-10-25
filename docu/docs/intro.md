@@ -167,7 +167,6 @@ import {match, constant} from 'variant';
 // ---cut---
 
 // @include: rivalWantsAnimal
-
 ```
 We can now use this function to evaluate some animal we come across, or we perhaps use it to filter a list of animals. 
 
@@ -368,6 +367,8 @@ export const rootReducer = (state = initState, action: Action) => {
 }
 ```
 
+My game logic (`GameAction`/`gameReducer`) is separated from my state saving and loading logic (`AppAction`/`appReducer`), which is further separated from my developer cheat codes (`DebugAction`/`debugReducer`). 
+
 ## Variant Applications
 
 *Variant is a language feature disguised as a library*. As such it's relevant to any type of application, and at only `3kb` zipped it's become very easy to include. I find myself using variant in every project I write, to the point that I import it in my personal template.
@@ -375,15 +376,17 @@ export const rootReducer = (state = initState, action: Action) => {
 However there are certainly applications where variants *excel*.
 
  - **Actions**. Variant types are the ideal solution for expressing a set of possible actions that need dispatching. That's exactly why this example is used in every conversation about discriminated unions. It will come up in this documentation as well, as soon as [the next section](tutorial/part-one), in fact.
- - **Optionals and result objects**. The [`Option<T>` type](https://en.wikipedia.org/wiki/Option_type) is familiar and loved for good reason as an alternative to null handling. Variants allow us to express this and even more powerful versions of result types with partial success and progress information.
+ - **Optionals and result objects**. The [`Option<T>` type](https://en.wikipedia.org/wiki/Option_type) is familiar and beloved for good reason as an alternative to null handling. Variants allow us to express this and even more powerful versions of result types with partial success and progress information.
  - **Compilers and interpreters.** Variants closely mirror the recursive rule definitions of S-langs. Expressing grammars in TypeScript feels natural and is feasible with this project's support for recursive and generic types.
  - **Heterogeneous** (mixed) **lists**. These are the best way to express heterogeneous lists that can still be unzipped into separate, well-typed parts. Job or task systems tend to love having access to heterogeneous lists for the task queue, a list made up of different types of jobs.
 
-Variant is smoothly incorporated into existing codebases. Recall that variant types simply _are_ discriminated unions. There's very little magic in the product, just its construction. Users may start refactoring from any part of their application while retaining a working build. You may wish to refactor your action creators yet continue processing them with the same old `switch` statement in the reducer. Or take the opportunity to refresh your complex `switch` statements with the [cleaner organization of the `matcher()`](book/matcher) while leaving your current constructors in place. Some utilize the match functions but leave type creation entirely to codegen with GraphQL or protobuf.
+Variant is smoothly incorporated into existing codebases and should not be relegated to new projects. Recall that variant types simply _are_ discriminated unions. There's very little magic in the product, just its construction. Users may start refactoring from any part of their application while retaining a working build. You may wish to refactor your action creators yet continue processing them with the same old `switch` statement. Or take the opportunity to refresh your complex `switch` statements with the cleaner organization of [`match()`](book/match) or [`matcher()`](book/matcher) while leaving your current constructors in place. Some utilize the match functions but leave type creation entirely to codegen with GraphQL or protobuf.
 
-**Flexibility** has been coded into Variant 3.0 from the gound up. The variants we saw were created with `type` as the [discriminant](glossary#discriminant), but this is simply the default. *Every* variant function can be keyed to a completely different common term, allowing the same level of functionality as `type` for unions that pivot on `kind`, `tag`, or GraphQL's `__typename`.
-
-The software is open-source, actively maintained, and matures with each update. Every function in the library has its own test suite and documentation. This package has been trusted by individuals, corporations, and government agencies for mission-critical applications.
+*Flexibility* has been coded into Variant 3.0 from the gound up. The variants we saw were created with `type` as the [discriminant](glossary#discriminant), but this is simply the default. *Every* variant function can be keyed to a completely different common term, allowing the same level of functionality as `type` for unions that pivot on `kind`, `tag`, or GraphQL's `__typename`.
+```ts
+const {variant, match} = variantCosmos('kind'); // is all it takes
+``` 
+The software is open-source, actively maintained, and matures with each update. Every function in the library has its own test suite and documentation. This package has been trusted by individuals, corporations, and governments for mission-critical applications. 
 
 ## Next Steps
 

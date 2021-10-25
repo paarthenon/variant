@@ -20,22 +20,23 @@ Pattern matching is the crown jewel of variant types. Like the traditional switc
 
 The most direct use of the match expression requires an instance and a handler object.
 
-```ts
-const result = match(instance, {
-    typeOne: _ => _.
+```ts twoslash
+// @include: animal-fullType
+import {match} from 'variant';
+// ---cut---
+const rivalWantsAnimal = (animal: Animal) => match(animal, {
+    dog: _ => false, // allergic to dogs
+    cat: ({furnitureDamaged}) => furnitureDamaged < 3, // some cats
+    snake: _ => true, // snakes are cool
 })
 ```
-
+This handler object requires a property for each case of a variant where the key equals the type literal and the value is a function that handles that type of variant.
 
 ## Matching Literals
 
-Match can be used on *any* valid string literal union. These can be generated simply with `catalog()` or may come from other libraries. For example, **Chakra-UI** provides a hook `useColorMode`.
+Match can be used on any valid string literal union. These can be generated simply with `catalog()` or may come from other libraries.
 
-```ts
-const {colorMode} = useColorMode();
-```
-
-The `colorMode` variable is a string `'dark' | 'light'`. As such, it can be processed with match.
+Imagine a `colorMode` variable, a string `'dark' | 'light'`. As a union, it can be processed with match.
 
 ```ts
 const result = match(colorMode, {
@@ -44,7 +45,6 @@ const result = match(colorMode, {
 });
 ```
 
-****
 
 ## Partial matching
 
@@ -67,6 +67,29 @@ Use the `otherwise(partialHandler, restHandler)` helper function. In this utilit
 
 ```ts
 const hasFur = match(animal, otherwise({snake: _ => false}, _ => true));
+```
+
+## Returning a constant
+
+Frequently typing `() => value` may be tedious or even painful for some developers.
+
+For a single case, use the functions `constant(value)` or `just(value)` as an alternative to `() => value`/`_ => value`.
+
+```ts
+const emoji = (animal: Animal) => match(animal, {
+    cat: constant('🐱'),
+    dog: constant('🐕'),
+    snake: constant('🐍'),
+})
+```
+If every case will be handled by returning a constant value, for example in a lookup table, use the `lookup()` helper function.
+
+```ts
+const emoji = (animal: Animal) => match(animal, lookup({
+    cat: '🐱',
+    dog: '🐕',
+    snake: '🐍',
+}))
 ```
 
 ## Inline matching
@@ -98,29 +121,53 @@ const message = getAnimal()
 
 But inline matching can also be used in situations like the array functions `.filter`, `.some`, and `.map`.
 
-## Unpack
+Combine this with partial matching to do something like:
 
-The `payload()` helper function is commonly used. Unpacking the payload from the variant results in typing `({payload}) => payload,` many times. This lambda is available as `unpack`.
-
-> Code sample TBD.
-
-## Returning a constant
-
-Use the functions `constant(value)` or `just(value)` as an alternative to `() => value`/`_ => value`.
-
-```ts
-// Code TBD.
+```ts twoslash
 
 ```
-## Matching scoped variants.
+
+
+## Special Cases
+### Matching scoped variants.
 
 Use the `descope()` function to remove the scope section, allowing the handler to work with the more friendly names.
 
-```ts
-// code tbd.
+```ts twoslash
+import {scoped, descope, fields, match, just, partial, TypeNames, VariantOf} from 'variant';
+// ---cut---
+const ScopedAnimal = scoped('Animal', {
+    Cat: fields<{name: string}>(),
+    Dog: fields<{name: string, toy?: string}>(),
+});
+type ScopedAnimal<T extends TypeNames<typeof ScopedAnimal> = undefined> = VariantOf<typeof ScopedAnimal, T>;
+
+const cat = ScopedAnimal.Cat({name: 'Perseus'});
+
+const rating = (animal: ScopedAnimal) => match(descope(animal), {
+    Cat: c => 1,
+    Dog: d => 2,
+})
 ```
 
-## Prematching
+Though it's also possible to work with the types directly.
+
+```ts twoslash
+import {scoped, descope, fields, match, just, partial, TypeNames, VariantOf} from 'variant';
+const ScopedAnimal = scoped('Animal', {
+    Cat: fields<{name: string}>(),
+    Dog: fields<{name: string, toy?: string}>(),
+});
+type ScopedAnimal<T extends TypeNames<typeof ScopedAnimal> = undefined> = VariantOf<typeof ScopedAnimal, T>;
+
+const cat = ScopedAnimal.Cat({name: 'Perseus'});
+// ---cut---
+const rating = (animal: ScopedAnimal) => match(animal, {
+    'Animal/Cat': c => 1,
+    [ScopedAnimal.Dog.type]: d => 2,
+})
+```
+### Prematching
 
 Match on a type ahead of time. No variable instance necessary. 
 
@@ -143,3 +190,10 @@ This can be accessed in two ways:
 const matchAnimal1 = prematch(Animal);
 const matchAnimal2 = prematch<Animal>();
 ```
+
+### Unpack
+
+The `payload()` helper function is commonly used. Unpacking the payload from the variant results in typing `({payload}) => payload,` many times. This lambda is available as `unpack`.
+
+> Code sample TBD.
+

@@ -54,7 +54,12 @@ The object notation is recommended most of the time. The array notation is more 
 
 The body of a variant—the shape of the data carried by some particular form—is defined by a function. More specifically, it is defined by that function's return value. In our snake example from earlier, we returned an object containing the properties `name` and `pattern`, which we sourced from our inputs. 
 
-When a variant is defined, it wraps the body of the function it receives into a new function. That new variant creator has the same inputs, and *almost* the same output (it merges in the `type` property).The beautiful thing about using a function as the definition of a variant is that it is both the simplest option and the nuclear option. Functions are capable of
+When a variant is defined, it wraps the body of the function it receives into a new function. That new variant creator has the same inputs, and *almost* the same output (it merges in the `type` property).
+
+Most of the time we will use helper functions like `payload()` or `fields()`, not because they increase our capabilities, but because they streamline how we think about and manage our domain.
+
+:::note On Functions
+The beautiful thing about using a function as the definition of a variant is that it is both the simplest option and the nuclear option. Functions are capable of
 
  - zero, one, multiple, [optional/default](https://www.typescriptlang.org/docs/handbook/2/functions.html#optional-parameters), and [variadic](https://en.wikipedia.org/wiki/Variadic_function) parameters. 
  - arbitrary processing logic like validation.
@@ -62,9 +67,8 @@ When a variant is defined, it wraps the body of the function it receives into a 
  - side effects like logging.
  - referencing [closures](https://basarat.gitbook.io/typescript/recap/closure).
 
-Adding to that power, the objects they return may contain internal state, methods, and property accessors. In the few cases that isn't good enough variants can also be generated from full classes with `construct()`.
-
-Most of the time we will use helper functions like `payload()` or `fields()`, not because they increase our capabilities, but because they streamline how we think about and manage our domain.
+Adding to that power, the objects they return may contain internal state, methods, and property accessors. In the few cases that isn't sufficient variants can also be generated from full classes with `construct()`.
+:::
 
 ### For empty bodies
 
@@ -259,4 +263,24 @@ const logLevels = catalog(
    (_, i) => i * 100
 );
 ```
-This version of the code can be shorter and is often more resilient against refactoring. 
+This version of the code can be shorter and is often more resilient against refactoring.
+
+
+### Matching Catalogs
+
+In order to streamline domain-modeling, literal unions (such as those from `catalog()`) may be directly processed through `match()` and `matcher()`.
+
+```ts twoslash
+import {variant, catalog, match} from 'variant';
+// ---cut---
+const animal = catalog(['cat', 'dog', 'snake']);
+type animal = keyof typeof animal;
+
+const fittingPokemon = (a: animal) => match(a, { 
+    cat: _ => 'Meowth',
+    dog: _ => 'Arcanine',
+    snake: _ => 'Ekans',
+})
+```
+
+Other library functions can be accessed by elevating the literal union to a full discriminated union through `ofLiteral()`. 
