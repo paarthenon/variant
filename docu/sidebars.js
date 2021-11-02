@@ -50,12 +50,16 @@ module.exports = {
       items: ['libraries/rxjs', 'libraries/redux-toolkit'],
     },
     'todo',
-    'api',
     'glossary',
+    {
+      type: 'doc',
+      id: 'api/modules',
+      label: '☕ API',
+    }
+    
   ],
   secondSidebar: [
     'about',
-    'changelog',
     'credits',
   ]
 };

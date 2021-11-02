@@ -24,6 +24,6 @@ export function payload<T>(_example?: T) {
 
 
 /**
- * Template to create an empty variation (`{type: 'literal'}`).
+ * Create an empty variation (`{type: 'literal'}`).
  */
 export const nil = () => ({});

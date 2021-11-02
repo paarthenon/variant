@@ -25,20 +25,3 @@ test('keymap object instance', () => {
     
     expect(cat.type).toBe(km.cat);
 })
-
-
-test('asdf', () => {
-    enum PriorityLevel {
-        Low,
-        Medium,
-        High,
-    }
-    const Attribute = variant({
-        dueDate: fields<{timestamp: number}>(),
-        priority: fields<{level: PriorityLevel}>(),
-        reminder: fields<{message?: string, timestamp: number}>(),
-    });
-
-    type Attributes = Flags<typeof Attribute>;
-    
-})

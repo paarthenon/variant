@@ -4,10 +4,9 @@ import {Identity} from './util';
 import {isVariantCreator, VariantRecord} from './variant';
 
 /**
- * Expand the functionality of a variant as a whole by tacking on 
- * computed properties. These are configured through a function parameter.
+ * Augment an existing variant model with new or overridden fields. 
  * 
- * @param variantDefinition a template for the variant, extends `RawVariant`
+ * @param variantDefinition a template for the variant, extends `RawVariant`, may be an existing variant.
  * @param f the augment function. This receives the object that is is augmenting, enabling calculated properties.
  * @tutorial
  * Use in conjunction with `variant` (or `variantModule`).

@@ -63,8 +63,12 @@ const BetterAnimal = variant(augment(
     Animal,
     animal => ({
         epithet: match(animal, {
-            cat: ({furnitureDamaged}) => furnitureDamaged > 5 ? 'dangerous' : 'safe',
-            dog: ({favoriteBall}) => favoriteBall === 'yellow' ? 'bad' : 'good',
+            cat: ({furnitureDamaged}) => furnitureDamaged > 5
+                ? 'dangerous'
+                : 'safe',
+            dog: ({favoriteBall}) => favoriteBall === 'yellow'
+                ? 'bad'
+                : 'good',
             snake: ({pattern}) => pattern,
         })
     }),

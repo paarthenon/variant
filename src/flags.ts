@@ -1,15 +1,28 @@
 import {CreatorOutput, GetTypeLabel, TypesOf, VariantModule} from './precepts';
 
+/**
+ * Transform a sum type (a variant) into a product type.
+ */
 export type Matrix<T extends VariantModule<string>> = {
     [P in TypesOf<T>]: CreatorOutput<T[GetTypeLabel<T, P>]>;
 }
 
 /**
- * Splay a list of variant instances into an object. 
+ * Turn a sum type (a variant) into a partial product type.
+ * 
+ * @see {@link Matrix}
  */
 export type Flags<T extends VariantModule<string>> = Partial<Matrix<T>>;
 
 export interface FlagsFunc<K extends string> {
+    /**
+     * Turn a list of sum type instances (variants) into a product type.
+     * 
+     * In other words, perform a unique groupBy on the list, grouping on the type property.
+     * @param flags An array of variant instances.
+     * @template T The discriminated union 
+     * @returns An object where each property's key is a type string and its value is the instance of that type.
+     */
     flags<T extends Record<K, string>>(flags: T[]): {[P in T[K]]: Extract<T, Record<K, P>>};
 }
 

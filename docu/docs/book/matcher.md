@@ -35,6 +35,12 @@ In the above example, cats and dogs both have fur and so can be handled the same
 
 A **terminal** is some matcher method that executes the handler immediately. The ideal terminal is `.complete()`
 
+### `.complete()`
+### `.else()`
+### `.execute()`
+### `.exhaust()`
+### `.lookup()`
+
 
 
 ## Matching Literals
@@ -55,3 +61,10 @@ const result = matcher(ofLiteral(colorMode)).lookup({
 ```
 
 Note that unlike the example for the [match function](match)
+
+****
+
+- `.with()`
+
+
+- ``

@@ -73,9 +73,9 @@ test('prematch on type', () => {
         snake: _ => 9,
     });
 
-    prematch<Animal>()({
+    prematch<Animal>()(partial({
         default: _ => 5,
-    })
+    }))
     const result = test(sample.cerberus);
 
     expect(result).toBe(6)
@@ -86,7 +86,7 @@ test('prematch on module', () => {
     const test = prematch(Animal)({
         cat: _ => 5,
         dog: _ => 6,
-        default: _ => 8,
+        snake: _ => 8,
     });
 
     const result = test(sample.cerberus);

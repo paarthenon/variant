@@ -9,7 +9,7 @@ import {TypedFunc, typedImpl} from './typed';
 import {MatcherFunc, matcherImpl} from './matcher';
 
 /**
- * All the `type`-centric functions in the library.
+ * All the functions in the library that pivot on a certain discriminant.
  */
 export interface VariantCosmos<
     K extends string,
@@ -37,6 +37,7 @@ export interface VariantCosmosConfig<K extends string> {
 /**
  * Generate a series of functions to work off a given key.
  * @param config the key to use.
+ * @template K discriminant as string literal.
  * @returns `VariantCosmos<K>`
  */
 export function variantCosmos<

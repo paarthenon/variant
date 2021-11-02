@@ -6,7 +6,7 @@ title: Introduction
 
 Variant aims to bring the experience of [variant types](https://dev.realworldocaml.org/variants.html) to TypeScript. Variant types, a.k.a. [discriminated unions](https://basarat.gitbook.io/typescript/type-system/discriminated-unions) in the TypeScript world, are an excellent tool for describing and handling flexible domains and problem spaces. However, because [*"TypeScript instead builds on JavaScript patterns as they exist today"*](http://web.archive.org/web/20191018040436/https://www.typescriptlang.org/docs/handbook/advanced-types.html#discriminated-unions) using them as-is can result in tedious and fragile code. This project addresses that by providing well-typed, fluent, and expressive tools to safely do away with the boilerplate.
 
-[🧠 Click here to jump straight to the API Reference](api.md)
+[🧠 Click here to jump straight to the API Reference](api/modules)
 
 ## Quick start
 
@@ -257,7 +257,7 @@ However, there will be times when we don't want to handle each case individually
     bird: fields<{name: string, canFly: boolean}>(),
 });
 export type Animal = VariantOf<typeof Animal>;
-import {match2 as match, constant, just, partial} from 'variant';
+import {match, constant, just, partial} from 'variant';
 // ---cut---
 
 const slytherinFanWantsAnimal = (hopefullyASnake: Animal) =>
@@ -367,7 +367,7 @@ export const rootReducer = (state = initState, action: Action) => {
 }
 ```
 
-My game logic (`GameAction`/`gameReducer`) is separated from my state saving and loading logic (`AppAction`/`appReducer`), which is further separated from my developer cheat codes (`DebugAction`/`debugReducer`). 
+My game logic (`GameAction`/`gameReducer`) is separated from my state saving and loading logic (`AppAction`/`appReducer`), which are both further separated from my developer cheat codes (`DebugAction`/`debugReducer`). 
 
 ## Variant Applications
 
@@ -399,17 +399,3 @@ Thanks for sticking around to this point. The remainder of the documentation is 
  - **Libraries**: Comparisons to competitors, or How-To guides for compatible packages.
  - **API**: A full API reference for the library. Every function, every type, every meaning.
  - **Glosssary**: A consolidated dictionary of the esoteric terms I use.
-
-:::note Under Construction
-This documentation is still under construction. The most fleshed out pages beyond this page are
-
- - The *Creation* section of *The Book*.
-    - [Making Variants](book/creation)
-    - [Advanced Creation](book/advanced-creation)
-    - [Augmenting Variants](book/augment)
-    - [Generic Variants](book/generic)
-    - [Procedural Generation](book/procedural-generation)
- - [`Articles/Documentation`](articles/documentation)
- - [New in Variant 3.0](new-in-3.0)
-
-:::

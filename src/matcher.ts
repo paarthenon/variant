@@ -127,7 +127,7 @@ export class Matcher<
     /**
      * Handle all unhandled cases and immediately execute. 
      * 
-     * > **Exhaust** — to consume entirely, *Merriam-Webster*
+     * > **Exhaust** — to consume entirely, _Merriam-Webster_
      * 
      * This is a **terminal** and resolves the matcher.
      * @param remainingCases an object wiht a method to handle every remaining case.
@@ -246,12 +246,7 @@ export class Matcher<
         Variations extends Splay<Handler<T, K>>,
     >(variations: Limited<Variations, T[K]> & Variations): Matcher<T, K, H & Variations>;
 
-    /**
-     * Actual impl.
-     * @param variations 
-     * @param handler 
-     * @returns 
-     */
+    // actual implementation
     when<
         Variation1 extends T[K],
         Variation2 extends VariantCreator<T[K], Func, K>,

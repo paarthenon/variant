@@ -15,12 +15,19 @@ import {TypeNames} from 'variant';
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 // - fullType
 ```
+Tools to answer two simple questions
 
-Most of the time to do something useful with a discriminated union we'll need to examine its members and their types. Matching is a form of inspection, but is often geared toward processing. Here let's focus on some of the ways to analyze these objects.
+1. **How do we check if we have a certain type?** 
+2. **How do we list all of the types of a given variant?** Perhaps I want to print them, or need to reference a subset of types to further delegate processing.
+
+## Checking types
+
+Let's talk about how to check if an animal is a dog, or if a protocol message is a session initiation packet. Matching allows for case-by-case handling, but can be overkill when we only care about one possibility.
 
 ### `type` equality
 
-Classic. Supports type narrowing
+The classic discriminated unions approach, simply check if the type equals a string literal. 
+
 ```ts twoslash
 // @include: animal
 declare var animal: Animal;
@@ -30,9 +37,10 @@ if (animal.type === 'dog') {
 //                      ^?
 }
 ```
+This literal is constrained to the union `'cat' | 'dog' | 'snake'`, but users who prefer to avoid string literals may use `Animal.dog.type` to access the literal `dog`. As your type strings become longer or more complex, the ability to reference them in this way becomes more useful.
 
 ### `isType()`
-A _user-defined type guard_ that can answer whether or not an instance of a variant is of a given type. Takes the type as either a string literal or the variant creator.
+The `istype()` function is a _user-defined type guard_ that answers whether or not an instance is of a given type. It accepts the type as either a string or a variant creator function.
 ```ts twoslash
 // @include: animal
 declare var animal: Animal;
@@ -55,7 +63,8 @@ if (isType(animal, Animal.dog)) {
 ```
 
 #### Point-free overload
-Note, this also works as a higher order function for filters.
+
+`isType()` may be used without an instance, where it will resolve to a function, roughly `(instance: T) => T is Type`, making it a perfect fit for filtering.
 
 ```ts twoslash
 // @include: animal
@@ -66,9 +75,57 @@ declare var animals: Animal[];
 const dogs = animals.filter(isType(Animal.dog));
 ```
 
+### `isOfVariant()`
+
+Check if an element is of a given variant. This is a _user-defined type guard_ that accepts a variant to compare against.
+
+```ts twoslash
+// @include: animal
+import {isOfVariant} from 'variant';
+// ---cut---
+declare var animal: object;
+if (isOfVariant(animal, Animal)) {
+    const name = animal.name; // safe, since all animals have a 'name'.
+    console.log('found animal named', name);
+}
+```
+
+#### Partial overload
+
+If an instance is not currently available, a predicate may still be generated.
+
+```ts twoslash
+// @include: animal
+import {isOfVariant} from 'variant';
+// ---cut---
+declare var animal: object;
+
+const isAnimal = isOfVariant(Animal);
+if (isAnimal(animal)) {
+    const name = animal.name; // safe, since all animals have a 'name'.
+    console.log('found animal named', name);
+}
+```
+
+This may be used to filter arrays, the same as `isType()`.
+
+```ts twoslash
+// @include: animal
+import {isOfVariant} from 'variant';
+// ---cut---
+declare var potentialAnimals: object[];
+
+const animals = potentialAnimals.filter(isOfVariant(Animal));
+//      ^?
+```
+
+## Listing types
+
+The possible types of a variant may be retrieved in various forms.
+
 ### `types()`
 
-Get a list of the types in a variant. For `Animal`, it would return `['cat', 'dog', 'snake']`. The order is... complicated. Expect it to be unspecified to be safe, but in some modern stacks it will match the order of the template. 
+Get an array of the types in a variant. For `Animal`, it would return `['cat', 'dog', 'snake']`.
 
 ```ts twoslash
 // @include: animal
@@ -77,14 +134,19 @@ import {types} from 'variant';
 // ---cut---
 const animalTypes = types(Animal);
 ```
+The order is... complicated. Expect it to be unspecified to be safe, but in some modern stacks it will match the order of the template. 
 
 ### `typeCatalog()`
 
 The `types()` function returns an array. This is often appropriate, but suffers from O(n) membership checking. `typeCatalog()`, by contrast, returns a constant object of string literals (a.k.a. what you get it if you call `catalog(types(_____))`on some variant.
 
-
-```ts
-const animalTypes = typeCatalog(Animal)
+```ts twoslash
+// @include: animal
+declare var animal: Animal;
+import {typeCatalog} from 'variant';
+// ---cut---
+const animalTypes = typeCatalog(Animal);
+//     ^?
 ```
 
 ### `inferTypes()`
@@ -109,3 +171,17 @@ console.log(animal.type === ani.dog); // true
 :::note Proxy limitations
 As a proxy object, this has no runtime information about the full list of types. Unlike a typical type catalog, we *cannot* use `Object.keys()` or `Object.values()` to capture or enumerate the items contained within. Proxies are a clever trick. The string "dog" becomes real only when we used the string "dog" to reference the property. It just spat back what we asked for.
 :::
+
+### `typeMap()`
+
+There's a quiet assumption that's held true so far. The type of `Animal.dog` has been the same string, `dog`. This is by no means required, and there will be situations that benefit from breaking that assumption.
+
+The `typeMap()` function creates and returns an object where the keys are the friendly names used for the variant and the values are the literal types used in the discriminant. In the trivial case where these are the same this function will return the same result as `typeCatalog()`
+
+```ts twoslash
+import {scoped, variant, typeMap} from 'variant';
+// ---cut---
+const ScopedAnimal = scoped('animal', variant(['cat', 'dog', 'snake']))
+const scopeMap = typeMap(ScopedAnimal);
+//     ^?
+```

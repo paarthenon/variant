@@ -45,14 +45,13 @@ const result = match(colorMode, {
 });
 ```
 
-
 ## Partial matching
 
 Use the `partial()` helper function.
 
 ```ts twoslash
 // @include: animal
-import {match2 as match, partial} from 'variant';
+import {match, partial} from 'variant';
 declare var animal: Animal;
 // ---cut---
 
@@ -127,7 +126,6 @@ Combine this with partial matching to do something like:
 
 ```
 
-
 ## Special Cases
 ### Matching scoped variants.
 
@@ -195,5 +193,16 @@ const matchAnimal2 = prematch<Animal>();
 
 The `payload()` helper function is commonly used. Unpacking the payload from the variant results in typing `({payload}) => payload,` many times. This lambda is available as `unpack`.
 
-> Code sample TBD.
+```ts twoslash
+import {variant, VariantOf, match, unpack, constant, payload} from 'variant';
+const BadOption = variant({
+    Some: payload<unknown>(),
+    None: {},
+});
+type BadOption = VariantOf<typeof BadOption>;
 
+const extract = (opt: BadOption) => match(opt, {
+    Some: unpack,
+    None: () => undefined,
+});
+```

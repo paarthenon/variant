@@ -176,13 +176,6 @@ export const Animal = variant({
     [AniType.snake]: (name: string, pattern: string = 'striped') => ({name, pattern}),
 })
 ```
-The `AniType` definition would be a good use of catalog.
-
-```ts twoslash
-import {variant, fields, catalog} from 'variant';
-// ---cut---
-export const AniType = catalog(['dog', 'cat', 'snake']);
-```
 
 It's also possible to use a string enum to similar effect.
 
@@ -193,6 +186,16 @@ export enum AniType {
     snake = 'snake',
 }
 ```
+
+:::info
+The `AniType` definition would be a good use of catalog.
+
+```ts twoslash
+import {variant, fields, catalog} from 'variant';
+// ---cut---
+export const AniType = catalog(['dog', 'cat', 'snake']);
+```
+:::
 
 ## Top-level Constructors
 

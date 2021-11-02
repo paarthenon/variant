@@ -1,10 +1,6 @@
 import {Func, VariantCreator} from './precepts';
 
 /**
- * Useful in generating friendly types. Intersections are rendered as the type of the intersection, not as A & B.
- */
-
-/**
  * Collapse a complex type into a more easily read object.
  */
 export type Identity<T> = T extends object ? {} & {

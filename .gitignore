@@ -65,3 +65,6 @@ typings/
 # project output
 lib
 scratch
+
+# OS X
+.DS_Store

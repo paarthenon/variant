@@ -31,8 +31,8 @@ export interface TypedFunc<K extends string> {
      * @param variant implementation of the underlying functions.
      * @returns the implementation passed in.
      * 
-     * @tutorial
-     * ```ts
+     * @example
+     * ```
      * type Option =
      *     | Variant<'Some', {payload: any}>
      *     | Variant<'None'>
@@ -40,10 +40,9 @@ export interface TypedFunc<K extends string> {
      * const Option = variant(typed<Option>({
      *     Some: pass,
      *     None: pass,
-     * }));
+     * }))
+     * // `pass` is just the identity function. Any function `(input: T) => T` is valid.
      * ```
-     * 
-     * `pass` is just the identity function. Any function `(input: T) => T` is valid.
      */
     typed<
         T extends Record<K, string>,
@@ -55,8 +54,8 @@ export interface TypedFunc<K extends string> {
      * @param factory factory function implementation of the underlying functions. Receives `pass` as the only parameter.
      * @returns the implementation passed in.
      * 
-     * @tutorial
-     * ```ts
+     * @example
+     * ```
      * type Option =
      *     | Variant<'Some', {payload: any}>
      *     | Variant<'None'>
@@ -65,9 +64,8 @@ export interface TypedFunc<K extends string> {
      *     Some: _,
      *     None: _,
      * })));
+     * // `_` is just the identity function. Any function `(input: T) => T` is valid.
      * ```
-     * 
-     * `_` is just the identity function. Any function `(input: T) => T` is valid.
      */
     typed<
         T extends Record<K, string>,

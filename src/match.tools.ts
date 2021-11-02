@@ -1,41 +1,22 @@
 
 /**
- * Meant to be used inside of a `match`
- * @param x 
+ * Create a function that returns a value after being called.
+ * @param x the value to be returned
  */
 export function constant<T>(x: T) {
     return () => x;
 }
+export const just = constant;
 
 /**
  * Extract the payload element from the object and return it.
- * 
- * Unstable API. 
- * 
- * Shorthand for
- * 
- * ```ts
+ * @example
+ * ```
  * match(object, {
  *     ...
  *     case: unpack,
  *     ...
  * })
  * ```
- * @param x 
  */
 export const unpack = <T>(x: {payload: T}) => x.payload;
-/**
- * Ignore the matched object and return a specific value.
- * 
- * Unstable API.
- * 
- * ```ts
- * match(object, {
- *     ...
- *     case: just(true),
- *     ...
- * })
- * ```
- * @param x 
- */
-export const just = <T>(x: T) => () => x;

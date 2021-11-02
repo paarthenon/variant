@@ -34,9 +34,6 @@ export type LiteralToUnion<
 
 
 export type MatchFuncs<K extends string> = {
-    /**
-     * Match function.
-     */
     match: MatchOverloads<K>;
 
     /**
@@ -54,7 +51,9 @@ export type MatchFuncs<K extends string> = {
     onLiteral<T extends string | number | symbol>(instance: T): LiteralToUnion<T, K>;
 
     /**
-     * Evaluate 
+     * Handle some cases, deal with the rest in a  well-typed function. If the discriminated union
+     * is `A | B | C` and `A` has been handled, then the else function will understand it will receive
+     * only `B | C`.
      * @param branches 
      * @param elseFunc 
      */
@@ -64,16 +63,16 @@ export type MatchFuncs<K extends string> = {
         Else extends (remainder: Exclude<T, Record<K, keyof P>>) => any,
     >(branches: P, elseFunc: Else): (input: T) =>  HandlerFromPartial<P & {default: Else}, T[K]>
 
-    /**
-     * Partial functions
-     */
+    // partial helper function.
     partial: PartialOverloads<K>;
 
-    /**
-     * Match against a function ahead of time.
-     */
+    // match against a variant ahead of time.
     prematch: PrematchFunc<K>;
     
+    /**
+     * Resolve the match with a lookup table. 
+     * @param handler 
+     */
     lookup<H extends Record<T[K], any>, T extends Record<K, string>>(handler: H): (instance: T) => LookupTableToHandler<H>;
 }
 
@@ -82,13 +81,25 @@ type HandlerFromPartial<H extends Record<'default', unknown>, Keys extends strin
 }
 
 export interface PartialOverloads<K extends string> {
+    /**
+     * Handle some cases, use **`default:`** to handle the remainder.
+     */
     <H extends AdvertiseDefault<Handler<T, K>>, T extends Record<K, string>>(handler: H | ((t: T) => H)): (input: T) => H;
+    /**
+     * Handle some cases, use **`default:`** to handle the remainder (Active).
+     */
     <H extends WithDefault<Handler<T, K>, T>, T extends Record<K, string>>(handler: H | ((t: T) => H)): (input: T) => HandlerFromPartial<H, T[K]>;
 }
 
 export interface MatchOverloads<K extends string> {
     /**
-     * Curried overload - handler.
+     * **(inline)** Match an instance of a variant or literal union against its possible cases.
+     * @remarks
+     * This point-free overload is intended for inline use, not pre-matching.
+     * 
+     * @param handler a handler object. This type will be properly constrained when used inline.
+     * @template T instance of a variant
+     * @template H handler object
      */
     <
         T extends Record<K, TType>,
@@ -97,7 +108,13 @@ export interface MatchOverloads<K extends string> {
     >(handler: EnforceHandler<H> | ((t: T) => H)): (instance: T | TType) => ReturnType<H[keyof H]>;
 
     /**
-     * Main match overload
+     * Match an instance of a variant or literal union against its possible cases.
+     * @remarks
+     * Supports exhaustiveness checking, partial matching, and literals.
+     * 
+     * @param target the target instance
+     * @param handler an object with a function corresponding to each case
+     * @returns The result of the appropriate branch based on the instance type
      */
     <
         T extends Record<K, TType>,
@@ -114,11 +131,17 @@ export type EnforceHandler<T> = {} extends T ? VariantError<['Handler cannot be 
 
 export interface PrematchFunc<K extends string> {
     /**
-     * Placeholder - prematch on variant module instance
+     * Match against a variant model
+     * 
+     * @param variant an object containing variant creators.
+     * @returns a function to handle an instance of that type.
      */
-    <T extends VariantModule<K>>(animal: T): TypedCurriedMatchFunc<VariantOf<T>, K>;
+    <T extends VariantModule<K>>(variant: T): TypedCurriedMatchFunc<VariantOf<T>, K>;
     /**
-     * Placeholder docs - prematch on variant union type.
+     * Match against a variant by type
+     * 
+     * @template T a discriminated union
+     * @returns a function to handle an instance of that type.
      */
     <T extends Record<K, string>>(): TypedCurriedMatchFunc<T, K>;
 }
@@ -128,19 +151,15 @@ export interface PrematchFunc<K extends string> {
  */
 export interface TypedCurriedMatchFunc<T extends Record<K, string>, K extends string> {
     /**
-     * Placeholder documentation - match against full list.
+     * Resolve the predefined matcher.
      */
-    <H extends AdvertiseDefault<Handler<T, K>>>(handler: H): (instance: T) => ReturnType<H[keyof H]>;
-    /**
-     * Placeholder documentation - 
-     */
-    <H extends WithDefault<Handler<T, K>, T>>(handler: H): (instance: T) => ReturnType<FuncsOnly<H>[keyof H]>;
+    <H extends Handler<T, K>>(handler: H | ((t: T) => H)): (instance: T) => ReturnType<H[keyof H]>;
 }
 
 export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
     // curryable wrapper around match.
     const prematch = (_?: {}) =>
-        (handler: Handler<Record<K, string>, K>) =>
+        (handler: Handler<Record<K, string>, K> | ((t: {}) => Handler<Record<K, string>, K>)) =>
             (instance: Record<K, string>) =>
                 match(instance, handler);
 

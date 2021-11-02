@@ -12,6 +12,11 @@ const GENERIC_BRAND = Symbol('VARIANT GENERIC TEMPLATE');
 export type GenericTemplate<T extends RawVariant> = T & {
     [GENERIC_BRAND]: undefined,
 }
+/**
+ * Define a generic variant
+ * @param func a template factory. Receives 26 generic placeholders (A-Z) in an object, returns a variant template
+ * @returns A variant with generic creators
+ */
 export function onTerms<T extends RawVariant>(func: (alpha: Alpha) => T): GenericTemplate<T> {
     return {
         ...func(Alpha),

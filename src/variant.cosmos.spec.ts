@@ -4,25 +4,13 @@ import {constant, just} from './match.tools';
 import {GetTypeLabel, TypeNames, VariantOf} from './precepts';
 import {fields, payload} from './variant.tools';
 
-const DISCRIMINANT = 'tag';
-const {isType, match, otherwise, ofLiteral, partial, variantModule, variantList, variation, variant} = variantCosmos({key: 'tag'});
+const {isType, match, otherwise, ofLiteral, partial, variantList, variation, variant} = variantCosmos({key: 'tag'});
 
-
-// tag('dog', fields<{name: string, favoriteBall?: string}>()),
-// tag('cat', fields<{name: string, furnitureDamaged: number}>()),
-// tag('snake', (name: string, patternName?: string) => ({
-//     name,
-//     pattern: patternName ?? 'striped',
-// })),
-
-const Animal = variantModule({
+const Animal = variant({
     cat: fields<{
         name: string;
         furnitureDamaged: number,
     }>(),
-    /**
-     * Trying this out.
-     */
     dog: fields<{
         name: string;
         favoriteBall?: string;
@@ -33,13 +21,6 @@ const Animal = variantModule({
     }),
 })
 export type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
-
-// test('', () => {
-//     const kitty = Animal.cat({name: 'Yannis', furnitureDamaged: 0}) as Animal;
-//     match(kitty, {
-//         cat: just(5),
-//     })
-// })
 
 test('', () => {
     const thing = variant({
@@ -118,11 +99,6 @@ test('match 2', () => {
         default: constant(6),
     }))
 
-    // const thing = match({tag: kt}, {
-
-    // });
-    
-    // expect(thing).toBe('string')
 })
 
 test('', () => {
@@ -134,10 +110,10 @@ test('', () => {
 });
 
 
-test('', () => {
-    const {variantModule} = variantCosmos({key: 'tag'});
+test('documentation test', () => {
+    const {variant} = variantCosmos({key: 'tag'});
 
-    const Test = variantModule({
+    const Test = variant({
         /**
          * T-One
          */
@@ -174,17 +150,4 @@ test('variant list', () => {
     const thing2 = Ani.b();
 
     expect(thing2.timestamp).toBeGreaterThan(0);
-    
 })
-// declare var animal: Animal;
-
-// test('asdfa', () => {
-//     const thing = matcher(animal, {}, 'tag')
-//         .when('cat', c => c.furnitureDamaged)
-//         .when({
-//             dog: d => d.favoriteBall ?? '',
-//             fjakj: just(45),
-//         })
-//         .when('snake', just('asdfaa'))
-//         .complete();
-// })

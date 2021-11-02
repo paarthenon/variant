@@ -127,24 +127,21 @@ export interface VariantFuncs<K extends string> {
      * that handles the creation logic for that shape. This may be `{}` or `nil` for an
      * empty-bodied variant (`{type: 'someType'}`). 
      * @returns a variant module.
-     * @tutorial
-     * 
-     * ```
+     * @example
+     * ```ts
      * const Action = variant({
      *     AddTodo: fields<{message: string}>(),
      *     Reload: {},
      * });
-     * ```
      * 
-     * Pair with `variation` to override the type returned by the creator function
-     * while still using a friendly name. For example,
+     * // Pair with `variation` to override the type returned by the creator function
+     * // while still using a friendly name. For example,
      * 
-     * ```
      * const Action = variant({
      *     AddTodo: variation('TODO:AddTodo', fields<{message: string}>()),
      *     Reload: variation('TODO:Reload'),
      * });
-     * ``` 
+     * ```
      */
     variantModule<VM extends RawVariant>(template: VM): Identity<VariantRecord<VM, K>>,
 
@@ -171,27 +168,23 @@ export interface VariantFuncs<K extends string> {
      * Create a **variant** from some template. 
      * @param template an object where each property represents a possible variation.
      * The **key** is the string literal used as the type and the **value** is a function
-     * that handles the creation logic for that shape. This may be `{}` or `nil` for an
-     * empty-bodied variant (`{type: 'someType'}`). 
+     * that handles the creation logic for that type.
      * @returns a variant module.
-     * @tutorial
-     * 
-     * ```
+     * @example
+     * ```ts
      * const Action = variant({
      *     AddTodo: fields<{message: string}>(),
      *     Reload: {},
      * });
-     * ```
      * 
-     * Pair with `variation` to override the type returned by the creator function
-     * while still using a friendly name. For example,
+     * // Pair with `variation` to override the type returned by the creator function
+     * // while still using a friendly name. For example,
      * 
-     * ```
      * const Action = variant({
      *     AddTodo: variation('TODO:AddTodo', fields<{message: string}>()),
      *     Reload: variation('TODO:Reload'),
      * });
-     * ``` 
+     * ```
      */
     variant<VM extends RawVariant>(template: VM): Identity<VariantRecord<VM, K>>,
 

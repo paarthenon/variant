@@ -2,7 +2,7 @@
 title: Flags and Matrix
 ---
 
-Flags and Matrix enable the creation of typed property bags. Inspired by flag(s) enums, this surprisingly useful pattern allows some object to express that it possesses one or more distinct qualities captured by the forms of some variant. Filter sets, configuration records, and data flags are particulaly well suited to this approach.
+Flags and Matrix enable the creation of typed property bags, collections that can carry a diverse set of data and correlate keys to subtypes. Inspired by flag(s) enums, this surprisingly useful pattern allows some object to express that it possesses one or more distinct qualities captured by the forms of some variant. Filter sets, configuration records, and data flags are particulaly well suited to this approach.
 
 Flags can replace some typically tightly-coupled functionality. In a todo app, for example, a single task will have a variety of possible attributes. A task may have a __due date__. It may be marked with a __priority level__. It may have a __reminder notification__ set.
 
@@ -48,7 +48,8 @@ The `attr` property has type `{ [type: string]?: Attribute<type> }`. In plain En
 Given these properties, it is simple to answer questions like "which tasks are overdue?"
 
 ```ts
-const overdueTasks = tasks.filter(t => t.attr.dueDate && t.attr.dueDate.timestamp < Date.now());
+const overdueTasks = tasks.filter(t => t.attr.dueDate
+    && t.attr.dueDate.timestamp < Date.now());
 ```
 
 However there's more. An `Attribute` is now it's own type of entity and can be processed or rendered directly. Rendering

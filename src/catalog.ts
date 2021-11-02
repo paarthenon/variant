@@ -28,8 +28,8 @@ export type IsLiteral<T extends LiteralBase> = LiteralBase extends T ? true : fa
 
 /**
  * Create a catalog object from a set of strings.
- * @param strings (`string[]`) - list of string literals.
- * 
+ * @param strings (`string[]`) - list of string literals
+ * @returns a string enum
  * @tutorial
  * ```ts
  * const Suit = catalog(['Spades', 'Hearts', 'Clubs', 'Diamonds']);
@@ -42,6 +42,7 @@ export function catalog<T extends string>(strings: T[]): {[P in T]: P};
  * Create a catalog object based on some calculation
  * @param strings list of string literals.
  * @param factory function to generate value.
+ * @returns an enum or constant mapping where the values are based on the factory function.
  * 
  * @tutorial
  * ```ts

@@ -1,5 +1,5 @@
 import {TypeMap, TypesOf, VariantModule} from './precepts';
-
+import {Identity} from './util';
 
 /**
  * A catalog object listing the types inherent to some `VariantModule`
@@ -11,6 +11,7 @@ export type TypeCatalog<T extends VariantModule<string>> = {
 /**
  * Create an a string enum-like object containing the type literals of a variant.
  * @param variant the definition of the variant in question.
+ * @template T the variant template, an object containing variant creators.
  * @returns an object `{[T: string]: T}`
  * @tutorial
  * ```ts
@@ -26,13 +27,14 @@ export function typeCatalog<T extends VariantModule<string>>(variant: T) {
             ...result,
             [vc.type]: vc.type,
         }
-    }, {} as TypeCatalog<T>)
+    }, {} as Identity<TypeCatalog<T>>)
 }
 
 /**
  * Create a mapping object containing the friendly names of a variant's forms
  * and the type literals they correspond to.
  * @param variant the definition of the variant in question.
+ * @template T the variant template, an object containing variant creators.
  * @tutorial
  * 
  * In the trivial case where each property label of a variant is exactly the
@@ -50,11 +52,11 @@ export function typeCatalog<T extends VariantModule<string>>(variant: T) {
  * // animalType: {cat: '@animal/cat', dog: '@animal/dog', snake: '@animal/snake'};
  * ```
  */
-export function typeMap<T extends VariantModule<string>>(variant: T): TypeMap<T> {
+export function typeMap<T extends VariantModule<string>>(variant: T) {
     return Object.keys(variant).reduce((result, key) => {
         return {
             ...result,
             [key]: variant[key].type,
         }
-    }, {} as TypeMap<T>)
+    }, {} as Identity<TypeMap<T>>)
 }

@@ -4,12 +4,15 @@ export interface TypesFunc<K extends string> {
     /**
      * Get the list of types from a variant.
      * @param content some variant definition.
+     * @template T target discriminated union
      * @returns list of string literal types.
      */
     types<T extends VariantModule<K>>(content: T): Identity<TypesOf<T>>[];
     /**
      * Get the list of types from the instances of a variant.
      * @param content list of instances.
+     * @template T target discriminated union
+     * @returns list of string literal types.
      */
     types<T extends Record<K, string>>(content: T[]): T[K][];
 
@@ -18,7 +21,9 @@ export interface TypesFunc<K extends string> {
      * 
      * Note this leverages proxies and is based on the perceived
      * type union for `instance`
-     * @param instance 
+     * @param instance
+     * @template T target discriminated union
+     * @returns a proxy TypeCatalog
      */
     inferTypes<T extends Record<K, string>>(instance: T): {[P in T[K]]: P}
 }

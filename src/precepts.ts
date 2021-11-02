@@ -35,7 +35,7 @@ export type PatchObjectOrPromise<
 ;
 
 /**
- * The type marking metadata. It's useful to know the type of the items the function will generate.
+ * The type marking metadata. 
  */
 export type Outputs<K, T> = {
     /**
@@ -56,11 +56,11 @@ export type Stringable<ReturnType extends string> = {
 }
 
 /**
- * The constructor for one tag of a variant type.
+ * The constructor function for one tag of a variant type
  * 
- *  - `T` extends `string` — The literal string used as the type
- *  - `F` extends `(...args: any[]) => {}` = `() => {}` — The function that serves as the variant's *body definition*
- *  - `K` extends `string` = `'type'` — The discriminant
+ * @template T literal string used as the type
+ * @template F function serving as the variant definition
+ * @template K the discriminant.
  */
 export type VariantCreator<
     T extends string,
@@ -87,14 +87,17 @@ export type CreatorOutput<VC extends VariantCreator<string, Func, string>> =
 export type Func = (...args: any[]) => any;
 
 /**
- * A variant module definition. Literally an object to group together
- * a set of variant constructors.
+ * A variant module definition. Literally an object serving as
+ * a collection of variant constructors.
  */
  export type VariantModule<K extends string> = {
     [name: string]: VariantCreator<string, Func, K>
 }
 
 /**
+ * A mapping of friendly names to the underlying type literals.
+ * 
+ * @remarks
  * Most `VariantModule`s will have labels (Animal.dog) that match the
  * underlying type of the object the function will create. Some will not.
  * This type creates a mapping from the name/label to the type.
@@ -114,6 +117,9 @@ export type GetTypeLabel<
 }[keyof T];
 
 /**
+ * 
+ * Reverse lookup from type literals to the labels on the object.
+ * 
  * Warning: may be expensive.
  */
 export type TypeNameLookup<T extends VariantModule<string>> = {
@@ -121,12 +127,12 @@ export type TypeNameLookup<T extends VariantModule<string>> = {
 }
 
 /**
- * Get the valid options for a variant's type property.
+ * Get the literal union for a variant's type property.
  */
 export type TypesOf<T extends VariantModule<string>> = TypeMap<T>[keyof T];
 
 /**
- * Get the valid options for a variant type's names, plus `undefined`.
+ * Get the literal union for a variant type's names, plus `undefined`.
  */
 export type TypeNames<T extends VariantModule<string>> = TypesOf<T> | undefined;
 
@@ -138,27 +144,22 @@ type VariantTypeSpread<T extends VariantModule<string>> = {
 }
 
 /**
- * Create a union of variation types from any arbitrary `VariantModule`
+ * A union of variation types from any arbitrary `VariantModule`
  */
 export type SumType<T extends VariantModule<string>> = Identity<VariantTypeSpread<T>[keyof T]>;
 
 
 /**
- * **Create a variant type**. Use as
+ * **Create a variant type**.
  * 
+ * @example
  * ```ts
- * export type SomeVariant<T extends TypeNames<typeof SomeVariant> = undefined> = VariantOf<typeof SomeVariant, T>;
- * ```
- * 
- * This allows the type `SomeVariant` to represent the union and the type `SomeVariant<'SomeType'>` to capture
- * one specific variation.
- * 
- * ### Minimal form
- * ```ts
+ * // full form
+ * export type SomeVariant<T extends TypeNames<typeof SomeVariant> = undefined>
+ *     = VariantOf<typeof SomeVariant, T>;
+ * // short form (no Animal<'cat'>)
  * export type SomeVariant = VariantOf<typeof SomeVariant>;
  * ```
- * Some users who prioritize brevity and do not mind using `Extract<SomeVariant, Record<'type', 'SomeType'>>` to
- * express a specific variation may prefer this simplified format.
  */
 export type VariantOf<
     T extends VariantModule<string>,
@@ -167,22 +168,21 @@ export type VariantOf<
 
 /**
  * The input type for `variant`/`variantModule`. 
- * 
  */
 export type RawVariant = {[type: string]: Func | {}};
 
 /**
- * Catch-all type to express type errors.
+ * Express some type error.
  */
 export interface VariantError<T> {__error: never, __message: T};
 
 /**
- * A type to express some arbitrary information.
+ * Express some arbitrary information.
  */
 export interface Message<T> {__: never, message: T};
 
 /**
- * Prevents 'overflow' in a literal.
+ * Prevent extraneous properties in a literal.
  */
 export type Limited<T, U> = Exclude<keyof T, U> extends never 
     ? T 
@@ -200,9 +200,11 @@ export type DEFAULT_KEY = typeof DEFAULT_KEY;
 
 
 /**
- * One step better than Partial<T>.
+ * One step better than `Partial<T>`.
  * 
  * But only one.
+ * 
+ * This is like `Partial<T>`, but requires at least one common property.
  */
 export type Splay<T> = {
     [P in keyof T]: Identity<Partial<T> & Record<P, T[P]>>;
