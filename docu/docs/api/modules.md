@@ -24,7 +24,7 @@ Turn a sum type (a variant) into a partial product type.
 
 #### Defined in
 
-[flags.ts:15](https://github.com/paarthenon/variant/blob/9eab4d9/src/flags.ts#L15)
+[flags.ts:15](https://github.com/paarthenon/variant/blob/1e64379/src/flags.ts#L15)
 
 ___
 
@@ -44,7 +44,7 @@ Generic Variant Of.
 
 #### Defined in
 
-[generic.ts:70](https://github.com/paarthenon/variant/blob/9eab4d9/src/generic.ts#L70)
+[generic.ts:70](https://github.com/paarthenon/variant/blob/1e64379/src/generic.ts#L70)
 
 ___
 
@@ -62,7 +62,7 @@ Transform a sum type (a variant) into a product type.
 
 #### Defined in
 
-[flags.ts:6](https://github.com/paarthenon/variant/blob/9eab4d9/src/flags.ts#L6)
+[flags.ts:6](https://github.com/paarthenon/variant/blob/1e64379/src/flags.ts#L6)
 
 ___
 
@@ -80,7 +80,7 @@ A catalog object listing the types inherent to some `VariantModule`
 
 #### Defined in
 
-[typeCatalog.ts:7](https://github.com/paarthenon/variant/blob/9eab4d9/src/typeCatalog.ts#L7)
+[typeCatalog.ts:7](https://github.com/paarthenon/variant/blob/1e64379/src/typeCatalog.ts#L7)
 
 ___
 
@@ -103,7 +103,7 @@ This type creates a mapping from the name/label to the type.
 
 #### Defined in
 
-[precepts.ts:105](https://github.com/paarthenon/variant/blob/9eab4d9/src/precepts.ts#L105)
+[precepts.ts:105](https://github.com/paarthenon/variant/blob/1e64379/src/precepts.ts#L105)
 
 ___
 
@@ -121,7 +121,7 @@ Get the literal union for a variant type's names, plus `undefined`.
 
 #### Defined in
 
-[precepts.ts:137](https://github.com/paarthenon/variant/blob/9eab4d9/src/precepts.ts#L137)
+[precepts.ts:137](https://github.com/paarthenon/variant/blob/1e64379/src/precepts.ts#L137)
 
 ___
 
@@ -139,7 +139,7 @@ Get the literal union for a variant's type property.
 
 #### Defined in
 
-[precepts.ts:132](https://github.com/paarthenon/variant/blob/9eab4d9/src/precepts.ts#L132)
+[precepts.ts:132](https://github.com/paarthenon/variant/blob/1e64379/src/precepts.ts#L132)
 
 ___
 
@@ -165,7 +165,7 @@ if you'd like to update the literal as this library updates.
 
 #### Defined in
 
-[precepts.ts:12](https://github.com/paarthenon/variant/blob/9eab4d9/src/precepts.ts#L12)
+[precepts.ts:12](https://github.com/paarthenon/variant/blob/1e64379/src/precepts.ts#L12)
 
 ___
 
@@ -188,7 +188,7 @@ a collection of variant constructors.
 
 #### Defined in
 
-[precepts.ts:93](https://github.com/paarthenon/variant/blob/9eab4d9/src/precepts.ts#L93)
+[precepts.ts:93](https://github.com/paarthenon/variant/blob/1e64379/src/precepts.ts#L93)
 
 ___
 
@@ -216,7 +216,7 @@ export type SomeVariant = VariantOf<typeof SomeVariant>;
 
 #### Defined in
 
-[precepts.ts:164](https://github.com/paarthenon/variant/blob/9eab4d9/src/precepts.ts#L164)
+[precepts.ts:164](https://github.com/paarthenon/variant/blob/1e64379/src/precepts.ts#L164)
 
 ## Functions
 
@@ -277,7 +277,7 @@ const defineThings = HOI<Record<string, Template>>();
 
 #### Defined in
 
-[util.ts:56](https://github.com/paarthenon/variant/blob/9eab4d9/src/util.ts#L56)
+[util.ts:56](https://github.com/paarthenon/variant/blob/1e64379/src/util.ts#L56)
 
 ___
 
@@ -321,7 +321,7 @@ export const Action = variant(augment(
 
 #### Defined in
 
-[augment.ts:25](https://github.com/paarthenon/variant/blob/9eab4d9/src/augment.ts#L25)
+[augment.ts:25](https://github.com/paarthenon/variant/blob/1e64379/src/augment.ts#L25)
 
 ___
 
@@ -358,7 +358,7 @@ a string enum
 
 #### Defined in
 
-[catalog.ts:40](https://github.com/paarthenon/variant/blob/9eab4d9/src/catalog.ts#L40)
+[catalog.ts:40](https://github.com/paarthenon/variant/blob/1e64379/src/catalog.ts#L40)
 
 ▸ **catalog**<`T`, `F`\>(`strings`, `factory`): { [P in T]: ReturnType<F\> }
 
@@ -408,7 +408,7 @@ an enum or constant mapping where the values are based on the factory function.
 
 #### Defined in
 
-[catalog.ts:69](https://github.com/paarthenon/variant/blob/9eab4d9/src/catalog.ts#L69)
+[catalog.ts:69](https://github.com/paarthenon/variant/blob/1e64379/src/catalog.ts#L69)
 
 ▸ **catalog**<`T`\>(`catalog`): `T`
 
@@ -443,7 +443,7 @@ const settingKey = catalog({
 
 #### Defined in
 
-[catalog.ts:85](https://github.com/paarthenon/variant/blob/9eab4d9/src/catalog.ts#L85)
+[catalog.ts:85](https://github.com/paarthenon/variant/blob/1e64379/src/catalog.ts#L85)
 
 ___
 
@@ -477,7 +477,7 @@ Create a function that returns a value after being called.
 
 #### Defined in
 
-[match.tools.ts:6](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.tools.ts#L6)
+[match.tools.ts:6](https://github.com/paarthenon/variant/blob/1e64379/src/match.tools.ts#L6)
 
 ___
 
@@ -510,7 +510,7 @@ This can be used to ensure optional properties exist on the union type.
 
 #### Defined in
 
-[constrained.ts:25](https://github.com/paarthenon/variant/blob/9eab4d9/src/constrained.ts#L25)
+[constrained.ts:25](https://github.com/paarthenon/variant/blob/1e64379/src/constrained.ts#L25)
 
 ___
 
@@ -540,7 +540,7 @@ a variant creator that wraps the class constructor into a factory function.
 
 #### Defined in
 
-[construct.ts:14](https://github.com/paarthenon/variant/blob/9eab4d9/src/construct.ts#L14)
+[construct.ts:14](https://github.com/paarthenon/variant/blob/1e64379/src/construct.ts#L14)
 
 ___
 
@@ -575,7 +575,7 @@ match(descope(target), {
 
 #### Defined in
 
-[variant.ts:77](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.ts#L77)
+[variant.ts:77](https://github.com/paarthenon/variant/blob/1e64379/src/variant.ts#L77)
 
 ___
 
@@ -617,7 +617,7 @@ When used creates a function of type `(input: T) => T & {type: 'literal'}`
 
 #### Defined in
 
-[variant.tools.ts:8](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.tools.ts#L8)
+[variant.tools.ts:8](https://github.com/paarthenon/variant/blob/1e64379/src/variant.tools.ts#L8)
 
 ___
 
@@ -649,7 +649,7 @@ An object where each property's key is a type string and its value is the instan
 
 #### Defined in
 
-[flags.ts:26](https://github.com/paarthenon/variant/blob/9eab4d9/src/flags.ts#L26)
+[flags.ts:26](https://github.com/paarthenon/variant/blob/1e64379/src/flags.ts#L26)
 
 ___
 
@@ -682,7 +682,7 @@ a proxy TypeCatalog
 
 #### Defined in
 
-[types.ts:28](https://github.com/paarthenon/variant/blob/9eab4d9/src/types.ts#L28)
+[types.ts:28](https://github.com/paarthenon/variant/blob/1e64379/src/types.ts#L28)
 
 ___
 
@@ -718,7 +718,7 @@ instance is variant
 
 #### Defined in
 
-[isOfVariant.ts:18](https://github.com/paarthenon/variant/blob/9eab4d9/src/isOfVariant.ts#L18)
+[isOfVariant.ts:18](https://github.com/paarthenon/variant/blob/1e64379/src/isOfVariant.ts#L18)
 
 ▸ **isOfVariant**<`T`\>(`variant`): (`instance`: `undefined` \| ``null`` \| {}) => instance is Identity<VariantTypeSpread<T\>[keyof T]\>
 
@@ -770,7 +770,7 @@ user-defined type guard.
 
 #### Defined in
 
-[isOfVariant.ts:30](https://github.com/paarthenon/variant/blob/9eab4d9/src/isOfVariant.ts#L30)
+[isOfVariant.ts:30](https://github.com/paarthenon/variant/blob/1e64379/src/isOfVariant.ts#L30)
 
 ___
 
@@ -822,7 +822,7 @@ A user-defined type guard indicating if the instance is of a given type.
 
 #### Defined in
 
-[isType.ts:10](https://github.com/paarthenon/variant/blob/9eab4d9/src/isType.ts#L10)
+[isType.ts:10](https://github.com/paarthenon/variant/blob/1e64379/src/isType.ts#L10)
 
 ▸ **isType**<`O`, `T`\>(`object`, `type`): object is Extract<O, Record<"type", TypeStr<T, "type"\>\>\>
 
@@ -850,7 +850,7 @@ A user-defined type guard indicating if the instance is of a given type.
 
 #### Defined in
 
-[isType.ts:17](https://github.com/paarthenon/variant/blob/9eab4d9/src/isType.ts#L17)
+[isType.ts:17](https://github.com/paarthenon/variant/blob/1e64379/src/isType.ts#L17)
 
 ___
 
@@ -882,7 +882,7 @@ ___
 
 #### Defined in
 
-[match.tools.ts:9](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.tools.ts#L9)
+[match.tools.ts:9](https://github.com/paarthenon/variant/blob/1e64379/src/match.tools.ts#L9)
 
 ___
 
@@ -912,7 +912,7 @@ Alias for compatibility
 
 #### Defined in
 
-[catalog.ts:103](https://github.com/paarthenon/variant/blob/9eab4d9/src/catalog.ts#L103)
+[catalog.ts:103](https://github.com/paarthenon/variant/blob/1e64379/src/catalog.ts#L103)
 
 ▸ `Const` **literalist**<`T`, `F`\>(`strings`, `factory`): { [P in T]: ReturnType<F\> }
 
@@ -940,7 +940,7 @@ Alias for compatibility
 
 #### Defined in
 
-[catalog.ts:103](https://github.com/paarthenon/variant/blob/9eab4d9/src/catalog.ts#L103)
+[catalog.ts:103](https://github.com/paarthenon/variant/blob/1e64379/src/catalog.ts#L103)
 
 ▸ `Const` **literalist**<`T`\>(`catalog`): `T`
 
@@ -966,7 +966,7 @@ Alias for compatibility
 
 #### Defined in
 
-[catalog.ts:103](https://github.com/paarthenon/variant/blob/9eab4d9/src/catalog.ts#L103)
+[catalog.ts:103](https://github.com/paarthenon/variant/blob/1e64379/src/catalog.ts#L103)
 
 ___
 
@@ -1009,7 +1009,7 @@ Resolve the match with a lookup table.
 
 #### Defined in
 
-[match.ts:76](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L76)
+[match.ts:76](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L76)
 
 ___
 
@@ -1059,7 +1059,7 @@ This point-free overload is intended for inline use, not pre-matching.
 
 #### Defined in
 
-[match.ts:104](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L104)
+[match.ts:104](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L104)
 
 ▸ **match**<`T`, `H`, `TType`\>(`target`, `handler`): `ReturnType`<`H`[`T`[``"type"``]]\>
 
@@ -1091,7 +1091,7 @@ The result of the appropriate branch based on the instance type
 
 #### Defined in
 
-[match.ts:119](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L119)
+[match.ts:119](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L119)
 
 ___
 
@@ -1120,7 +1120,7 @@ Create a matcher on some target variant instance.
 
 #### Defined in
 
-[matcher.ts:289](https://github.com/paarthenon/variant/blob/9eab4d9/src/matcher.ts#L289)
+[matcher.ts:297](https://github.com/paarthenon/variant/blob/1e64379/src/matcher.ts#L297)
 
 ___
 
@@ -1136,7 +1136,7 @@ Create an empty variation (`{type: 'literal'}`).
 
 #### Defined in
 
-[variant.tools.ts:29](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.tools.ts#L29)
+[variant.tools.ts:29](https://github.com/paarthenon/variant/blob/1e64379/src/variant.tools.ts#L29)
 
 ___
 
@@ -1165,7 +1165,7 @@ elevate a literal `A | B | C` to a type union `{type: A} | {type: B} | {type: C}
 
 #### Defined in
 
-[match.ts:44](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L44)
+[match.ts:44](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L44)
 
 ___
 
@@ -1195,7 +1195,7 @@ Elevate a literal `A | B | C` to a type union `{type: A} | {type: B} | {type: C}
 
 #### Defined in
 
-[match.ts:51](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L51)
+[match.ts:51](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L51)
 
 ___
 
@@ -1225,7 +1225,7 @@ A variant with generic creators
 
 #### Defined in
 
-[generic.ts:20](https://github.com/paarthenon/variant/blob/9eab4d9/src/generic.ts#L20)
+[generic.ts:20](https://github.com/paarthenon/variant/blob/1e64379/src/generic.ts#L20)
 
 ___
 
@@ -1274,7 +1274,7 @@ only `B | C`.
 
 #### Defined in
 
-[match.ts:60](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L60)
+[match.ts:60](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L60)
 
 ___
 
@@ -1317,7 +1317,7 @@ Handle some cases, use **`default:`** to handle the remainder.
 
 #### Defined in
 
-[match.ts:87](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L87)
+[match.ts:87](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L87)
 
 ▸ **partial**<`H`, `T`\>(`handler`): (`input`: `T`) => `HandlerFromPartial`<`H`, `T`[``"type"``]\>
 
@@ -1356,7 +1356,7 @@ Handle some cases, use **`default:`** to handle the remainder (Active).
 
 #### Defined in
 
-[match.ts:91](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L91)
+[match.ts:91](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L91)
 
 ___
 
@@ -1386,7 +1386,7 @@ This is the identity function by a better name.
 
 #### Defined in
 
-[typed.ts:25](https://github.com/paarthenon/variant/blob/9eab4d9/src/typed.ts#L25)
+[typed.ts:25](https://github.com/paarthenon/variant/blob/1e64379/src/typed.ts#L25)
 
 ___
 
@@ -1414,7 +1414,7 @@ ___
 
 #### Defined in
 
-[patterned.ts:15](https://github.com/paarthenon/variant/blob/9eab4d9/src/patterned.ts#L15)
+[patterned.ts:15](https://github.com/paarthenon/variant/blob/1e64379/src/patterned.ts#L15)
 
 ___
 
@@ -1458,7 +1458,7 @@ Take a single variable of type T and store as 'payload'
 
 #### Defined in
 
-[variant.tools.ts:21](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.tools.ts#L21)
+[variant.tools.ts:21](https://github.com/paarthenon/variant/blob/1e64379/src/variant.tools.ts#L21)
 
 ___
 
@@ -1488,7 +1488,7 @@ a function to handle an instance of that type.
 
 #### Defined in
 
-[match.ts:139](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L139)
+[match.ts:139](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L139)
 
 ▸ **prematch**<`T`\>(): `TypedCurriedMatchFunc`<`T`, ``"type"``\>
 
@@ -1508,7 +1508,7 @@ a function to handle an instance of that type.
 
 #### Defined in
 
-[match.ts:146](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.ts#L146)
+[match.ts:146](https://github.com/paarthenon/variant/blob/1e64379/src/match.ts#L146)
 
 ___
 
@@ -1536,7 +1536,7 @@ Create a "remote control" for a variant.
 
 #### Defined in
 
-[remote.ts:116](https://github.com/paarthenon/variant/blob/9eab4d9/src/remote.ts#L116)
+[remote.ts:116](https://github.com/paarthenon/variant/blob/1e64379/src/remote.ts#L116)
 
 ___
 
@@ -1564,7 +1564,7 @@ ___
 
 #### Defined in
 
-[variant.ts:85](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.ts#L85)
+[variant.ts:85](https://github.com/paarthenon/variant/blob/1e64379/src/variant.ts#L85)
 
 ___
 
@@ -1594,7 +1594,7 @@ Create a sequence based on a variant.
 
 #### Defined in
 
-[remote.ts:122](https://github.com/paarthenon/variant/blob/9eab4d9/src/remote.ts#L122)
+[remote.ts:122](https://github.com/paarthenon/variant/blob/1e64379/src/remote.ts#L122)
 
 ▸ **sequence**<`O`\>(`order`): `Sequence`<`VMFromVC`<`CreatorFromSeqInput`<`O`, ``"type"``\>\>, `O`, ``"type"``, `Pick`<`VMFromVC`<`CreatorFromSeqInput`<`O`, ``"type"``\>\>, `SequenceInputType`<`O`, ``"type"``\>\>\>
 
@@ -1618,7 +1618,7 @@ Create a sequenced variant.
 
 #### Defined in
 
-[remote.ts:130](https://github.com/paarthenon/variant/blob/9eab4d9/src/remote.ts#L130)
+[remote.ts:130](https://github.com/paarthenon/variant/blob/1e64379/src/remote.ts#L130)
 
 ___
 
@@ -1656,7 +1656,7 @@ an object `{[T: string]: T}`
 
 #### Defined in
 
-[typeCatalog.ts:24](https://github.com/paarthenon/variant/blob/9eab4d9/src/typeCatalog.ts#L24)
+[typeCatalog.ts:24](https://github.com/paarthenon/variant/blob/1e64379/src/typeCatalog.ts#L24)
 
 ___
 
@@ -1702,7 +1702,7 @@ const animalType = typeMap(Animal);
 
 #### Defined in
 
-[typeCatalog.ts:55](https://github.com/paarthenon/variant/blob/9eab4d9/src/typeCatalog.ts#L55)
+[typeCatalog.ts:55](https://github.com/paarthenon/variant/blob/1e64379/src/typeCatalog.ts#L55)
 
 ___
 
@@ -1745,7 +1745,7 @@ the implementation passed in.
 
 #### Defined in
 
-[typed.ts:47](https://github.com/paarthenon/variant/blob/9eab4d9/src/typed.ts#L47)
+[typed.ts:47](https://github.com/paarthenon/variant/blob/1e64379/src/typed.ts#L47)
 
 ▸ **typed**<`T`\>(`factory`): `VoidEmpty`<`ExactDefinition`<`T`, ``"type"``\>\>
 
@@ -1786,7 +1786,7 @@ the implementation passed in.
 
 #### Defined in
 
-[typed.ts:70](https://github.com/paarthenon/variant/blob/9eab4d9/src/typed.ts#L70)
+[typed.ts:70](https://github.com/paarthenon/variant/blob/1e64379/src/typed.ts#L70)
 
 ___
 
@@ -1816,7 +1816,7 @@ list of string literal types.
 
 #### Defined in
 
-[types.ts:10](https://github.com/paarthenon/variant/blob/9eab4d9/src/types.ts#L10)
+[types.ts:10](https://github.com/paarthenon/variant/blob/1e64379/src/types.ts#L10)
 
 ▸ **types**<`T`\>(`content`): `T`[``"type"``][]
 
@@ -1842,7 +1842,7 @@ list of string literal types.
 
 #### Defined in
 
-[types.ts:17](https://github.com/paarthenon/variant/blob/9eab4d9/src/types.ts#L17)
+[types.ts:17](https://github.com/paarthenon/variant/blob/1e64379/src/types.ts#L17)
 
 ___
 
@@ -1880,7 +1880,7 @@ match(object, {
 
 #### Defined in
 
-[match.tools.ts:22](https://github.com/paarthenon/variant/blob/9eab4d9/src/match.tools.ts#L22)
+[match.tools.ts:22](https://github.com/paarthenon/variant/blob/1e64379/src/match.tools.ts#L22)
 
 ___
 
@@ -1921,7 +1921,7 @@ Note the use of `GVariantOf` instead of `VariantOf`.
 
 #### Defined in
 
-[variant.ts:165](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.ts#L165)
+[variant.ts:165](https://github.com/paarthenon/variant/blob/1e64379/src/variant.ts#L165)
 
 ▸ **variant**<`VM`\>(`template`): `Identity`<`VariantRecord`<`VM`, ``"type"``\>\>
 
@@ -1963,7 +1963,7 @@ a variant module.
 
 #### Defined in
 
-[variant.ts:189](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.ts#L189)
+[variant.ts:189](https://github.com/paarthenon/variant/blob/1e64379/src/variant.ts#L189)
 
 ▸ **variant**<`T`\>(`template`): `Identity`<`VMFromVC`<`CreatorFromListType`<`T`, ``"type"``\>\>\>
 
@@ -2015,7 +2015,7 @@ a variant module.
 
 #### Defined in
 
-[variant.ts:222](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.ts#L222)
+[variant.ts:222](https://github.com/paarthenon/variant/blob/1e64379/src/variant.ts#L222)
 
 ___
 
@@ -2045,7 +2045,7 @@ Generate a series of functions to work off a given key.
 
 #### Defined in
 
-[cosmos.ts:43](https://github.com/paarthenon/variant/blob/9eab4d9/src/cosmos.ts#L43)
+[cosmos.ts:43](https://github.com/paarthenon/variant/blob/1e64379/src/cosmos.ts#L43)
 
 ___
 
@@ -2101,7 +2101,7 @@ a variant module.
 
 #### Defined in
 
-[variant.ts:121](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.ts#L121)
+[variant.ts:121](https://github.com/paarthenon/variant/blob/1e64379/src/variant.ts#L121)
 
 ___
 
@@ -2147,7 +2147,7 @@ a variant module.
 
 #### Defined in
 
-[variant.ts:146](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.ts#L146)
+[variant.ts:146](https://github.com/paarthenon/variant/blob/1e64379/src/variant.ts#L146)
 
 ___
 
@@ -2201,4 +2201,4 @@ a variation creator a.k.a. a tag construtor.
 
 #### Defined in
 
-[variant.ts:252](https://github.com/paarthenon/variant/blob/9eab4d9/src/variant.ts#L252)
+[variant.ts:252](https://github.com/paarthenon/variant/blob/1e64379/src/variant.ts#L252)

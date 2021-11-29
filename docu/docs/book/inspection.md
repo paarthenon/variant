@@ -134,7 +134,23 @@ import {types} from 'variant';
 // ---cut---
 const animalTypes = types(Animal);
 ```
-The order is... complicated. Expect it to be unspecified to be safe, but in some modern stacks it will match the order of the template. 
+To be safe, expect the order to be unspecified, but in some modern stacks it will match the order of the template. 
+
+#### On instances
+
+`types()` may be used on a list of variant instances as opposed to the model.
+
+```ts twoslash
+// @include: animal
+declare var animal: Animal;
+import {types} from 'variant';
+// ---cut---
+const animals = [
+    Animal.cat({name: 'Perseus', furnitureDamaged: 0}),
+    Animal.dog({name: 'Cerberus'}),
+];
+const animalTypes = types(animals);
+```
 
 ### `typeCatalog()`
 

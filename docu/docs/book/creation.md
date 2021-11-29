@@ -1,5 +1,5 @@
 ---
-title: Making Variants
+title: "Creating Variants"
 ---
 ```twoslash include animal
 import {variant, fields, VariantOf} from 'variant';
@@ -14,7 +14,7 @@ export type Animal = VariantOf<typeof Animal>;
 
 Variant aims to give the user complete control over how their objects are created. A variant's constructor may perform side effects, rely on asynchronous information, or generate objects of any kind.
 
-A call to Variant must be accompanied by a **template** that expresses the possibilities of the variant. This template may be given as an object or an array.
+A call to `variant()` must be accompanied by a **template** that expresses the possibilities of the variant. This template may be given as an object or an array.
 
 > #### Object Templates
 >
@@ -156,8 +156,14 @@ type ClassyAnimal = VariantOf<typeof ClassyAnimal>;
 const dog = ClassyAnimal.dog(4);
 const isDog = dog instanceof Dog; // true!
 ```
+## Complications
+If only real-world use always resembled ideal cases. Here are some ways to complicate the setup for various purposes.
 
-## Computed Keys
+- Computed keys allow for the type literals to be based on a pre-existing enum or const object.
+- Top-level constructors allow for fp-like tags (though be warned, they are still polymorphic variants)
+- Labels that don't match the type literals they generate can be useful for scoped types or supporting legacy protocols.
+
+### Computed Keys
 
 In the earlier examples we defined a variant template as an object literal. The keys of the literal are what will become the types of each variant. However, the library is perfectly happy to accept computed keys including constants objects or string literals.
 
@@ -187,17 +193,15 @@ export enum AniType {
 }
 ```
 
-:::info
-The `AniType` definition would be a good use of catalog.
+Though my recommendation for `AniType`'s definition would be [catalog](catalog).
 
 ```ts twoslash
 import {variant, fields, catalog} from 'variant';
 // ---cut---
 export const AniType = catalog(['dog', 'cat', 'snake']);
 ```
-:::
 
-## Top-level Constructors
+### Top-level Constructors
 
 I find great utility in consolidating the relevant cases, but I'm sympathetic to the desire to have these tag constructors as top-level functions in the scope, rather than being under `Animal`. This works just fine. The object `Animal` is very intentionally just a loose collection of the constructors, destructure or regroup it as you wish.
 
@@ -226,64 +230,30 @@ import {variation} from 'variant';
 const snake = variation('snake',  (name: string, pattern: string = 'striped') => ({name, pattern}));
 const echidna = snake('Echidna',  'speckled');
 ```
-## Catalog
 
-Use a catalog when you don't need state and just want a group of literals types. These objects are essentially maps of constants. The most common case takes an array of strings. In this scenario, it is essentially the same as the common [`strEnum`](https://github.com/basarat/typescript-book/blob/master/docs/types/literal-types.md) function.
+### Differing key labels and names
 
-```ts twoslash
-import {catalog} from 'variant';
-// ---cut---
-const Suit = catalog(['Spades', 'Hearts', 'Clubs', 'Diamonds']);
-type Suit = keyof typeof Suit;
-```
+In many cases, the label used when referring to a variant is exactly what is used in the underlying `type` field. However, this is not always desirable.
 
-The catalog function can also work with different types, like numbers in a key-value map:
+ - Sometimes coding conventions will dictate `camelCase` or `PascalCase` names while database/network conventions will demand `ALL_CAPS`.
+ - The `UPPER_SNAKE_CASE` format has historically been the most common naming scheme for constant values. Perhaps you'll need to support them to support existing code or data models.
+ - In larger codebases, it may be necessary to start introducing scopes to avoid name collisions. These might look something like `@player/update` or `AUDIT::END_RECORDING`. These strings contain special characters and so are not valid property names, but may be required by your code. Ideally, the variant creators would manage that complexity.
+
+Using `variation()` resolves these concerns. The first parameter, the string, will be the *actual* underlying type (both at runtime and compile time). The second parameter is the function that will handle the rest of the body.
 
 ```ts twoslash
-import {catalog} from 'variant';
-// ---cut---
-const logLevels = catalog({
-    trace: 100,
-    debug: 200,
-    info: 300,
-    warn: 400,
-    error: 500,
-    fatal: 600,
+import {variant, variation, fields} from 'variant';
+
+const Action = variant({
+    DoSomething: variation('DO_SOMETHING'),
+    LoadThing: variation('LOAD_THING', fields<{thingId: number}>()),
+    RefreshPage: variation('REFRESH_PAGE'),
 })
+
+const doAction = Action.DoSomething();
+doAction.type
+//        ^?
 ```
 
-The advantage being the catalog function will enforce that all values are of the same type, ensuring that a stray `'600'` will raise an error.
 
-### Programmatic values
-
-The `logLevels` values follow a strict formula—the index times `100`. Catalog allows us to express this programmatically.
-
-```ts twoslash
-import {catalog} from 'variant';
-// ---cut---
-const logLevels = catalog(
-   ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
-   (_, i) => i * 100
-);
-```
-This version of the code can be shorter and is often more resilient against refactoring.
-
-
-### Matching Catalogs
-
-In order to streamline domain-modeling, literal unions (such as those from `catalog()`) may be directly processed through `match()` and `matcher()`.
-
-```ts twoslash
-import {variant, catalog, match} from 'variant';
-// ---cut---
-const animal = catalog(['cat', 'dog', 'snake']);
-type animal = keyof typeof animal;
-
-const fittingPokemon = (a: animal) => match(a, { 
-    cat: _ => 'Meowth',
-    dog: _ => 'Arcanine',
-    snake: _ => 'Ekans',
-})
-```
-
-Other library functions can be accessed by elevating the literal union to a full discriminated union through `ofLiteral()`. 
+`variation()` can also be used individually, similarly to `createAction`. 

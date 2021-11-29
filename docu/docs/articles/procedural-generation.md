@@ -33,7 +33,7 @@ Procedurally generating results from a variant that may have one or more variati
 
 #### `.else()` terminal
 
-When every case that needs specific handling has been described, the remaining cases can be directly executed with no parameters. The [matcher](matcher)'s `.else()` function takes into account which cases have already been handled and only passes the remaining cases into the else's handler function. If all the remaining cases are empty variants, `.else(f => f())` should be type-safe.
+When every case that needs specific handling has been described, the remaining cases can be directly executed with no parameters. The [matcher](../book/matcher)'s `.else()` function takes into account which cases have already been handled and only passes the remaining cases into the else's handler function. If all the remaining cases are empty variants, `.else(f => f())` should be type-safe.
 
 ```ts
 // Code sample TBD

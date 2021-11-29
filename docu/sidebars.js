@@ -14,35 +14,42 @@ module.exports = {
       label: 'The Book',
       collapsed: false,
       items: [
+        'book/creation',
         {
           type: 'category',
-          label: 'Creation',
+          label: 'Fancier Variants',
           collapsed: true,
           items: [
-            'book/creation',
-            'book/advanced-creation',
-            'book/augment',
+            'book/scoped',
+            'book/recursive',
             'book/generic',
-            'book/procedural-generation',
+            'book/augment',
           ]
         },
         'book/inspection',
         'book/organization',
-        {
-          type: 'category',
-          label: 'Matching',
-          items: ['book/match', 'book/matcher'],
-        },
+        'book/match',
+        'book/matcher',
+        'book/catalog',
         'book/flags',
-        'new-in-3.0',
-        'cheat',
+        'book/utilities',
       ],
-
+      
     },
     {
       type: 'category',
       label: 'Articles',
-      items: ['articles/naming', 'articles/semantics', 'articles/that-type', 'articles/documentation', 'articles/pitch', 'changelog'],
+      items: [
+        'articles/naming',
+        'articles/semantics',
+        'articles/that-type',
+        'articles/documentation',
+        'articles/procedural-generation',
+        'articles/pitch',
+        'changelog',
+        'new-in-3.0',
+        'cheat',
+      ],
     },
     {
       type: 'category',
