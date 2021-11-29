@@ -1,6 +1,5 @@
 import {lookup, match, matcher, ofLiteral, types} from './type';
 import {constant, just} from './match.tools';
-import {typeCatalog} from './typeCatalog';
 import {Animal, sample} from './__test__/animal';
 
 test('matcher creation', () => {
@@ -23,13 +22,49 @@ test('matcher exhaust', () => {
     expect(rating(sample.perseus)).toBe(1);
 })
 
-test('matcher lookup', () => {
+test('matcher exhaust', () => {
+    const rating = (animal: Animal) => matcher(animal)
+        .when('cat', _ => 1)
+        .exhaust({
+            dog: _ => 2,
+            snake: _ => 3,
+        });
+
+    expect(rating(sample.cerberus)).toBe(2);
+    expect(rating(sample.perseus)).toBe(1);
+})
+
+test('matcher register', () => {
     const rating = (animal: Animal) => matcher(animal).register({
         cat: 4,
     }).execute();
 
     expect(rating(sample.perseus)).toBe(4);
     expect(rating(sample.cerberus)).toBeUndefined();
+})
+
+test('matcher register repeating', () => {
+    const rating = (animal: Animal) => matcher(animal)
+        .register({
+            cat: 'kitty',
+        })
+        .register({
+            dog: 'puppy',
+            snake: 'snek',
+        })
+        .complete();
+})
+
+
+test('matcher lookup remaining', () => {
+    const rating = (animal: Animal) => matcher(animal)
+        .register({
+            cat: 'kitty',
+        })
+        .lookup({
+            dog: 'puppy',
+            snake: 'snek',
+        })
 })
 
 test('matcher lookupTable', () => {
@@ -123,6 +158,20 @@ test('matcher (when-complete)', () => {
         })
         .complete();
 
+    expect(getFeature(sample.cerberus)).toBeUndefined();
+    expect(getFeature(sample.perseus)).toBe(0);
+    expect(getFeature(Animal.snake('Tanya', 'spotted'))).toBe('spotted');
+})
+
+test('matcher (repeated withs)', () => {
+    const getFeature = (a: Animal) => matcher(a)
+        .with({cat: c => c.furnitureDamaged})
+        .with({
+            dog: d => d.favoriteBall,
+            snake: s => s.pattern,
+        })
+        .complete();
+    
     expect(getFeature(sample.cerberus)).toBeUndefined();
     expect(getFeature(sample.perseus)).toBe(0);
     expect(getFeature(Animal.snake('Tanya', 'spotted'))).toBe('spotted');
@@ -226,7 +275,8 @@ test('matcher lookup', () => {
             beta: _ => 'B',
             gamma:_ => 'Γ',
         })
-        .complete());
+        .complete()
+    );
 
     expect(greekLetters[0]).toBe('A');
     expect(greekLetters[1]).toBe('B');

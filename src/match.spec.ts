@@ -95,6 +95,20 @@ test('prematch on module', () => {
     expect(test(Animal.snake('Kailash'))).toBe(8);
 })
 
+test('prematch on partial match', () => {
+    const test = prematch(Animal)(partial({
+        cat: _ => 5,
+        dog: _ => 6,
+        default: _ => 8,
+    }));
+
+    const result = test(sample.cerberus);
+
+    expect(result).toBe(6)
+    expect(test(Animal.snake('Kailash'))).toBe(8);
+})
+
+
 test('match (partial)', () => {
     const rate = (animal: Animal) => match(animal, partial({
         cat: _ => _.furnitureDamaged,

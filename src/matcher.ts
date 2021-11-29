@@ -48,17 +48,20 @@ type CompleteFunc<RemainingKeys, Return> = {
     incomplete: VariantError<['The handler has not been fully completed. Expected key(s)', RemainingKeys]>
 }
 
-/**
- * Determine the complenetary handler.
- */
-type RestOfHandler<
-    T extends Record<K, string>,
-    H extends Partial<Handler<T, K>>,
-    K extends string,
-> = keyof H extends never 
-    ? Handler<T, K> // the extract will fail if asked to retrieve Record<K, never>
-    : Handler<Extract<T, Record<K, keyof H>>, K>;
 
+export type RegisterLookup<T extends Record<K, string>, K extends string> = {
+    [P in T[K]]: unknown;
+}
+
+/**
+ * Given a union and the current state of the handler, calculate the
+ * complementary handler (the handler object with the remaining elements). 
+ */
+type ComplementaryHandler<
+    T extends Record<K, string>,
+    K extends string,
+    H extends Partial<Handler<T, K>>,
+> = RemainingKeys<T, K, H> extends never ? never : Handler<Extract<T, Record<K, RemainingKeys<T, K, H>>>, K>
 /**
  * Retrieve keys not yet handled.
  */
@@ -68,6 +71,11 @@ type RemainingKeys<
     H extends Partial<Handler<T, K>>,
 > = keyof H extends never ? T[K] : Exclude<T[K], keyof H>;
 
+type ComplementaryLookup<
+    T extends Record<K, string>,
+    K extends string,
+    H extends Partial<Handler<T, K>>,
+> = RemainingKeys<T, K, H> extends never ? never : RegisterLookup<Extract<T, Record<K, RemainingKeys<T, K, H>>>, K>
 /**
  * The matcher, a builder-pattern form of `match()`
  * 
@@ -133,7 +141,7 @@ export class Matcher<
      * @param remainingCases an object wiht a method to handle every remaining case.
      * @returns the result of executing the handler, given these final additions.
      */
-    exhaust<R extends RestOfHandler<T, H, K>>(remainingCases: R): ReturnType<(H & R)[T[K]]> {
+    exhaust<R extends ComplementaryHandler<T, K, H>>(remainingCases: R): ReturnType<(H & R)[T[K]]> {
         const combinedHandler = {
             ...this.handler,
             ...remainingCases,
@@ -180,7 +188,7 @@ export class Matcher<
      * @param table 
      * @returns 
      */
-    register<Table extends Splay<Record<T[K], any>>>(table: Limited<Table, T[K]> & Table): Matcher<T, K, H & LookupTableToHandler<Table>> {
+    register<Table extends Splay<ComplementaryLookup<T, K, H>>>(table: Limited<Table, T[K]> & Table): Matcher<T, K, H & LookupTableToHandler<Table>> {
         const newHandler = {
             ...this.handler,
             ...tableToHandler(table),
@@ -205,7 +213,7 @@ export class Matcher<
      * @param table 
      * @returns 
      */
-    lookup<Table extends Record<T[K], any>>(table: Table): ReturnType<(H & LookupTableToHandler<Table>)[T[K]]> {
+    lookup<Table extends Record<RemainingKeys<T, K, H>, any>>(table: Table): ReturnType<(H & LookupTableToHandler<Table>)[T[K]]> {
         const combinedHandler = {
             ...this.handler,
             ...tableToHandler(table),
@@ -219,7 +227,7 @@ export class Matcher<
      * @param variations
      */
     with<
-        Variations extends Splay<Handler<T, K>>,
+        Variations extends Splay<ComplementaryHandler<T, K, H>>,
     >(variations: Limited<Variations, T[K]> & Variations): Matcher<T, K, H & Variations> {
         return new Matcher(this.target, this.key, {
             ...this.handler,
