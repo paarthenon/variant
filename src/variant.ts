@@ -106,13 +106,13 @@ export function variantFactory<K extends string>(key: K) {
             const returned = (func ?? identityFunc)(...args);
             if (isPromise(returned)) {
                 return returned.then(result => ({
-                    [key]: tag,
                     ...result,
+                    [key]: tag,
                 }))
             } else {
                 return {
-                    [key]: tag,
                     ...returned,
+                    [key]: tag,
                 }
             }
         };
