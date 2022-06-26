@@ -272,7 +272,7 @@ The supporting cast of types that helps keep this concise and relevant.
 ### Flags<T\>
 
 ```typescript
-exp\ort type Flags<T extends VariantModule> = Partial<Matrix<T>>;
+export type Flags<T extends VariantModule> = Partial<Matrix<T>>;
 ```
 
 ### Handler<T\>
