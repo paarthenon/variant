@@ -241,7 +241,6 @@ test('match enum directly', () => {
     expect(rate(Alpha.B)).toBe(1);
 })
 
-
 test('matcher greeks', () => {
     const greeks = [
         'alpha',
@@ -281,4 +280,20 @@ test('matcher lookup', () => {
     expect(greekLetters[0]).toBe('A');
     expect(greekLetters[1]).toBe('B');
     expect(greekLetters[2]).toBe('Γ');
+})
+
+test('matcher with fallback', () => {
+    const rating = (a: Animal) => 
+        matcher(a)
+            .with({
+                cat: _ => 1,
+                dog: _ => 2,
+                snake: _ => 3,
+            })
+            .complete({
+                withFallback: _ => 0,
+            })
+
+    expect(rating(Animal.dog({name: 'Buffy'}))).toBe(2);
+    expect(rating({type: 'none'} as any)).toBe(0);
 })

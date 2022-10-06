@@ -35,11 +35,15 @@ export function tableToHandler<
     }, {} as Handler<T, K>);
 }
 
+interface CompleteOptions {
+    withFallback?: (input: unknown) => any;
+}
+
 type CompleteFunc<RemainingKeys, Return> = {
     /**
      * Execute the matcher with all cases and retrieve the result.
      */
-    complete(): Return;
+    complete(options?: CompleteOptions): Return;
     /**
      * The **incomplete** complete function.
      * 
@@ -149,7 +153,17 @@ export class Matcher<
         return combinedHandler[this.target[this.key]]?.(this.target as any);
     }
 
-    complete = this.execute as
+    complete = (
+        (options?: CompleteOptions) => {
+            if (this.target != undefined && this.target[this.key] in this.handler) {
+                return this.handler[this.target[this.key]]?.(this.target as Extract<T, Record<K, string>>);
+            } else {
+                if (options?.withFallback != undefined) {
+                    return options.withFallback(this.target)
+                }
+            }
+        }
+    ) as
         RemainingKeys<T, K, H> extends never
             ? CompleteFunc<RemainingKeys<T, K, H>, ReturnType<EnsureFunc<H[keyof H]>>>['complete']
             : CompleteFunc<RemainingKeys<T, K, H>, ReturnType<EnsureFunc<H[keyof H]>>>['incomplete']
@@ -267,7 +281,7 @@ export class Matcher<
             const list = Array.isArray(variations) ? variations : [variations];
             const newCases = list.reduce((acc, cur) => {
                 const type = typeof cur === 'string' ? cur : isVariantCreator(cur) ? cur.type : undefined;
-    
+
                 return type != undefined ? (
                     {...acc, [type]: handler}
                 ) : (
