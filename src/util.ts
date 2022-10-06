@@ -7,6 +7,10 @@ export type Identity<T> = T extends object ? {} & {
     [P in keyof T]: T[P]
 } : T;
 
+/**
+ * https://github.com/microsoft/TypeScript/issues/31751#issuecomment-498526919
+ */
+export type IsNever<T> = [T] extends [never] ? true : false;
 
 /**
  * Identity function. Doubles as the noop func.

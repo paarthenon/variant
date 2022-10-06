@@ -1,4 +1,4 @@
-import {Identity} from './util';
+import {Identity, IsNever} from './util';
 
 /**
  * Used in writing cases of a type-first variant.
@@ -184,7 +184,7 @@ export interface Message<T> {__: never, message: T};
 /**
  * Prevent extraneous properties in a literal.
  */
-export type Limited<T, U> = Exclude<keyof T, U> extends never 
+export type Limited<T, U> = IsNever<Exclude<keyof T, U>> extends true
     ? T 
     : VariantError<['Expected keys of handler', keyof T, 'to be limited to possible keys', U]>
 ;
