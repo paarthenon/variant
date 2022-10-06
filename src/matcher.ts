@@ -153,6 +153,18 @@ export class Matcher<
         return combinedHandler[this.target[this.key]]?.(this.target as any);
     }
 
+    /**
+     * Resolve all remaining cases without executing the matcher.
+     * @param remainingCases 
+     * @returns 
+     */
+    remaining<R extends ComplementaryHandler<T, K, H>>(remainingCases: R): Matcher<T, K, H & R> {
+        return new Matcher(this.target, this.key, {
+            ...this.handler,
+            ...remainingCases,
+        })
+    }
+
     complete = (
         (options?: CompleteOptions) => {
             if (this.target != undefined && this.target[this.key] in this.handler) {

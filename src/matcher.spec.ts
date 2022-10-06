@@ -297,3 +297,32 @@ test('matcher with fallback', () => {
     expect(rating(Animal.dog({name: 'Buffy'}))).toBe(2);
     expect(rating({type: 'none'} as any)).toBe(0);
 })
+
+
+test('matcher remaining', () => {
+    const rating = (a: Animal) => matcher(a)
+        .when('cat', _ => 1)
+        .remaining({
+            dog: _ => 2,
+            snake: _ => 3,
+        })
+        .complete()
+
+    expect(rating(sample.cerberus)).toBe(2);
+    expect(rating(undefined as any)).toBeUndefined();
+})
+
+test('matcher remaining withFallback', () => {
+    const rating = (a: Animal) => matcher(a)
+        .when('cat', _ => 1)
+        .remaining({
+            dog: _ => 2,
+            snake: _ => 3,
+        })
+        .complete({
+            withFallback: _ => 0
+        })
+
+    expect(rating(sample.cerberus)).toBe(2);
+    expect(rating(undefined as any)).toBe(0);
+})
