@@ -1,4 +1,5 @@
 import {fields, match, payload, scoped, TypeNames, VariantOf} from '.';
+import {variantCosmos} from './cosmos';
 import {lookup, ofLiteral, otherwise, partial, prematch, variant} from './type';
 import {typeMap} from './typeCatalog';
 import {constant, just, unpack} from './match.tools';
@@ -355,4 +356,46 @@ test('match promise inline', async () => {
     }));
 
     expect(result).toBe('Cerberus');
+})
+
+test('match (creator)', () => {
+    const makeInstance = (creator: typeof Animal[Animal['type']]) => {
+        return match(creator, {
+            cat: (c) => c({name: 'Snookums', furnitureDamaged: 10}),
+            dog: (d) => d({name: 'Fido'}),
+            snake: (s) => s("Ssssid"),
+        })
+    }
+
+    expect(makeInstance(Animal.cat).name).toBe('Snookums');
+    expect(makeInstance(Animal.dog).name).toBe('Fido');
+    expect(makeInstance(Animal.snake).name).toBe('Ssssid');
+})
+
+test('match (tag creator)', () => {
+    const {match: tagMatch, variant: tagVariant} = variantCosmos({key: 'tag'})
+
+    const TagAnimal = tagVariant({
+        cat: fields<{
+            name: string;
+            furnitureDamaged: number;
+        }>(),
+        dog: fields<{
+            name: string;
+            favoriteBall?: string;
+        }>(),
+        snake: (name: string, pattern: string = 'striped') => ({name, pattern})
+    })
+
+    const makeInstance = (creator: typeof TagAnimal[keyof typeof TagAnimal]) => {
+        return tagMatch(creator, {
+            cat: (c) => c({name: 'Snookums', furnitureDamaged: 10}),
+            dog: (d) => d({name: 'Fido'}),
+            snake: (s) => s("Ssssid"),
+        })
+    }
+
+    expect(makeInstance(TagAnimal.cat).name).toBe('Snookums');
+    expect(makeInstance(TagAnimal.dog).name).toBe('Fido');
+    expect(makeInstance(TagAnimal.snake).name).toBe('Ssssid');
 })

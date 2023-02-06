@@ -1,11 +1,19 @@
 import {LookupTableToHandler} from './matcher'
-import {DEFAULT_KEY, Limited, Message, Func, VariantModule, VariantOf, VariantError} from './precepts'
+import {isVariantCreator} from './variant'
+import {DEFAULT_KEY, Limited, Message, Func, VariantCreator, VariantModule, VariantOf, VariantError} from './precepts'
 
 /**
  * A set of functions meant to handle the variations of an object.
  */
 export type Handler<T extends Record<K, string>, K extends string> = {
     [P in T[K]]: (instance: Extract<T, Record<K, P>>) => any;
+}
+
+/**
+ * A set of functions meant to handle the _constructors_ of a variant type
+ */
+export type CreatorHandler<C extends VariantCreator<string, (...args: any[]) => {}, string>> = {
+    [P in C['output']['type']]: (instance: Extract<C, { output: { type: P } }>) => any;
 }
 
 type AdvertiseDefault<T> = T & {
@@ -108,6 +116,20 @@ export interface MatchOverloads<K extends string> {
     >(handler: EnforceHandler<H> | ((t: T) => H)): (instance: T | TType) => ReturnType<H[keyof H]>;
 
     /**
+     * **(inline)** Match a variant creator against the constructors it contains.
+     * @remarks
+     * This point-free overload is intended for inline use, not pre-matching.
+     *
+     * @param handler a handler object. This type will be properly constrained when used inline.
+     * @template T instance of a variant
+     * @template H handler object
+     */
+    <
+        C extends VariantCreator<string, (...args: any[]) => {}, K>,
+        H extends CreatorHandler<C>,
+    >(handler: EnforceHandler<H> | ((t: C) => H)): (instance: C) => ReturnType<H[keyof H]>;
+
+    /**
      * Match an instance of a variant or literal union against its possible cases.
      * @remarks
      * Supports exhaustiveness checking, partial matching, and literals.
@@ -121,6 +143,21 @@ export interface MatchOverloads<K extends string> {
         H extends Handler<T, K>,
         TType extends string,
     >(target: T | TType, handler: H | ((t: T) => H)): ReturnType<H[T[K]]>;
+
+
+    /**
+     * Match a variant creator against the constructors it contains.
+     * @remarks
+     * Supports exhaustiveness checking, partial matching, and literals.
+     *
+     * @param target the variant creator
+     * @param handler an object with a function corresponding to each case
+     * @returns The result of the appropriate branch based on the creator type
+     */
+    <
+        C extends VariantCreator<string, (...args: any[]) => {}, K>,
+        H extends CreatorHandler<C>,
+    >(target: C, handler: H | ((t: C) => H)): ReturnType<H[C['output']['type']]>;
 }
 
 /**
@@ -174,22 +211,27 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
             return (instance: T | TType) => match(instance, handler);
         } else if (args.length === 2) {
             // regular match
-            const [instanceOrType, handlerParam] = args as [T | TType, H];
+            const [instanceOrTypeOrCreator, handlerParam] = args as [T | TType | VariantCreator<string, (...args: any[]) => {}, K>, H];
 
-            const instance = typeof instanceOrType === 'string'
-                ? ofLiteral(instanceOrType) as T
-                : instanceOrType
+            const instanceOrCreator = typeof instanceOrTypeOrCreator === 'string'
+                ? ofLiteral(instanceOrTypeOrCreator) as T
+                : instanceOrTypeOrCreator
             ;
             // unpack handler from function if necessary.
             const handler: WithDefault<Handler<T, K>, T> = typeof handlerParam === 'function'
-                ? (handlerParam as Extract<H, Func>)(instance)
+                ? (handlerParam as Extract<H, Func>)(instanceOrCreator as any)
                 : handlerParam
             ;
 
-            if (instance[key] in handler) {
-                return handler[instance[key]]?.(instance as any);
+            const tType = isVariantCreator(instanceOrCreator)
+                ? instanceOrCreator.output.type as keyof typeof handler
+                : (instanceOrCreator as T)[key]
+            ;
+
+            if (tType in handler) {
+                return handler[tType]?.(instanceOrCreator as any);
             } else if (DEFAULT_KEY in handler) {
-                return handler[DEFAULT_KEY]?.(instance as any);
+                return handler[DEFAULT_KEY]?.(instanceOrCreator as any);
             }
         }
     }
