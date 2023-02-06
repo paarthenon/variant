@@ -23,4 +23,5 @@ export const {
     variantList,
     variantModule,
     variation,
+    withFallback,
 } = variantCosmos({key: 'type'});

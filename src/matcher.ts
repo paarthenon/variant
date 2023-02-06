@@ -35,11 +35,15 @@ export function tableToHandler<
     }, {} as Handler<T, K>);
 }
 
+interface CompleteOptions {
+    withFallback?: (input: unknown) => any;
+}
+
 type CompleteFunc<RemainingKeys, Return> = {
     /**
      * Execute the matcher with all cases and retrieve the result.
      */
-    complete(): Return;
+    complete(options?: CompleteOptions): Return;
     /**
      * The **incomplete** complete function.
      * 
@@ -149,7 +153,29 @@ export class Matcher<
         return combinedHandler[this.target[this.key]]?.(this.target as any);
     }
 
-    complete = this.execute as
+    /**
+     * Resolve all remaining cases without executing the matcher.
+     * @param remainingCases 
+     * @returns 
+     */
+    remaining<R extends ComplementaryHandler<T, K, H>>(remainingCases: R): Matcher<T, K, H & R> {
+        return new Matcher(this.target, this.key, {
+            ...this.handler,
+            ...remainingCases,
+        })
+    }
+
+    complete = (
+        (options?: CompleteOptions) => {
+            if (this.target != undefined && this.target[this.key] in this.handler) {
+                return this.handler[this.target[this.key]]?.(this.target as Extract<T, Record<K, string>>);
+            } else {
+                if (options?.withFallback != undefined) {
+                    return options.withFallback(this.target)
+                }
+            }
+        }
+    ) as
         RemainingKeys<T, K, H> extends never
             ? CompleteFunc<RemainingKeys<T, K, H>, ReturnType<EnsureFunc<H[keyof H]>>>['complete']
             : CompleteFunc<RemainingKeys<T, K, H>, ReturnType<EnsureFunc<H[keyof H]>>>['incomplete']
@@ -267,7 +293,7 @@ export class Matcher<
             const list = Array.isArray(variations) ? variations : [variations];
             const newCases = list.reduce((acc, cur) => {
                 const type = typeof cur === 'string' ? cur : isVariantCreator(cur) ? cur.output.type : undefined;
-    
+
                 return type != undefined ? (
                     {...acc, [type]: handler}
                 ) : (

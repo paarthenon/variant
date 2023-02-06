@@ -82,7 +82,29 @@ export type MatchFuncs<K extends string> = {
      * @param handler 
      */
     lookup<H extends Record<T[K], any>, T extends Record<K, string>>(handler: H): (instance: T) => LookupTableToHandler<H>;
+
+    /**
+     * Resolve the match but account for edge cases. 
+     * @param handler 
+     * @param fallback 
+     */
+    withFallback<
+        T extends Record<K, string>,
+        H extends Handler<T, K>,
+        F extends (instance: T) => any,
+    >(handler: H, fallback: F): (input: T) => ExplicitHandler<H, F, T[K]>;
 }
+
+
+/**
+ * When H is acting as the generic term and its constraint, the system doesn't understand what to expect.
+ * If H is empty, it still satisfies its own contract.
+ * 
+ * This requires us to inform TS of what the expected keys should be, giving it shape.
+ */
+type ExplicitHandler<H extends Record<Keys, Func>, F, Keys extends string> = {
+    [K in Keys]: H[K];
+} & {[DEFAULT_KEY]: F};
 
 type HandlerFromPartial<H extends Record<'default', unknown>, Keys extends string> = {
     [K in Keys]: H extends Record<K, any> ? H[K] : H['default'];
@@ -223,13 +245,15 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
                 : handlerParam
             ;
 
-            const tType = isVariantCreator(instanceOrCreator)
+            const tType = instance == undefined 
+                ? undefined
+                : isVariantCreator(instanceOrCreator)
                 ? instanceOrCreator.output.type as keyof typeof handler
                 : (instanceOrCreator as T)[key]
             ;
 
-            if (tType in handler) {
-                return handler[tType]?.(instanceOrCreator as any);
+            if (instance != undefined && tType !== undefined && tType in handler) {
+                return handler[tType]?.(instance as any);
             } else if (DEFAULT_KEY in handler) {
                 return handler[DEFAULT_KEY]?.(instanceOrCreator as any);
             }
@@ -261,5 +285,13 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
         return _ => ({...branches, default: elseFunc});
     }
 
-    return {match, ofLiteral, onLiteral, otherwise, partial, prematch, lookup};
+    function withFallback<
+        T extends Record<K, string>,
+        H extends Handler<T, K>,
+        F extends (instance: T) => any,
+    >(handler: H, fallback: F): (input: T) => ExplicitHandler<H, F, T[K]> {
+        return _ => ({...handler, default: fallback});
+    }
+
+    return {match, ofLiteral, onLiteral, otherwise, partial, prematch, lookup, withFallback};
 }

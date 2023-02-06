@@ -1,6 +1,6 @@
-import {fields, match, payload, scoped, TypeNames, VariantOf} from '.';
+import {fields, match, payload, scoped, TypeNames, VariantOf, variation} from '.';
 import {variantCosmos} from './cosmos';
-import {lookup, ofLiteral, otherwise, partial, prematch, variant} from './type';
+import {lookup, ofLiteral, otherwise, partial, prematch, variant, withFallback} from './type';
 import {typeMap} from './typeCatalog';
 import {constant, just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';
@@ -356,6 +356,34 @@ test('match promise inline', async () => {
     }));
 
     expect(result).toBe('Cerberus');
+})
+
+test('match withFallback', () => {
+    const rating = (a: Animal) => {
+        return match(a, withFallback({
+            cat: _ => 1,
+            dog: _ => 2,
+            snake: _ => 3,
+        }, _ => 0))
+    }
+
+    const fakeAnimal = {type: 'toaster'} as unknown as Animal;
+
+    expect(rating(Animal.dog({name: 'Blair'}))).toBe(2);
+    expect(rating(fakeAnimal)).toBe(0);
+})
+
+test('match withFallback (undefined)', () => {
+    const rating = (a: Animal) => {
+        return match(a, withFallback({
+            cat: _ => 1,
+            dog: _ => 2,
+            snake: _ => 3,
+        }, _ => 0))
+    }
+
+    expect(rating(Animal.dog({name: 'Blair'}))).toBe(2);
+    expect(rating(undefined as any)).toBe(0);
 })
 
 test('match (creator)', () => {
