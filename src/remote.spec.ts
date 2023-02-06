@@ -63,6 +63,6 @@ test('order index', () => {
 })
 
 test('get', () => {
-    expect(rank.get(0).type).toBe('dog');
+    expect(rank.get(0).output.type).toBe('dog');
     expect(rank.types[0]).toBe('dog');
 })

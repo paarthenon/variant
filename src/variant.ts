@@ -1,5 +1,5 @@
 import {GenericTemplate, GenericVariantRecord} from './generic';
-import {Func, Outputs, RawVariant, Variant, VariantCreator} from './precepts';
+import {Func, Outputs, RawVariant, VariantCreator} from './precepts';
 import {Identity, identityFunc, isPromise} from './util';
 
 /**
@@ -26,7 +26,7 @@ type CreatorFromListType<T extends ValidListType, K extends string> =
  * Create something that satisfies `VariantModule<K>` from some `VariantCreator`.
  */
 export type VMFromVC<T extends VariantCreator<string, Func, string>> = {
-    [P in T['type']]: Extract<T, Record<'type', P>>;
+    [P in T['output']['type']]: Extract<T, Record<'output', Record<'type', P>>>;
 }
 
 type CleanResult<T, U> = T extends undefined ? U : T extends Func ? T : T extends object ? U : T;
@@ -300,13 +300,13 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
             }
         };
         Object.defineProperty(maker, 'name', {value: type, writable: false});
-        const outputs: Outputs<K, T> = {key, type};
+        const outputs: Outputs<K, T> = {output: {key, type}};
         return Object.assign(
             maker,
             outputs,
             {
                 [VARIANT_CREATOR_BRAND]: VARIANT_CREATOR_BRAND,
-                toString: function(this: Outputs<K, T>){return this.type}
+                toString: function(this: Outputs<K, T>){return this.output.type}
             }
         ) as VariantCreator<T, F extends VariantCreator<string, infer VF> ? VF : F, K>;
     }
@@ -339,7 +339,7 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
             let creator = ((typeof t === 'string') ? variation(t) : t) as VariantCreator<string, Func, K>;
             return {
                 ...result,
-                [creator.type]: creator,
+                [creator.output.type]: creator,
             }
         }, {} as Identity<VMFromVC<CreatorFromListType<T, K>>>)
     }

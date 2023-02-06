@@ -66,7 +66,7 @@ type SequenceInputType<T extends SequenceInput<K>, K extends string> =
     T extends string
         ? T
         : T extends VariantCreator<string, Func, K>
-            ? T['type']
+            ? T['output']['type']
             : T extends Record<K, string>
                 ? T[K]
                 : never
@@ -160,7 +160,7 @@ export function remoteImpl<K extends string>(key: K): RemoteFuncs<K> {
         if (typeof input === 'string') {
             return input as U;
         } else if (typeof input === 'function') {
-            return (input as VariantCreator<string, Func, K>).type as U;
+            return (input as VariantCreator<string, Func, K>).output.type as U;
         } else {
             return (input as Record<K, string>)[key] as U;
         }

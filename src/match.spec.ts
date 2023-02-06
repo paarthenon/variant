@@ -1,9 +1,8 @@
-import {fields, match, payload, scoped, TypeNames, VariantOf, variation} from '.';
+import {fields, match, payload, scoped, TypeNames, VariantOf} from '.';
 import {lookup, ofLiteral, otherwise, partial, prematch, variant} from './type';
 import {typeMap} from './typeCatalog';
 import {constant, just, unpack} from './match.tools';
 import {Animal, CapsAnimal, sample} from './__test__/animal';
-import {catalog} from './catalog';
 
 
 test('match (basic)', () => {
@@ -123,9 +122,9 @@ test('caps animal', () => {
     const cat = CapsAnimal.cat({name: 'Steve', furnitureDamaged: 0}) as CapsAnimal;
     
     match(cat, {
-        [CapsAnimal.cat.type]: just(5),
-        [CapsAnimal.dog.type]: just(4),
-        [CapsAnimal.snake.type]: just(4),
+        [CapsAnimal.cat.output.type]: just(5),
+        [CapsAnimal.dog.output.type]: just(4),
+        [CapsAnimal.snake.output.type]: just(4),
     });
 })
 
@@ -167,7 +166,7 @@ test('scoped match', () => {
     const cat = Animal2.Cat({name: 'Perseus'});
 
     const rating = (animal: Animal2) => match(animal, partial({
-        [Animal2.Cat.type]: c => c.name,
+        [Animal2.Cat.output.type]: c => c.name,
         default: just('yo'),
     }))
 

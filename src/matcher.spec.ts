@@ -1,5 +1,5 @@
-import {lookup, match, matcher, ofLiteral, types} from './type';
-import {constant, just} from './match.tools';
+import {match, matcher, ofLiteral, types} from './type';
+import {constant} from './match.tools';
 import {Animal, sample} from './__test__/animal';
 
 test('matcher creation', () => {
@@ -153,7 +153,7 @@ test('matcher (when-complete)', () => {
     const getFeature = (a: Animal) => matcher(a)
         .with({
             cat: c => c.furnitureDamaged,
-            [Animal.dog.type]: d => d.favoriteBall,
+            [Animal.dog.output.type]: d => d.favoriteBall,
             snake: s => s.pattern,
         })
         .complete();
@@ -185,8 +185,8 @@ test('matcher (ofLiteral)', () => {
             snake: 3,
         });
 
-    expect(rate(Animal.cat.type)).toBe(1);
-    expect(rate(Animal.dog.type)).toBe(2);
+    expect(rate(Animal.cat.output.type)).toBe(1);
+    expect(rate(Animal.dog.output.type)).toBe(2);
 })
 declare var animal: Animal;
 
@@ -222,8 +222,8 @@ test('matcher (of literal directly)', () => {
             snake: 3,
         });
 
-    expect(rate(Animal.cat.type)).toBe(1);
-    expect(rate(Animal.dog.type)).toBe(2);
+    expect(rate(Animal.cat.output.type)).toBe(1);
+    expect(rate(Animal.dog.output.type)).toBe(2);
 })
 
 test('match enum directly', () => {

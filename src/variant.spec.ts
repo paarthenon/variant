@@ -1,6 +1,4 @@
 import {fields, payload, scoped, TypeNames, variant, VariantOf, variation} from '.';
-import {GVariantOf, onTerms} from './generic';
-import {match} from './type';
 
 test('Simple module', () => {
     const Animal = variant({
@@ -13,7 +11,7 @@ test('Simple module', () => {
     })
     type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 
-    expect(Animal.cat.type).toBe('cat');
+    expect(Animal.cat.output.type).toBe('cat');
 })
 
 test('Renamed module', () => {
@@ -27,7 +25,7 @@ test('Renamed module', () => {
     }
     type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 
-    expect(Animal.cat.type).toBe('CAT');
+    expect(Animal.cat.output.type).toBe('CAT');
 })
 
 test('variant with variations', () => {
@@ -42,7 +40,7 @@ test('variant with variations', () => {
     type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 
     const snek = Animal.snake('Steve');
-    expect(Animal.cat.type).toBe('CAT');
+    expect(Animal.cat.output.type).toBe('CAT');
     expect(snek.name).toBe('Steve');
 })
 
@@ -58,8 +56,8 @@ test('variant with variations', () => {
     type Animal<T extends TypeNames<typeof Animal> = undefined> = VariantOf<typeof Animal, T>;
 
     const snek = Animal.snake('Steve');
-    expect(Animal.cat.type).toBe('cat');
-    expect(Animal.dog.type).toBe('DOG');
+    expect(Animal.cat.output.type).toBe('cat');
+    expect(Animal.dog.output.type).toBe('DOG');
     expect(snek.name).toBe('Steve');
 })
 
@@ -158,6 +156,6 @@ test('variant retains mismatched names', () => {
     const Animal3 = variant(Animal2);
 
     expect(Animal3.Cat).toBeDefined();
-    expect(Animal3.Cat.type).toBe('Animal/Cat');
-    expect(Animal3.Dog.type).toBe('Animal/Dog');
+    expect(Animal3.Cat.output.type).toBe('Animal/Cat');
+    expect(Animal3.Dog.output.type).toBe('Animal/Dog');
 })

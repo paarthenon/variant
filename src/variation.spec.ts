@@ -1,4 +1,4 @@
-import {isVariantCreator, scopeType, variantImpl} from './variant';
+import {isVariantCreator, variantImpl} from './variant';
 import {fields, payload} from './variant.tools';
 
 const str = {
@@ -90,8 +90,8 @@ test('variation .name', () => {
 test('variation outputs', () => {
     const yoc = variation('yo');
 
-    expect(yoc.key).toBe(DISCRIMINANT);
-    expect(yoc.type).toBe('yo');
+    expect(yoc.output.key).toBe(DISCRIMINANT);
+    expect(yoc.output.type).toBe('yo');
 })
 
 test('isVariantCreator', () => {
@@ -142,8 +142,8 @@ test('async variation output types', async () => {
 
     const result = AsyncTask();
 
-    expect(AsyncTask.type).toBe('A_TASK');
-    expect(AsyncTask.key).toBe('type');
+    expect(AsyncTask.output.type).toBe('A_TASK');
+    expect(AsyncTask.output.key).toBe('type');
 
     expect((result as any).four).toBeUndefined();
     expect((await result).four).toBe(4);

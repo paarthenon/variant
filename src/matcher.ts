@@ -1,7 +1,7 @@
 import {Handler} from './match';
 import {just} from './match.tools';
 import {Func, Limited, Splay, VariantCreator, VariantError} from './precepts';
-import {Identity, TypeStr} from './util';
+import {TypeStr} from './util';
 import {isVariantCreator} from './variant';
 
 /**
@@ -266,7 +266,7 @@ export class Matcher<
             // 2 param case
             const list = Array.isArray(variations) ? variations : [variations];
             const newCases = list.reduce((acc, cur) => {
-                const type = typeof cur === 'string' ? cur : isVariantCreator(cur) ? cur.type : undefined;
+                const type = typeof cur === 'string' ? cur : isVariantCreator(cur) ? cur.output.type : undefined;
     
                 return type != undefined ? (
                     {...acc, [type]: handler}

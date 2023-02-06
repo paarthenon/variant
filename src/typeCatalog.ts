@@ -25,7 +25,7 @@ export function typeCatalog<T extends VariantModule<string>>(variant: T) {
     return Object.values(variant).reduce((result, vc) => {
         return {
             ...result,
-            [vc.type]: vc.type,
+            [vc.output.type]: vc.output.type,
         }
     }, {} as Identity<TypeCatalog<T>>)
 }
@@ -56,7 +56,7 @@ export function typeMap<T extends VariantModule<string>>(variant: T) {
     return Object.keys(variant).reduce((result, key) => {
         return {
             ...result,
-            [key]: variant[key].type,
+            [key]: variant[key].output.type,
         }
     }, {} as Identity<TypeMap<T>>)
 }

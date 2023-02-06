@@ -1,6 +1,6 @@
-import {flagsImpl, Matrix} from './flags';
-import {Func, TypesOf, Outputs, PatchObjectOrPromise, RawVariant, Stringable, SumType, TypeNames, VariantModule, VariantOf} from './precepts';
-import {variantImpl, VariantRecord} from './variant';
+import {flagsImpl} from './flags';
+import {Func, TypesOf, Outputs, PatchObjectOrPromise, RawVariant, Stringable, TypeNames, VariantOf} from './precepts';
+import {variantImpl} from './variant';
 
 type primitive = number | string | symbol | boolean | bigint;
 
