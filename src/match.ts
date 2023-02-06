@@ -245,15 +245,15 @@ export function matchImpl<K extends string>(key: K): MatchFuncs<K> {
                 : handlerParam
             ;
 
-            const tType = instance == undefined 
+            const tType = instanceOrCreator == undefined
                 ? undefined
                 : isVariantCreator(instanceOrCreator)
                 ? instanceOrCreator.output.type as keyof typeof handler
                 : (instanceOrCreator as T)[key]
             ;
 
-            if (instance != undefined && tType !== undefined && tType in handler) {
-                return handler[tType]?.(instance as any);
+            if (instanceOrCreator != undefined && tType !== undefined && tType in handler) {
+                return handler[tType]?.(instanceOrCreator as any);
             } else if (DEFAULT_KEY in handler) {
                 return handler[DEFAULT_KEY]?.(instanceOrCreator as any);
             }
