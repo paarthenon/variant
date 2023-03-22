@@ -42,11 +42,11 @@ export function isOfVariantImpl<K extends string>(key: K): IsOfVariantFunc<K> {
             const [variant] = args;
 
             return (instance: {} | null | undefined) => instance != undefined
-                && Object.values(variant).some(vc => vc.type === (instance as Record<K, string>)[key]);
+                && Object.values(variant).some(vc => vc.output.type === (instance as Record<K, string>)[key]);
         } else if (args.length === 2) {
             const [instance, variant] = args;
             return instance != undefined
-                && Object.values(variant).some(vc => vc.type === (instance as Record<K, string>)[key]);
+                && Object.values(variant).some(vc => vc.output.type === (instance as Record<K, string>)[key]);
         }
         return false;
     }

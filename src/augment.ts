@@ -27,7 +27,7 @@ export function augment<T extends RawVariant, F extends (x: VariantOf<VariantRec
         let inputFunc = variantDefinition[key] as Func
 
         let returnFunc = isVariantCreator(inputFunc)
-            ? variation(inputFunc.type, (...args: any[]) => {
+            ? variation(inputFunc.output.type, (...args: any[]) => {
                 let result = inputFunc(...args);
                 return {
                     ...f(result),

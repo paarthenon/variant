@@ -5,9 +5,9 @@ test('types (on variant)', () => {
     const animalTypes = types(Animal);
 
     expect(animalTypes.length).toBe(3);
-    expect(animalTypes.includes(Animal.cat.type)).toBe(true);
-    expect(animalTypes.includes(Animal.dog.type)).toBe(true);
-    expect(animalTypes.includes(Animal.snake.type)).toBe(true);
+    expect(animalTypes.includes(Animal.cat.output.type)).toBe(true);
+    expect(animalTypes.includes(Animal.dog.output.type)).toBe(true);
+    expect(animalTypes.includes(Animal.snake.output.type)).toBe(true);
 })
 
 test('types (on empty variant)', () => {

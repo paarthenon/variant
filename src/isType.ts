@@ -30,12 +30,12 @@ export function isTypeImpl<K extends string>(key: K): IsTypeFunc<K> {
         if (instanceOrType != undefined) {
             if (typeof instanceOrType === 'function' || typeof instanceOrType === 'string') {
                 const typeArg = instanceOrType as T;
-                const typeStr = typeof typeArg === 'string' ? typeArg : (typeArg as VariantCreator<string, any, K>).type;
+                const typeStr = typeof typeArg === 'string' ? typeArg : (typeArg as VariantCreator<string, any, K>).output.type;
                 return <O extends Record<K, string>>(o: O): o is Extract<O, Record<K, TypeStr<T, K>>> => isType(o, typeStr);
             } else {
                 const instance = instanceOrType as O;
 
-                const typeStr = typeof type === 'string' ? type : (type as VariantCreator<string, any, K>).type;
+                const typeStr = typeof type === 'string' ? type : (type as VariantCreator<string, any, K>).output.type;
                 return instance != undefined && (instance as Record<K, string>)[key ?? 'type'] === typeStr;
             }
         } else {

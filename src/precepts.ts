@@ -38,14 +38,16 @@ export type PatchObjectOrPromise<
  * The type marking metadata. 
  */
 export type Outputs<K, T> = {
-    /**
-     * Discriminant property key
-     */
-    key: K
-    /**
-     * The type of object created by this function.
-     */
-    type: T
+    output: {
+      /**
+       * Discriminant property key
+       */
+      key: K
+      /**
+       * The type of object created by this function.
+       */
+      type: T
+    }
 };
 
 /**
@@ -77,7 +79,7 @@ export type VariantCreator<
  */
 export type CreatorOutput<VC extends VariantCreator<string, Func, string>> = 
     ReturnType<VC> extends PromiseLike<infer R>
-        ? R extends Record<VC['key'], string> ? R : never
+        ? R extends Record<VC['output']['key'], string> ? R : never
         : ReturnType<VC>
 ;
 
@@ -103,7 +105,7 @@ export type Func = (...args: any[]) => any;
  * This type creates a mapping from the name/label to the type.
  */
 export type TypeMap<T extends VariantModule<string>> = {
-    [P in keyof T]: T[P]['type'];
+    [P in keyof T]: T[P]['output']['type'];
 }
 
 /**
@@ -113,7 +115,7 @@ export type GetTypeLabel<
     T extends VariantModule<string>,
     Key extends TypesOf<T>
 > = {
-    [P in keyof T]: T[P]['type'] extends Key ? P : never
+    [P in keyof T]: T[P]['output']['type'] extends Key ? P : never
 }[keyof T];
 
 /**
@@ -164,7 +166,7 @@ export type SumType<T extends VariantModule<string>> = Identity<VariantTypeSprea
 export type VariantOf<
     T extends VariantModule<string>,
     TType = undefined,
-> = TType extends undefined ? SumType<T> : TType extends TypesOf<T> ? Extract<SumType<T>, Record<T[keyof T]['key'], TType>> : SumType<T>;
+> = TType extends undefined ? SumType<T> : TType extends TypesOf<T> ? Extract<SumType<T>, Record<T[keyof T]['output']['key'], TType>> : SumType<T>;
 
 /**
  * The input type for `variant`/`variantModule`. 
