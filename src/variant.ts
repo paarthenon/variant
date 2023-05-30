@@ -273,7 +273,7 @@ export function variantImpl<K extends string>(key: K): VariantFuncs<K> {
 
     function descope<
         T extends Record<K, ScopedType<string, string>>,
-    >(obj: T): T extends Record<K, ScopedType<string, infer TType>> ? Identity<Omit<T, K> & Record<K, TType>> : T {
+    >(obj: T) {
         return {
             ...obj,
             [key]: descopeType(obj[key] as ScopedType<string, string>),

@@ -7,20 +7,22 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
-    "copydocs": "cp -R build/* ../docs"
+    "copydocs": "cp -R build/* ../docs",
+    "prep-shiki": "cp ../res/shiki-themes/* ./node_modules/shiki/themes/",
+    "postinstall": "yarn prep-shiki"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-beta.1",
-    "@docusaurus/preset-classic": "^2.0.0-beta.1",
+    "@docusaurus/core": "2.4.1",
+    "@docusaurus/preset-classic": "2.4.1",
     "classnames": "^2.2.6",
-    "docusaurus-plugin-typedoc": "^0.16.3",
+    "docusaurus-plugin-typedoc": "0.16.9",
     "docusaurus-preset-shiki-twoslash": "^1.1.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "typedoc": "^0.22.7",
-    "typedoc-plugin-markdown": "^3.11.3",
-    "typescript": "4.2",
-    "variant": "^3.0.0-dev.19"
+    "typedoc": "0.22.7",
+    "typedoc-plugin-markdown": "3.12.0",
+    "typescript": "4.4.4",
+    "variant": "^3.0.0-dev.26"
   },
   "browserslist": {
     "production": [

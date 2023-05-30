@@ -13,10 +13,7 @@ module.exports = {
       darkTheme: require('prism-react-renderer/themes/ultramin'),
     },
     colorMode: {
-      switchConfig: {
-        lightIcon: '🌔',
-        darkIcon: '🌒',
-      }
+
     },
     navbar: {
       title: 'Variant',
@@ -116,9 +113,9 @@ module.exports = {
             }
           }
         },
-        about: {
-          sidebarPath: require.resolve('./sidebars.js'),
-        },
+        // about: {
+        //   sidebarPath: require.resolve('./sidebars.js'),
+        // },
         blog: {
           showReadingTime: true,
         },

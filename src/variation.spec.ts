@@ -6,7 +6,7 @@ const str = {
     kerberos: 'kerberos',
 } as const;
 const DISCRIMINANT = 'type';
-const {variation} = variantImpl(DISCRIMINANT);
+const {variation, descope} = variantImpl(DISCRIMINANT);
 
 /**
  * Begin tests.
@@ -147,4 +147,14 @@ test('async variation output types', async () => {
 
     expect((result as any).four).toBeUndefined();
     expect((await result).four).toBe(4);
+})
+
+
+test('descope', () => {
+    const scopedLabel = variation('scope/label');
+    const scopedInstance = scopedLabel();
+
+    const descopedInstance = descope(scopedInstance);
+
+    expect(descopedInstance.type).toBe('label');
 })
