@@ -162,7 +162,7 @@ const cat = ScopedAnimal.Cat({name: 'Perseus'});
 // ---cut---
 const rating = (animal: ScopedAnimal) => match(animal, {
     'Animal/Cat': c => 1,
-    [ScopedAnimal.Dog.type]: d => 2,
+    'Animal/Dog': d => 2,
 })
 ```
 ### Prematching

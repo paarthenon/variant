@@ -2,7 +2,7 @@
 title: Catalog
 ---
 
-Use a catalog when you don't need state and just want a group of literals types. These objects are essentially maps of constants, with the most common case takes an array of strings. 
+A **Catalog** is a union of literal types. Use a catalog when needing to track which state some element is in, but no additional details. These maps of constants are most often used to store strings, but may also be used with `number`s or `boolean`s. 
 
 ```ts twoslash
 import {catalog} from 'variant';
@@ -13,10 +13,10 @@ type Suit = keyof typeof Suit;
 //    ^?
 ```
 
-In this scenario, it is essentially the same as the common [`strEnum`](https://github.com/basarat/typescript-book/blob/master/docs/types/literal-types.md) function.
+In this scenario, catalog is quite similar to the [`strEnum`](https://github.com/basarat/typescript-book/blob/master/docs/types/literal-types.md) function users may be familiar with.
 
 
-The catalog function can also work with different types, like numbers in a key-value map:
+### Numbers
 
 ```ts twoslash
 import {catalog} from 'variant';
@@ -31,18 +31,18 @@ const logLevels = catalog({
 })
 ```
 
-The advantage being the catalog function will enforce that all values are of the same type, ensuring that a stray `'600'` will raise an error.
+`catalog()` will enforce that all values are of the same type, ensuring that a stray `'600'` will raise an error.
 
 ### Programmatic values
 
-The `logLevels` values follow a strict formula—the index times `100`. Catalog allows us to express this programmatically.
+The values of the literals can be defined programmatiocally. For example, the `logLevels` values follow a strict formula—the index times `100`. Catalog allows us to express this programmatically.
 
 ```ts twoslash
 import {catalog} from 'variant';
 // ---cut---
 const logLevels = catalog(
    ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
-   (_, i) => i * 100
+   (_, i) => (i+1) * 100
 );
 ```
 This version of the code can be shorter and is often more resilient against refactoring.

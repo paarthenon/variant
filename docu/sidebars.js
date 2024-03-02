@@ -34,7 +34,6 @@ module.exports = {
         'book/flags',
         'book/utilities',
       ],
-      
     },
     {
       type: 'category',
@@ -54,7 +53,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Libraries',
-      items: ['libraries/rxjs', 'libraries/redux-toolkit'],
+      items: ['libraries/react', 'libraries/redux', 'libraries/redux-toolkit', 'libraries/rxjs'],
     },
     'todo',
     'glossary',

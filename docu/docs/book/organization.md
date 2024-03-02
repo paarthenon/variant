@@ -2,7 +2,40 @@
 title: Organization
 ---
 
-Let's discuss some strategies for organizing variants as our applications grow.
+As an application grows, managing a list of options in the dozens or hundreds can be difficult to do in one place. Users are encouraged to create smaller variants (across files as appropriate) which are then combined to generate these larger unions.
+
+## Extending a variant
+
+A variant definition can be used as the base for a larger variant definition. Simply use the ES6 spread operator to pre-populate the values of the variant expression. 
+
+```ts
+
+const MoreAnimal = variant({
+    ...Animal,
+    bird: fields<{
+        name: string;
+        flying: boolean;
+    }>(),
+})
+
+```
+
+## Merging
+Let's say we have two variants, creatively named `Variant1` and `Variant2`.
+
+```ts
+const Variant1 = ...
+const Variant2 = ...
+
+const CombinedVariant = variant({
+    ...Variant1,
+    ...Variant2,
+})
+```
+
+If we wanted a `CombinedVariant` with the properties of both, we could merge them together, again leveraging the ES6 spread operator.
+
+- ! Be aware that name conflicts will be handled the same way they are in ES6—latest wins. If `Variant1` and `Variant2` define the same variation in two different ways, it's `Variant2`'s definition that will be used in `CombinedVariant`
 
 ### Mechanics
 

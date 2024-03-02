@@ -9,13 +9,16 @@
     <icon>https://paarthenon.github.io/variant/img/variant.ico</icon>
     <entry>
         <title type="html"><![CDATA[Intro]]></title>
-        <id>intro</id>
+        <id>https://paarthenon.github.io/variant/blog/intro</id>
         <link href="https://paarthenon.github.io/variant/blog/intro"/>
         <updated>2020-05-11T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[This is version one of the variant docs. I'll add more content over time.]]></summary>
+        <content type="html"><![CDATA[<p>This is version one of the variant docs. I'll add more content over time.</p>]]></content>
         <author>
             <name>Paarth</name>
             <uri>https://github.com/paarthenon</uri>
         </author>
+        <category label="intro" term="intro"/>
+        <category label="docusaurus" term="docusaurus"/>
     </entry>
 </feed>
